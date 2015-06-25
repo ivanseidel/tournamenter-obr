@@ -1,0 +1,67 @@
+<!-- v1.01 -->
+<div ng-controller="RescueScorer">
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation"
+		ng-class="{ended: timer.data.value > 290*10}">
+		<div class="container">
+
+			<div class="navbar-text pull-left" style="width: 70px; font-size: 22px; margin: 6px;">{{timer.data.value/10}}s</div>
+
+			<div class="btn-group pull-left">
+				<div class="btn navbar-btn btn-default disabled" disabled style="min-width: 60px;">
+					{{timer.data.value/10}}s
+				</div>
+
+				<div class="btn navbar-btn btn-success" ng-click="timer.start();"  ng-class="{disabled: timer.data.state == 'RUNNING'}">
+					<span class="glyphicon glyphicon-play"></span> <span class="hidden-xs">Iniciar</span>
+				</div>
+
+				<div class="btn navbar-btn btn-info" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
+					<span class="glyphicon glyphicon-pause"></span> <span class="hidden-xs">Pausar</span>
+				</div>
+
+				<div class="btn navbar-btn btn-warning" ng-click="timer.reset();" ng-class="{disabled: timer.data.state != 'STOPPED' || timer.data.value == 0}">
+					<span class="glyphicon glyphicon-stop"></span> <span class="hidden-xs">Zerar</span>
+				</div>
+			</div>
+
+			<div class="btn-group pull-left" style="margin-left: 10px;">
+				
+				<div class="btn navbar-btn btn-default" ng-click="timer.increment(-60)" ng-class="{disabled: timer.data.value == 0}">
+					-1 Min
+				</div>
+
+				<div class="btn navbar-btn btn-default" ng-click="timer.increment(60)" ng-class="{disabled: timer.data.value == 0}">
+					+1 Min
+				</div>
+
+			</div>
+
+			<div class="btn-group navbar-btn pull-right">
+				<div class="btn btn-default disabled" disabled style="min-width: 50px;">
+					<strong>{{scorings.total === null ? 'Invalid' : scorings.total}}</strong>
+				</div>
+
+				<div class="btn btn-danger" ng-click="newScore(null, true);" ng-class="{disabled: timer.data.state == 'RUNNING'}">
+					Zerar<span class="hidden-xs"></span>
+				</div>
+
+				<!-- Split button -->
+				<div class="btn-group">
+					<button type="button" class="btn btn-success" ng-click="selectScoredTeam();" ng-class="{disabled: timer.data.state == 'RUNNING'}">Salvar<span class="hidden-xs"></span></button>
+					<!-- <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-class="{disabled: timer.data.state == 'RUNNING'}">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#" ng-click="selectScoredTeam(true);">Carregar score</a></li>
+					</ul> -->
+				</div>
+
+			</div>
+
+			<!-- <div class="navbar-text pull-right badge badge-warning" style="font-size: 24px; min-width: 60px; color: #FFF;">{{scorings.total === null ? 'Invalid' : scorings.total}}</div> -->
+		</div>
+	</nav>
+
+	<div ng-include="scorer.view" style="padding-top: 90px;"></div>
+</div>

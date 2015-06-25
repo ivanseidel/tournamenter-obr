@@ -1,0 +1,135 @@
+<!-- V1 -->
+
+<div class="modal-header">
+	<h3 class="modal-title">Salvar pontuação</h3>
+</div>
+<div class="modal-body">
+
+	<ol class="breadcrumb">
+		<li>Salvar/Carregar</li>
+		<li ng-show="selected.table"><span ng-click="page='selectTable'">{{selected.table.name}}</span></li>
+		<li ng-show="selected.round !== null"><span ng-click="page='selectRound'">{{selected.table.headers.scores[selected.round]}}</span></li>
+		<li ng-show="selected.score"><span ng-click="page='selectTeam'">{{selected.score.team.name}}</span></li>
+	</ol>
+
+	<div ng-show="page == 'selectTable'">
+		<h2>Selecione a Tabela</h2>
+		<div class="list-group">
+			<div class="list-group-item"
+				ng-repeat="table in tables"
+				ng-class="{active: selected.table.id == table.id}"
+				ng-click="selectTable(table);">
+				{{table.name}}
+			</div>
+		</div>
+		<div class="btn-group pull-right">
+			<div class="btn btn-info"
+				ng-click="page = 'selectRound'"
+				ng-class="{disabled: !selected.table}">
+				Próximo
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+	<div ng-show="page == 'selectRound'">
+		<h2>Selecione o Round</h2>
+		<div class="list-group">
+			<div class="list-group-item"
+				ng-repeat="n in ['ROUND 1 (PASSADO)', 'ROUND 2 (PASSADO)', 'Round 3 <- Atual']"
+				ngold-repeat="n in selected.table.headers.scores"
+				ng-class="{active: selected.round == $index}"
+				ng-click="selectRound($index);">
+				{{n}}
+			</div>
+		</div>
+
+		<div class="btn-group pull-right">
+			<div class="btn btn-default"
+				ng-click="page = 'selectTable'">
+				Mudar Tabela
+			</div>
+			<div class="btn btn-info"
+				ng-click="page = 'selectTeam'"
+				ng-class="{disabled: selected.round === null}">
+				Próximo
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+	<div ng-show="page == 'selectTeam'">
+		<h2>Selecione a Equipe</h2>
+		<div class="list-group">
+			<div class="list-group-item"
+				ng-repeat="score in selected.table.scores | orderBy: 'team.name'"
+				ng-class="{active: selected.score.id == score.id}"
+				ng-click="selectScore(score);">
+				{{score.team.name || 'Sem nome'}}
+					<span class="label label-danger" ng-if="score.scores[selected.round * 2]">
+						{{score.scores[selected.round * 2].value}} Pontos
+					</span>
+			</div>
+		</div>
+
+		<div class="btn-group pull-right">
+			<div class="btn btn-default"
+				ng-click="page = 'selectRound'">
+				Mudar Round
+			</div>
+			<div ng-hide="selected.doNotSave" class="btn btn-info"
+				ng-click="page = 'confirm'"
+				ng-class="{disabled: !selected.score}">
+				Próximo
+			</div>
+
+			<div ng-show="selected.doNotSave" class="btn btn-success"
+				ng-click="ok()"
+				ng-class="{disabled: !selected.score}">
+				Carregar
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+	<div ng-show="page == 'confirm'">
+		<h2>Confirmar dados</h2>
+		
+		<h3>Tabela: <span class="label label-info">{{selected.table.name}}</span></h3>
+		<!-- <h3>Round: <span class="label label-info">{{selected.table.headers.scores[selected.round]}}</span></h3> -->
+		<h3>Round: <span class="label label-info">{{selected.round + 1}}</span></h3>
+		<h3>Equipe: <span class="label label-info">{{selected.score.team.name}}</span></h3>
+		<h3>
+			Pontuação: 
+			<span class="label label-success">{{selected.total}}</span>
+			<span class="label label-danger" ng-if="selected.score.scores[selected.round * 2]">
+				 <- {{selected.score.scores[selected.round * 2].value}} Pontos
+			</span>
+		</h3>
+
+
+		<div class="input-group input-group-lg">
+			<span class="input-group-addon">Tempo total:</span>
+			<input type="text" class="form-control" placeholder="Tempo" ng-model="selected.time">
+		</div>
+
+
+		<div class="btn-group pull-right">
+			<div class="btn btn-default"
+				ng-click="page = 'selectRound'">
+				Mudar Equipe
+			</div>
+			<div class="btn btn-success"
+				ng-click="ok()"
+				ng-class="{disabled: aceitou}">
+				SALVAR
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+</div>
+<div class="modal-footer">
+	<!-- <button class="btn btn-primary" ng-click="ok()">OK</button> -->
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

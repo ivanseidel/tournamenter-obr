@@ -1,0 +1,328 @@
+<div class="container" ng-show="timer.data.value == 0 && scorings.total == 0 ">
+	<div class="jumbotron">
+			<h1>Aguardando...</h1>
+			<p>Para começar a pontuar, inicie o cronômetro</p>
+		</div>
+	</div>
+</div>
+
+<div class="container" ng-hide="timer.data.value == 0 && scorings.total == 0 ">
+	<!-- SALAS -->
+	<div class="row">
+
+		<div class="col-md-6 col-sm-6"
+			ng-init="k = 'first'">
+
+			<div class="thumbnail">
+				<h2>Sala 1</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.rooms['first']"
+						btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['first']"
+						btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['first']"
+						btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['first']"
+						btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['first']"
+						btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.rooms['first'] || 0}} pts</span>
+				</div>
+
+				<h5>Obstáculos</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.obstacles[j]"
+						ng-repeat="j in [1,2]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.obstacles, [1,2])}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in [1,2]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, [1,2])}} pts</span>
+				</div>
+
+				<h5>Redutores</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.speedbump[j]"
+						ng-repeat="j in [1,2]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.speedbump, [1,2])}} pts</span>
+				</div>
+
+				<h5>Interceções</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.intersection[k]"
+						ng-repeat="k in [1,2]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.intersection, [1,2])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="col-md-6 col-sm-6"
+			ng-init="k = 'secc'">
+
+			<div class="thumbnail">
+				<h2>Sala 2</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.rooms['secc']"
+						btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['secc']"
+						btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['secc']"
+						btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['secc']"
+						btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['secc']"
+						btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.rooms['secc'] || 0}} pts</span>
+				</div>
+
+				<h5>Obstáculos</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.obstacles[j]"
+						ng-repeat="j in [20,21]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.obstacles, [20,21])}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in [20,21]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, [20,21])}} pts</span>
+				</div>
+
+				<h5>Redutores</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.speedbump[j]"
+						ng-repeat="j in [20,21]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.speedbump, [20,21])}} pts</span>
+				</div>
+
+				<h5>Interceções</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.intersection[k]"
+						ng-repeat="k in [20,21]"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.intersection, [20,21])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- CORREDORES -->
+	<div class="row">
+		<div class="col-md-6 col-sm-6">
+
+			<div class="thumbnail">
+				<h2>Corredor</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallway']" btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallway']" btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallway']" btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallway']" btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallway']" btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.corridors['hallway'] || 0}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in ['hallway1', 'hallway2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, ['hallway1', 'hallway2'])}} pts</span>
+				</div>
+
+				<h5>Interceções</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.intersection[k]"
+						ng-repeat="k in ['hallway1', 'hallway2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.intersection, ['hallway1', 'hallway2'])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-6 col-sm-6">
+
+			<div class="thumbnail">
+				<h2>Rampa</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.corridors['ramp'] || 0}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in ['ramp1', 'ramp2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, ['ramp1', 'ramp2'])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="row">
+		<div class="col-md-6 col-sm-6">
+
+			<div class="thumbnail">
+				<h2>Corredor (Volta)</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallwayback']" btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallwayback']" btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallwayback']" btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallwayback']" btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['hallwayback']" btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.corridors['hallwayback'] || 0}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in ['hallwayback1', 'hallwayback2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, ['hallwayback1', 'hallwayback2'])}} pts</span>
+				</div>
+
+				<h5>Interceções</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.intersection[k]"
+						ng-repeat="k in ['hallwayback1', 'hallwayback2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.intersection, ['hallwayback1', 'hallwayback2'])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-6 col-sm-6">
+
+			<div class="thumbnail">
+				<h2>Rampa (Volta)</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.corridors['rampback']" btn-radio="0">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['rampback']" btn-radio="1">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['rampback']" btn-radio="2">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['rampback']" btn-radio="3">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.corridors['rampback']" btn-radio="4">4th</label>
+					<span class="input-group-addon">{{scorings.corridors['rampback'] || 0}} pts</span>
+				</div>
+
+				<h5>Gaps</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default"
+						ng-model="scoreData.gaps[k]"
+						ng-repeat="k in ['rampback1', 'rampback2']"
+						btn-checkbox>
+							{{$index + 1}}
+					</label>
+					<span class="input-group-addon">{{sumSpecial(scorings.gaps, ['rampback1', 'rampback2'])}} pts</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 col-sm-12">
+
+			<div class="thumbnail">
+				<h2>Resgate</h2>
+
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.rooms['last']"
+						btn-radio="0"
+						ng-click="timer.stop();">Nop</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['last']"
+						btn-radio="1"
+						ng-click="timer.stop();">1st</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['last']"
+						btn-radio="2"
+						ng-click="timer.stop();">2nd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['last']"
+						btn-radio="3"
+						ng-click="timer.stop();">3rd</label>
+					<label class="btn btn-default" ng-model="scoreData.rooms['last']"
+						btn-radio="4"
+						ng-click="timer.stop();">4th</label>
+					<span class="input-group-addon">{{scorings.rooms['last'] || 0}} pts</span>
+				</div>
+
+				<h5>Tocou vítima</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.victim.touch" btn-radio="false">Não</label>
+					<label class="btn btn-default" ng-model="scoreData.victim.touch" btn-radio="true">Sim</label>
+					<span class="input-group-addon">{{scorings.victim.touch || 0}} pts</span>
+				</div>
+
+				<h5>Levantou vítima</h5>
+				<div class="btn-group btn-group-justified">
+					<label class="btn btn-default" ng-model="scoreData.victim.raise" btn-radio="false">Não</label>
+					<label class="btn btn-default" ng-model="scoreData.victim.raise" btn-radio="true">Sim</label>
+					<span class="input-group-addon">{{scorings.victim.raise || 0}} pts</span>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</div>

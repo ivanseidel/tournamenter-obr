@@ -1,0 +1,21 @@
+{
+  "name": "bootstrap-bower",
+  "version": "3.0.0",
+  "homepage": "https://github.com/diegotoral/bootstrap-bower",
+  "authors": [
+    "Diego Toral <diegotoral@gmail.com>"
+  ],
+  "description": "Bootstrap v3.0, just what you need! Ready to use!",
+  "keywords": [
+    "bootstrap"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ]
+}

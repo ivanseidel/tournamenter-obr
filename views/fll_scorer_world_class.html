@@ -1,0 +1,326 @@
+<!-- <div class="container" ng-show="timer.data.value == 0 && scorings.total == 0 ">
+	<div class="jumbotron">
+			<h1>Aguardando...</h1>
+			<p>Para começar a pontuar, inicie o cronômetro</p>
+		</div>
+	</div>
+</div> -->
+
+<!-- <div class="container" ng-hide="timer.data.value == 0 && scorings.total == 0 "> -->
+<div class="container">
+
+	<div class="col-md-6 missions-group">
+
+		<!-- Porta -->
+		<div>
+			<h4>Porta</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.door"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.door"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Porta obviamente aberta</p>
+			</div>
+		</div>
+
+		<!-- Acesso à nuvem -->
+		<div>
+			<h4>Acesso à nuvem</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.cloud"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.cloud"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Cartão SD levantado</p>
+			</div>
+		</div>
+
+		<!-- Aprendizagem coletiva -->
+		<div>
+			<h4>Aprendizagem coletiva</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.collective"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.collective"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Laço sem contato com modelo</p>
+			</div>
+		</div>
+
+		<!-- Braço robótico -->
+		<div>
+			<h4>Braço robótico</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.insert"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.insert"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Objeto inserido no braço</p>
+			</div>
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.insertLoop"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.insertLoop"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Loop separado do braço</p>
+			</div>
+		</div>
+
+		<!-- Uso dos Sentidos -->
+		<div>
+			<h4>Uso dos Sentidos</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.sense"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.sense"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Laço sem contato com modelo</p>
+			</div>
+		</div>
+
+		<!-- Pensar fora da [caixa] -->
+		<div>
+			<h4>Pensar fora da [caixa]</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.outbox"
+						btn-radio="2">Para cima</label>
+					<label class="btn btn-default" ng-model="scoreData.outbox"
+						btn-radio="1">Para baixo</label>
+					<label class="btn btn-default" ng-model="scoreData.outbox"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Ideia tocando o tapete</p>
+			</div>
+		</div>
+
+		<!-- Aprendizado remoto -->
+		<div>
+			<h4>Aprendizado remoto</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.remote"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.remote"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Puxou a barra deslizante</p>
+			</div>
+		</div>
+
+		<!-- Motor de buscas -->
+		<div class="can-be-wrong">
+			<h4>Motor de buscas</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.search"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.search"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Empurrou a barra deslizante</p>
+			</div>
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.searchLoops"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.searchLoops"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Laço correto, sem contato com modelo</p>
+			</div>
+		</div>
+
+		
+	</div>
+	<!-- 
+	Porta
+	Acesso às núvens
+	Aprendizagem coletiva
+	Braço robótico
+	Uso dos Sentidos
+	Pensar fora da [caixa]
+	Aprendizado remoto
+	Motor de buscas
+	Esportes
+	Engenharia reversa
+	Adaptando às mudanças
+	Aprendizagem
+	Engajamento
+	Aprendizagem com projetos
+	Penalidades
+	 -->
+
+	<div class="col-md-6 missions-group">
+		<!-- Esportes -->
+		<div>
+			<h4>Esportes</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.sports"
+						btn-radio="2">Sim e fez GOL</label>
+					<label class="btn btn-default" ng-model="scoreData.sports"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.sports"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Chutou a bola</p>
+			</div>
+		</div>
+
+		<!-- Engenharia reversa -->
+		<div>
+			<h4>Engenharia reversa</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.reverseBasker"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.reverseBasker"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Cesta na base</p>
+			</div>
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.reverseReplicate"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.reverseReplicate"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Modelo replicado corretamente</p>
+			</div>
+		</div>
+
+		<!-- Adaptando às mudanças -->
+		<div>
+			<h4>Adaptando às mudanças</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.adapt"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.adapt"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Rotacionou 90 graus</p>
+			</div>
+		</div>
+
+		<!-- Aprendizagem -->
+		<div style="margin-top: 5px; padding-top: 3px;">
+			<h4>Aprendizagem</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.learnBound"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.learnBound"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Ambas as pessoas ligadas</p>
+			</div>
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.learnTouch"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.learnTouch"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Modelo com pessoas tocando área da balança</p>
+			</div>
+		</div>
+
+		<!-- Aprendizagem com projetos -->
+		<div class="can-be-wrong">
+			<h4>Aprendizagem com projetos</h4>
+			<div class="row-fluid">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="8">8</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="7">7</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="6">6</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="5">5</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="4">4</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="3">3</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="2">2</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="1">1</label>
+					<label class="btn btn-default" ng-model="scoreData.projects"
+						btn-radio="0">0</label>
+				</div>
+				<p>Laços na balança</p>
+			</div>
+		</div>
+
+		<!-- Engajamento -->
+		<div>
+			<h4>Engajamento</h4>
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.engage"
+						btn-radio="1">Sim</label>
+					<label class="btn btn-default" ng-model="scoreData.engage"
+						btn-radio="0">Não</label>
+				</div>
+				<p>Modelo ativado pela alavanca</p>
+			</div>
+			<div class="row-fluid" style="margin-top: 10px;">
+				<p>Giros de 90˚</p>
+				<div class="input-group pull-right col-md-3" style="margin-top: -20px;">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button" ng-click="scoreData.gyros = scoreData.gyros <= 0 ? 0 : scoreData.gyros - 1">-</button>
+					</span>
+					<input type="text" disabled class="form-control text-center" ng-model="scoreData.gyros">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button" ng-click="scoreData.gyros = scoreData.gyros >= 49 ? 49 : scoreData.gyros + 1">+</button>
+					</span>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Penalidades -->
+		<div style="margin-top: 6px; padding-top: 5px;">
+			<div class="row-fluid" style="margin-top: 15px;">
+				<div class="btn-group pull-right">
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="8">8</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="7">7</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="6">6</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="5">5</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="4">4</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="3">3</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="2">2</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="1">1</label>
+					<label class="btn btn-default" ng-model="scoreData.penalties"
+						btn-radio="0">0</label>
+				</div>
+				<h4>Penalidades</h4>
+			</div>
+		</div>
+
+	</div>
+</div>
