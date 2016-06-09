@@ -18,7 +18,7 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 	])
 
 	.config(['$routeProvider', function($routeProvider) {
-		
+
 		return $routeProvider
 
 		.when('/score', {
@@ -28,7 +28,7 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 			redirectTo: '/score'
 			// templateUrl: '/views/participar/'
 		});
-		
+
 	}])
 
 	.factory('Table', ['$resource', function ($resource) {
@@ -39,7 +39,7 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 				isArray: true,
 			},
 		});
-		
+
 	}])
 
 	.factory('Score', ['$resource', function ($resource) {
@@ -52,7 +52,7 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 				url: TOURNAMENTER_URL + '/scores/:id',
 			}
 		});
-		
+
 	}])
 
 	.factory('RescueAScorer', function (){
@@ -68,16 +68,16 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 				'hallway': 0,
 			},
 			gaps: {
-				
+
 			},
 			obstacles: {
-				
+
 			},
 			speedbump: {
-				
+
 			},
 			intersection: {
-				
+
 			},
 			victim: {
 				raise: 0,
@@ -139,16 +139,16 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 				'ramp': 0,
 			},
 			gaps: {
-				
+
 			},
 			obstacles: {
-				
+
 			},
 			speedbump: {
-				
+
 			},
 			intersection: {
-				
+
 			},
 			passage: {
 
@@ -175,7 +175,7 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 		}
 
 		return {
-			view: '/views/rescue_scorer_2015_regional.html?r='+Math.random(),
+			view: '/views/rescue_scorer_2016_regional.html?r='+Math.random(),
 			model: model,
 			scorings: scorings,
 			score: function (model){
@@ -416,13 +416,13 @@ var TOURNAMENTER_URL = 'http://192.168.0.4:8090';
 
 	.constant('SW_DELAI', 100)
 	.factory('stopwatch', function (SW_DELAI, $timeout) {
-	    var data = { 
+	    var data = {
 	            value: 0,
 	            laps: [],
 	            state: 'STOPPED',
 	        },
 	        stopwatch = null;
-	        
+
 	    var start = function () {;
 	    	data.state = 'RUNNING';
 	    	if(stopwatch) $timeout.cancel(stopwatch);
