@@ -4,8 +4,8 @@
   "description": "Tournamenter scorer app for OBR",
   "main": "index.js",
   "scripts": {
-    "start": "http-server public/tournamenter-obr",
-    "postinstall": "bower install",
+    "start": "./node_modules/.bin/http-server public/tournamenter-obr",
+    "postinstall": "./node_modules/.bin/bower install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
