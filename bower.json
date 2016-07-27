@@ -1,6 +1,7 @@
 {
-  "name": "tournamenterRescueA",
-  "version": "0.0.0",
+  "name": "tournamenter-obr",
+  "description": "Tournamenter scorer app for OBR",
+  "version": "1.0.0",
   "authors": [
     "Ivan Seidel <ivan@tendadigital.net>"
   ],
