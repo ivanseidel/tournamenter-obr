@@ -5,7 +5,7 @@ var _ = require('lodash');
 var path = require('path');
 
 module.exports = {
-	type: 'view',
+	type: ['menu'],
 
   getAssets: function (app){
     return {
@@ -20,6 +20,10 @@ module.exports = {
       ]
     }
   },
+
+  menus: [
+    {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
+  ],
 
 	initialize: function(app){
     // app.
