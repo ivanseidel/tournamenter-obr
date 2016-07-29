@@ -5,6 +5,44 @@
   "authors": [
     "Ivan Seidel <ivan@tendadigital.net>"
   ],
+  "install": {
+    "path": "public/tournamenter-obr/components",
+    "sources": {
+      "angular-bootstrap": {
+        "mapping": [
+          {
+            "public/tournamenter-obr/.components/angular-bootstrap/ui-bootstrap.js": "ui-bootstrap.js"
+          }
+        ]
+      },
+      "font-awesome": {
+        "mapping": [
+          {
+            "public/tournamenter-obr/.components/font-awesome/fonts/fontawesome-webfont.eot": "../fonts/fontawesome-webfont.eot"
+          },
+          {
+            "public/tournamenter-obr/.components/font-awesome/fonts/fontawesome-webfont.svg": "../fonts/fontawesome-webfont.svg"
+          },
+          {
+            "public/tournamenter-obr/.components/font-awesome/fonts/fontawesome-webfont.ttf": "../fonts/fontawesome-webfont.ttf"
+          },
+          {
+            "public/tournamenter-obr/.components/font-awesome/fonts/fontawesome-webfont.woff": "../fonts/fontawesome-webfont.woff"
+          }
+        ]
+      },
+      "bootstrap": {
+        "mapping": [
+          {
+            "public/tournamenter-obr/.components/bootstrap/fonts/glyphicons-halflings-regular.woff": "../fonts/glyphicons-halflings-regular.woff"
+          },
+          {
+            "public/tournamenter-obr/.components/bootstrap/fonts/glyphicons-halflings-regular.ttf": "../fonts/glyphicons-halflings-regular.tff"
+          }
+        ]
+      }
+    }
+  },
   "license": "MIT",
   "ignore": [
     "**/.*",

@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/http-server public/tournamenter-obr",
-    "postinstall": "./node_modules/.bin/bower install",
+    "assets": "bower install && bower-installer",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bower": "^1.7.9",
     "http-server": "^0.7.1",
     "lodash": "^4.14.0"
+  },
+  "devDependencies": {
+    "bower": "^1.7.9",
+    "bower-installer": "latest"
   }
 }
