@@ -1,6 +1,6 @@
 {
   "name": "tournamenter-obr",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tournamenter scorer app for OBR",
   "main": "index.js",
   "scripts": {

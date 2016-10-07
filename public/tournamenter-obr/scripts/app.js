@@ -219,13 +219,19 @@ var TOURNAMENTER_URL = '';
 
 			},
       squares1: {
-        a: 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
       },
       squares2: {
-        a: 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
       },
       squares3: {
-        a: 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
       },
 			obstacles: {
 
