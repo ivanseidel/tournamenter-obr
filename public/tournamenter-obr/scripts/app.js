@@ -128,7 +128,7 @@ var TOURNAMENTER_URL = '';
 
 	})
 
-	.factory('RescueScorer2015Regional', function (){
+  .factory('RescueScorer2015Regional', function (){
 
 		var model = {
 			rooms: {
@@ -202,7 +202,102 @@ var TOURNAMENTER_URL = '';
 				return scored;
 			}
 		}
+	})
 
+
+  .factory('RescueScorer2016Regional', function (){
+
+		var model = {
+			rooms: {
+				'first': 0,
+				'secc': 0,
+			},
+			corridors: {
+				'ramp': 0,
+			},
+			gaps: {
+
+			},
+      squares1: {
+        a: 0,
+      },
+      squares2: {
+        a: 0,
+      },
+      squares3: {
+        a: 0,
+      },
+			obstacles: {
+
+			},
+			speedbump: {
+
+			},
+			intersection: {
+
+			},
+			passage: {
+
+			},
+
+			victims: {
+				'1a': 0,
+				'2a': 0,
+				'3a': 0,
+			},
+		};
+
+		var scorings ={
+			rooms: [0, 60, 40, 20, 0],
+			corridors: [0,30,20,10,0],
+			gaps: [0,10],
+
+      squares1: 3,
+      squares2: 2,
+      squares3: 1,
+
+			obstacles: [0,10],
+			speedbump: [0, 5],
+			intersection: [0,15],
+			passage: [0, 10],
+
+			victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+		}
+
+		return {
+			view: 'views/rescue_scorer_2016_nacional.html?r='+Math.random(),
+			model: model,
+			scorings: scorings,
+			score: function (model){
+				var scored = {
+					total: 0,
+				};
+
+				for(var k in model){
+					scored[k] = {};
+					var group = model[k];
+
+					for(var i in group){
+						var mission = group[i];
+						if(mission === false) mission = 0;
+						if(mission === true) mission = 1;
+
+            var pointsGroup = scorings[k];
+            var points;
+            if(typeof pointsGroup == 'number'){
+              points = pointsGroup * mission;
+            }else{
+              points = scorings[k][mission];
+            }
+
+            scored[k][i] = points
+						scored.total += points || 0;
+					}
+				}
+
+				return scored;
+			}
+		}
 	})
 
 	.factory('FLLWorldClassScorer', function (){

@@ -1,7 +1,7 @@
 <!-- v1.01 -->
 <div ng-controller="RescueScorer">
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation"
-		ng-class="{ended: timer.data.value > 290*10}">
+		ng-class="{ended: timer.data.value > 470*10}">
 		<div class="container">
 
 			<div class="navbar-text pull-left" style="width: 70px; font-size: 22px; margin: 6px;">{{timer.data.value/10}}s</div>
@@ -24,8 +24,8 @@
 				</div>
 			</div>
 
-			<div class="btn-group pull-left" style="margin-left: 10px;">
-				
+			<!-- <div class="btn-group pull-left" style="margin-left: 10px;">
+
 				<div class="btn navbar-btn btn-default" ng-click="timer.increment(-60)" ng-class="{disabled: timer.data.value == 0}">
 					-1 Min
 				</div>
@@ -34,7 +34,7 @@
 					+1 Min
 				</div>
 
-			</div>
+			</div> -->
 
 			<div class="btn-group navbar-btn pull-right">
 				<div class="btn btn-default disabled" disabled style="min-width: 50px;">
