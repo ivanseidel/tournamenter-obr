@@ -1,11 +1,11 @@
 /*
-	Default view module
+  Default view module
 */
 var _ = require('lodash');
 var path = require('path');
 
 module.exports = {
-	type: ['menu'],
+  type: ['menu'],
 
   getAssets: function (app){
     return {
@@ -25,17 +25,29 @@ module.exports = {
     {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
   ],
 
-	initialize: function(app){
-    // app.
-	},
+  initialize: function(app){
+    // Get 'Table' model from App
+    var tournamenterRoot = app.config.root;
+    var tableModelPath = path.join(tournamenterRoot, './models/Table');
+    var TableModel = require(tableModelPath)
+    
+    // Inject OBR Scoring systems
+    TableModel.evaluateMethods.obr2017 = require('./sorters/obr2017');
 
-	render: function(req, res, next, locals){
-		var viewPath = __dirname+'/index';
+    // Set 'obr2017' as default sorting algorithm
+    TableModel.attributes.evaluateMethod.defaultsTo = 'obr2017';
 
-		var relViewPath = path.relative(path.resolve(__dirname+'/../../views'), viewPath);
+    // Update Default Tournamenter Logo
+    app.config.appLogo = path.join(__dirname, 'obr.png')
+  },
 
-		res.render(relViewPath, _.extend(locals, {
-			layout: path.join(__dirname, 'layout.ejs'),
-		}));
-	},
+  render: function(req, res, next, locals){
+    var viewPath = __dirname+'/index';
+
+    var relViewPath = path.relative(path.resolve(__dirname+'/../../views'), viewPath);
+
+    res.render(relViewPath, _.extend(locals, {
+      layout: path.join(__dirname, 'layout.ejs'),
+    }));
+  },
 }
