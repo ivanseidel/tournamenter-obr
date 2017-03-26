@@ -36,6 +36,14 @@ module.exports = {
 
     // Set 'obr2017' as default sorting algorithm
     TableModel.attributes.evaluateMethod.defaultsTo = 'obr2017';
+    
+    // Set columns count to 6 as default, with names
+    TableModel.attributes.columns.defaultsTo = 6;
+    TableModel.attributes.headerScore.defaultsTo = 
+     'Round 1, Tempo 1, Round 2, Tempo 3, Round 3, Tempo 3';
+
+    // Set default to Portugese on columns
+    TableModel.attributes.headerTeam.defaultsTo = 'Equipe';
 
     // Update Default Tournamenter Logo
     app.config.appLogo = path.join(__dirname, 'obr.png')

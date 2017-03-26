@@ -1,7 +1,7 @@
 {
   "name": "tournamenter-obr",
-  "version": "2.1.0",
-  "description": "Tournamenter scorer app for OBR",
+  "version": "2.1.2",
+  "description": "Plugin da OBR Regional para o Tournamenter",
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/http-server public/tournamenter-obr",
