@@ -65,6 +65,6 @@
     "seiyria-bootstrap-slider": "~1.9.0",
     "bootstrap": "~3.2.0",
     "angular-bootstrap": "~0.10.0",
-    "bootstrap-bower": "~3.0.0"
+    "async": "^2.2.0"
   }
 }
