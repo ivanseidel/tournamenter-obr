@@ -1,0 +1,67 @@
+// v1.01
+var TOURNAMENTER_URL    = '';
+var EXTERNAL_API_BASE   = 'http://58da575cfc6c7e120000a113.mockapi.io/';
+var EXTERNAL_API_EVENTS = '/events';
+var EXTERNAL_API_TEAMS  = '/teams';
+
+var app = angular.module('app', [
+  'ngRoute',
+  'ngAnimate',
+  'ngResource',
+
+  'ui.bootstrap',
+
+  'app.importar',
+  'app.exportar',
+])
+
+.controller('AppCtrl', function ($scope, $timeout) {
+  $scope.loaded = false
+
+  $timeout(function (){
+    $scope.loaded = true
+  }, 500)
+})
+
+.factory('ExternalEventAPI', ['$resource', function ($resource) {
+
+  return $resource(EXTERNAL_API_BASE + EXTERNAL_API_EVENTS, {id: '@id'}, {
+    all: {
+      url: EXTERNAL_API_BASE + EXTERNAL_API_EVENTS,
+      isArray: true,
+    },
+  });
+
+}])
+
+.factory('ExternalTeamAPI', ['$resource', function ($resource) {
+
+  return $resource(EXTERNAL_API_BASE + EXTERNAL_API_EVENTS, {event: '@event'}, {
+    all: {
+      url: EXTERNAL_API_BASE + EXTERNAL_API_EVENTS,// + '/:event',
+      isArray: true,
+    },
+  });
+
+}])
+
+.factory('Team', ['$resource', function ($resource) {
+
+  return $resource(TOURNAMENTER_URL + '/teams', {id: '@id'}, {
+    all: {
+      url: TOURNAMENTER_URL + '/teams?limit=10000',
+      isArray: true,
+    },
+  });
+
+}])
+
+.factory('ObrConfig', ['$resource', function ($resource) {
+
+  return $resource(TOURNAMENTER_URL + '/obr-sync', {}, {
+    save: {
+      url: TOURNAMENTER_URL + '/obr-sync',
+    }
+  });
+
+}])
