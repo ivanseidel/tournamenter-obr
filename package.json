@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "http-server": "^0.7.1",
-    "lodash": "^4.14.0"
+    "lodash": "^4.14.0",
+    "request": "^2.81.0"
   },
   "devDependencies": {
     "bower": "^1.7.9",
