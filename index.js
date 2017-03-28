@@ -3,6 +3,7 @@
 */
 var _ = require('lodash');
 var path = require('path');
+var SyncModule = require('./SyncModule')
 
 module.exports = {
   type: ['menu'],
@@ -23,6 +24,7 @@ module.exports = {
 
   menus: [
     {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
+    {name: 'Importador Sistema Olimpo', path: '/tournamenter-obr/importar.html', order: 7},
   ],
 
   initialize: function(app){
@@ -46,7 +48,13 @@ module.exports = {
     TableModel.attributes.headerTeam.defaultsTo = 'Equipe';
 
     // Update Default Tournamenter Logo
-    app.config.appLogo = path.join(__dirname, 'obr.png')
+    app.config.appLogo = path.join(__dirname, '/public/tournamenter-obr/obr.png')
+
+    // Add route to change configs/get
+    app.server.all('/obr-sync', SyncModule.updateConfig)
+
+    // Init SyncModule
+    SyncModule.init(app)
   },
 
   render: function(req, res, next, locals){
