@@ -1,0 +1,294 @@
+<!-- lol -->
+<!doctype html>
+<!-- <html manifest="app.appcache"> -->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+  <title>Importador Sistema Olimpo</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <!-- <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:400,700' rel='stylesheet' type='text/css'> -->
+  <link rel="stylesheet" href="components/font-awesome/font-awesome.css">
+  <link rel="stylesheet" href="components/bootstrap/bootstrap.css">
+  <!-- <link rel="stylesheet" href="components/bootstrap/bootstrap-theme.min.css"> -->
+  <!-- <link rel="stylesheet" href="components/circliful/css/jquery.circliful.css"> -->
+  <link rel="stylesheet" href="styles/site.css">
+
+  <!-- WebApp -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" sizes="128x128" href="img/icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" sizes="128x128" href="img/icon.png">
+  <link rel="apple-touch-icon-precomposed" sizes="128x128" href="img/icon.png">
+
+  <style type="text/css">
+  .ended{
+    background-color: rgba(255,20,20,0.7);
+    background-image: none;
+  }
+  .hide {
+    display: none;
+  }
+  </style>
+
+</head>
+<body data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+      <div class="pull-left">
+        <img src="obr.png" style="height: 32px; margin: 8px;">
+      </div>
+      <div class="navbar-text pull-left">
+        Importar/Exportar dados do Sistema Olimpo
+      </div>
+
+    </div>
+  </nav>
+
+  <div class="container hide" style="padding-top: 90px;" ng-class="{hide: !loaded}">
+
+    <!-- Importar equipes -->
+    <div class="col-md-6" ng-controller="ImportarCtrl">
+      <h2>Importar Equipes</h2>
+      <hr/>
+      <p>
+        <small style="color: rgba(0,0,0,0.6);">
+          Importe todas as equipes do seu regional específico para o Tournamenter.
+        </small>
+      <p>
+
+      <div class="alert alert-danger ng-cloak" ng-show="error" role="alert">{{error}}</div>
+      <div class="alert alert-success ng-cloak" ng-show="success" role="alert">{{success}}</div>
+
+      <label>
+        Evento para importar equipes:
+      </label>
+      <div class="form-group row">
+        <div class="col-md-6">
+          <select 
+            class="form-control"
+            ng-model="importEvent" 
+            ng-disabled="!events || executing">
+            <option 
+              ng-if="!events"
+              value="0">
+                Carregando...
+            </option>
+            <option
+              ng-repeat="event in events"
+              value="{{event.id}}">
+                {{event.name}}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6" style="margin-top: 8px;">
+          <span
+            ng-show="!!teamsToImport" 
+            class="label label-success"
+            style="font-size: 16px;">
+              {{teamsToImport.length}} Equipes
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="checkbox">
+          <label>
+            <input
+              ng-model="allowDelete"
+              type="checkbox"> Remover equipes não presentes
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button 
+          type="button"
+          ng-click="diffTeams()"
+          ng-disabled="!importEvent || !teamsToImport || executing"
+          class="btn btn-primary btn-sm btn-block">
+            Verificar Diferenças (passo 1)
+        </button>
+      </div>
+
+      <div class="panel panel-default" ng-show="actions.length">
+        
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Alterações a serem feitas
+            <button 
+              type="button"
+              style="margin-top: -3px;"
+              class="pull-right btn btn-success btn-xs"
+              ng-disabled="executing || !canCommit"
+              ng-click="executeCommits()">
+                Executar (passo 2)
+            </button>
+          </h3>
+        </div>
+
+        <div class="progress" ng-show="executing">
+          <div
+            class="progress-bar" 
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            ng-style="{width: progress + '%'}">
+            {{progress}}%
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <ul>
+            <li ng-repeat="(action, value) in actionsStats">
+              {{action}}: {{value}}x
+            </li>
+          </ul>
+          <div class="panel panel-default" style="max-height: 200px; overflow-y: scroll;">
+            <ul class="list-group">
+              <li class="list-group-item" ng-repeat="action in actions" style="padding: 4px 10px;">
+                <span class="glyphicon" ng-class="{'glyphicon-remove-sign': action.action == 'remove', 'glyphicon-plus-sign': action.action == 'create', 'glyphicon-exclamation-sign': action.action == 'update'}"></span> 
+                {{action.msg}}
+                <div class="pull-right">
+                  <span
+                    ng-if="action.status == 'success'"
+                    class="text-success glyphicon glyphicon-ok">
+                  </span>
+                  <span
+                    ng-if="action.status == 'error'"
+                    class="text-success glyphicon glyphicon-remove">
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Syncronização -->
+    <div class="col-md-6" ng-controller="ExportarCtrl">
+      <h2>
+        Envio de notas 
+        <small>
+          <span class="label label-warning" ng-show="!needsSave && syncConfig.sync === false">
+            Desabilitado
+          </span>
+          <span class="label label-success" ng-show="!needsSave && syncConfig.sync === true">
+            Habilitado ({{syncConfig.interval}}s)
+          </span>
+          <span class="label label-danger" ng-show="needsSave">
+            Salve as Configurações
+          </span>
+        </small>
+      </h2>
+      <hr/>
+      <p>
+        <small style="color: rgba(0,0,0,0.6);">
+          Configure para habilitar o envio das pontuações automaticamente durante o torneio.
+        </small>
+      <p>
+
+      <div class="alert alert-danger ng-cloak" ng-show="error" role="alert">{{error}}</div>
+      <div class="alert alert-success ng-cloak" ng-show="success" role="alert">{{success}}</div>
+
+      <div class="col-md-12">
+        <div class="form-group row">
+          <div class="input-group">
+            <span class="input-group-addon" style="width: 5%;">
+              <input
+                ng-model="syncConfig.sync"
+                type="checkbox">
+            </span>
+            <span class="input-group-addon" style="width: 95%;">
+              Habilitar/Desabilitar sincronização automática
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group row" ng-show="syncConfig.sync">
+          <label>
+            URL de envio (Somente a organização nacional da OBR pode fornece-la)
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            ng-model="syncConfig.url"
+            placeholder="URL de envio"/>
+        </div>
+
+        <div class="form-group row" ng-show="syncConfig.sync">
+          <label>
+            Método HTTP de submissão (padrão: PUT)
+          </label>
+          <select 
+            class="form-control"
+            ng-model="syncConfig.method">
+            <option value="PUT">PUT</option>
+            <option value="POST">POST</option>
+          </select>
+        </div>
+
+        <div class="form-group row" ng-show="syncConfig.sync">
+          <label>
+            Intervalo de sincronização (em segundos)
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            ng-model="syncConfig.interval"
+            min="60"
+            max="1800"
+            placeholder="60"/>
+        </div>
+
+        <div class="form-group row">
+          <button 
+            type="button"
+            ng-click="save()"
+            ng-disabled="!needsSave"
+            class="btn btn-success btn-sm btn-block">
+              Salvar configurações
+          </button>
+        </div>
+
+        <div class="form-group row">
+          <button 
+            type="button"
+            ng-click="sync()"
+            ng-disabled="needsSave"
+            class="btn btn-warning btn-sm btn-block">
+              Enviar dados (agora)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- build:js scripts/vendor.js -->
+  <script src="components/async/async.js"></script>
+  <script src="components/underscore/underscore.js"></script>
+  <script src="components/jquery/jquery.js"></script>
+  <script src="components/angular/angular.js"></script>
+  <script src="components/angular-route/angular-route.js"></script>
+  <script src="components/angular-animate/angular-animate.js"></script>
+  <script src="components/angular-resource/angular-resource.js"></script>
+  <script src="components/angular-bootstrap/ui-bootstrap.js"></script>
+  <script src="components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:js scripts/site-ui.js -->
+  <!-- endbuild -->
+
+  <!-- build:js({.tmp,client}) scripts/participar.js -->
+  <script src="importar_scripts/app.js"></script>
+  <script src="importar_scripts/importar.js"></script>
+  <script src="importar_scripts/exportar.js"></script>
+  <!-- endbuild -->
+</body>
+</html>
