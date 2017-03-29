@@ -8,6 +8,13 @@
   "install": {
     "path": "public/tournamenter-obr/components",
     "sources": {
+      "moment": {
+        "mapping": [
+          {
+            "public/tournamenter-obr/.components/moment/locale/pt-br.js": "pt-br.js"
+          }
+        ]
+      },
       "angular-bootstrap": {
         "mapping": [
           {
@@ -65,6 +72,7 @@
     "seiyria-bootstrap-slider": "~1.9.0",
     "bootstrap": "~3.2.0",
     "angular-bootstrap": "~0.10.0",
-    "async": "^2.2.0"
+    "async": "^2.2.0",
+    "moment": "^2.18.1"
   }
 }
