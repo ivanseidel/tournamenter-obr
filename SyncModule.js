@@ -21,7 +21,6 @@ exports.init = function (app) {
       return console.log('Falha ao criar configuração da `obr-sync`!');
     }
 
-    console.log(TAG, config)
     exports.updateDeamon(config)
   })
 
@@ -31,8 +30,6 @@ exports.init = function (app) {
     if (err) {
       return console.log('Falha ao criar configuração da `obr-last-sync`!');
     }
-
-    console.log(TAG, config)
   })
 }
 
@@ -75,6 +72,23 @@ exports.updateConfig = function (req, res) {
 }
 
 /*
+ * Controls the menu badge with the Sync status
+ */
+exports.statusMenu = {
+  path: '/obr-config',
+  name: '',
+  badge: 'Sync: Inicializando...'
+}
+
+exports.updateBadge = function () {
+  var on = '<span style="color: #33EE30">Ligado</span>'
+  var off = '<span style="color: #ff687d">Desligada</span>'
+  var badge = 'Syncronização: ' + (exports.config.sync ? on : off)
+
+  exports.statusMenu.badge = badge
+}
+
+/*
  * Returns the last successfull sync
  */
 exports.getLastSync = function getLastSync(req, res) {
@@ -108,6 +122,9 @@ exports.interval = null
 exports.updateDeamon = function (config) {
   exports.config = config
   clearInterval(exports.interval)
+  exports.interval = null
+
+  exports.updateBadge()
 
   if (!config.sync) {
     return

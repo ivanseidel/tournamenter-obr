@@ -274,7 +274,7 @@ var TOURNAMENTER_URL = '';
 		}
 
 		return {
-			view: 'views/rescue_scorer_2016_nacional.html?r='+Math.random(),
+			view: 'views/rescue_scorer_2016_regional.html?r='+Math.random(),
 			model: model,
 			scorings: scorings,
 			score: function (model){

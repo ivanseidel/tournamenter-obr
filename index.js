@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var path = require('path');
 var SyncModule = require('./SyncModule')
+var auth = app.helpers.isAuthenticated
 
 module.exports = {
   type: ['menu'],
@@ -23,8 +24,24 @@ module.exports = {
   },
 
   menus: [
-    {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
-    {name: 'Importador Sistema Olimpo', path: '/tournamenter-obr/importar.html', order: 7},
+    {
+      name: 'Plugin OBR',
+      childs: [
+        {
+          path: '/tournamenter-obr',
+          name: 'Pontuador',
+        },
+        {
+          path: '/obr-config',
+          name: 'Configurar (Importar/Exportar)',
+        },
+      ],
+      order: 6
+    },
+    // Realtime badge for Sincronization with Sistema Olimpo
+    SyncModule.statusMenu
+    // {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
+    // {name: 'Importador Sistema Olimpo', path: '/tournamenter-obr/importar.html', order: 7},
   ],
 
   initialize: function(app){
@@ -50,9 +67,23 @@ module.exports = {
     // Update Default Tournamenter Logo
     app.config.appLogo = path.join(__dirname, '/public/tournamenter-obr/obr.png')
 
+    // Add views path to view engine
+    var viewsFolder = path.join(__dirname, '/public/tournamenter-obr')
+    var views = app.server.get('views').push(viewsFolder)
+
     // Add route to change configs/get
-    app.server.all('/obr-sync', SyncModule.updateConfig)
-    app.server.all('/obr-last-sync', SyncModule.getLastSync)
+    app.server.all('/obr-sync',       auth, SyncModule.updateConfig)
+    app.server.all('/obr-last-sync',  auth, SyncModule.getLastSync)
+
+    // Render Configuration screen
+    app.server.get('/obr-config',     auth, function (req, res) {
+      return res.render('obr-config', { path: req.route.path });
+    })
+
+    // Set home screen to show a big huge button to guide judges
+    app.server.get('/',     auth, function (req, res) {
+      return res.render('obr-home', { path: req.route.path });
+    })
 
     // Init SyncModule
     SyncModule.init(app)
