@@ -20,7 +20,7 @@ angular.module('app.exportar', [])
   $scope.save = function (){
     $scope.error = ''
     $scope.success = ''
-    
+
     // var newConfig = angular.toJson($scope.syncConfig)
     var config = _.pick($scope.syncConfig, ObrConfigProps)
     ObrConfig.save(config, function (){
@@ -48,6 +48,6 @@ angular.module('app.exportar', [])
     })
   }
 
-  $interval(checkSync, 1000)
+  $interval(checkSync, 5000)
   checkSync()
 })

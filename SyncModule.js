@@ -44,7 +44,6 @@ exports.updateConfig = function (req, res) {
 
   // Save to database
   app.models.Config.findOne('obr-sync', function (err, model) {
-    console.log(TAG, 'model:', model)
     var config = _.defaults(req.query, model, exports.default)
     config = _.pick(config, _.keys(exports.default))
     
@@ -96,7 +95,7 @@ exports.didSync = function didSync() {
   app.models.Config.update('obr-last-sync', {
     value: Date.now()
   }, function (err, model) {
-    console.log(TAG, 'didSync', err, model)
+    console.log(TAG, 'didSync', err ? err : 'OK')
   })
 }
 
@@ -119,7 +118,7 @@ exports.updateDeamon = function (config) {
   period = Math.min(period, 30 * 60 * 1000) // 30 minutes maximum
   
   // Update interval
-  setInterval(exports.sync, period)
+  exports.interval = setInterval(exports.sync, period)
   console.log(TAG, 'Deamon updated. ')
 }
 
