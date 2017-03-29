@@ -176,7 +176,17 @@
     <div class="col-md-6" ng-controller="ExportarCtrl">
       <h2>
         Envio de notas 
-        <small>
+      </h2>
+      <hr/>
+      <p>
+        <small style="color: rgba(0,0,0,0.6);">
+          Configure para habilitar o envio das pontuações automaticamente durante o torneio.
+        </small>
+      <p>
+
+      <div class="alert alert-info" role="alert">
+        Última sincronização: <b>{{lastSync}}</b>
+        <div class="pull-right">
           <span class="label label-warning" ng-show="!needsSave && syncConfig.sync === false">
             Desabilitado
           </span>
@@ -186,15 +196,8 @@
           <span class="label label-danger" ng-show="needsSave">
             Salve as Configurações
           </span>
-        </small>
-      </h2>
-      <hr/>
-      <p>
-        <small style="color: rgba(0,0,0,0.6);">
-          Configure para habilitar o envio das pontuações automaticamente durante o torneio.
-        </small>
-      <p>
-
+        </div>
+      </div>
       <div class="alert alert-danger ng-cloak" ng-show="error" role="alert">{{error}}</div>
       <div class="alert alert-success ng-cloak" ng-show="success" role="alert">{{success}}</div>
 
@@ -208,6 +211,16 @@
             </span>
             <span class="input-group-addon" style="width: 95%;">
               Habilitar/Desabilitar sincronização automática
+            </span>
+            <span class="input-group-btn">
+              <button
+                type="button"
+                ng-click="save()"
+                ng-disabled="!needsSave"
+                ng-class="{'btn-success': needsSave, 'btn-default': !needsSave}"
+                class="btn">
+                Salvar
+              </button>
             </span>
           </div>
         </div>
@@ -248,7 +261,7 @@
             placeholder="60"/>
         </div>
 
-        <div class="form-group row">
+        <!-- <div class="form-group row">
           <button 
             type="button"
             ng-click="save()"
@@ -256,7 +269,7 @@
             class="btn btn-success btn-sm btn-block">
               Salvar configurações
           </button>
-        </div>
+        </div> -->
 
         <div class="form-group row">
           <button 
@@ -273,6 +286,8 @@
   <!-- build:js scripts/vendor.js -->
   <script src="components/async/async.js"></script>
   <script src="components/underscore/underscore.js"></script>
+  <script src="components/moment/moment.js"></script>
+  <script src="components/moment/pt-br.js"></script>
   <script src="components/jquery/jquery.js"></script>
   <script src="components/angular/angular.js"></script>
   <script src="components/angular-route/angular-route.js"></script>

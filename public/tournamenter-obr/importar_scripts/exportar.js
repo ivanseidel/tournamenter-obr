@@ -2,7 +2,7 @@ const ObrConfigProps = ['url', 'sync', 'method', 'interval']
 
 angular.module('app.exportar', [])
 
-.controller('ExportarCtrl', function($scope, $interval, ObrConfig) {
+.controller('ExportarCtrl', function($scope, $interval, ObrConfig, $interval) {
   $scope.error = ''
   $scope.success = ''
   $scope.needsSave = false
@@ -20,10 +20,15 @@ angular.module('app.exportar', [])
   $scope.save = function (){
     $scope.error = ''
     $scope.success = ''
-    $scope.needsSave = false
+    
     // var newConfig = angular.toJson($scope.syncConfig)
     var config = _.pick($scope.syncConfig, ObrConfigProps)
-    ObrConfig.save(config)
+    ObrConfig.save(config, function (){
+      $scope.needsSave = false
+    }, function (err){
+      $scope.needsSave = true
+      $scope.error = 'Falha ao salvar!'
+    })
   }
 
   $scope.sync = function (){
@@ -36,4 +41,13 @@ angular.module('app.exportar', [])
       $scope.error = res.data
     })
   }
+
+  function checkSync() {
+    ObrConfig.lastSync(function (model){
+      $scope.lastSync = moment(parseInt(model.timestamp)).fromNow()
+    })
+  }
+
+  $interval(checkSync, 1000)
+  checkSync()
 })

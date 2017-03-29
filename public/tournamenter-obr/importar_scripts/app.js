@@ -4,6 +4,9 @@ var EXTERNAL_API_BASE   = 'http://58da575cfc6c7e120000a113.mockapi.io';
 var EXTERNAL_API_EVENTS = '/events';
 var EXTERNAL_API_TEAMS  = '/teams';
 
+moment.locale('pt-BR');
+console.log(moment.locale());
+
 var app = angular.module('app', [
   'ngRoute',
   'ngAnimate',
@@ -73,6 +76,9 @@ var app = angular.module('app', [
   return $resource(TOURNAMENTER_URL + '/obr-sync', {}, {
     save: {
       url: TOURNAMENTER_URL + '/obr-sync',
+    },
+    lastSync: {
+      url: TOURNAMENTER_URL + '/obr-last-sync',
     }
   });
 
