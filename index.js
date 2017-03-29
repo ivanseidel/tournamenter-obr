@@ -52,6 +52,7 @@ module.exports = {
 
     // Add route to change configs/get
     app.server.all('/obr-sync', SyncModule.updateConfig)
+    app.server.all('/obr-last-sync', SyncModule.getLastSync)
 
     // Init SyncModule
     SyncModule.init(app)

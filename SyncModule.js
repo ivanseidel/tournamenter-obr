@@ -24,6 +24,16 @@ exports.init = function (app) {
     console.log(TAG, config)
     exports.updateDeamon(config)
   })
+
+  app.models.Config.findOrCreate(_.defaults({
+    id:'obr-last-sync',
+  }, {}), function (err, config){
+    if (err) {
+      return console.log('Falha ao criar configuração da `obr-last-sync`!');
+    }
+
+    console.log(TAG, config)
+  })
 }
 
 /*
@@ -65,6 +75,31 @@ exports.updateConfig = function (req, res) {
   })
 }
 
+/*
+ * Returns the last successfull sync
+ */
+exports.getLastSync = function getLastSync(req, res) {
+  app.models.Config.findOne('obr-last-sync', function (err, config) {
+    if (err) {
+      return res.status(500).send(err)
+    }
+
+    var lastSync = config && config.value
+    res.send({timestamp: lastSync || null,  })
+  })
+}
+
+/*
+ * Updates the timestamp of the last success on sync (config: obr-last-sync)
+ */
+exports.didSync = function didSync() {
+  app.models.Config.update('obr-last-sync', {
+    value: Date.now()
+  }, function (err, model) {
+    console.log(TAG, 'didSync', err, model)
+  })
+}
+
 exports.config = null
 exports.interval = null
 
@@ -99,8 +134,6 @@ exports.sync = function (config, next) {
 
   // Get tables
   app.controllers.Table._findAssociated(null, function (tables) {
-    console.log('Fetched tables', tables && tables.length)
-
     request({
       url: config.url, 
       json: tables,
@@ -110,6 +143,9 @@ exports.sync = function (config, next) {
         console.log(TAG, 'Failed to sync: ' + err)
         return next && next((err || '').toString() || body)
       }
+      // Update timestamp
+      exports.didSync()
+
       // Push to url as post
       next && next(null, body)
     })
