@@ -59,7 +59,7 @@ module.exports = {
     // Set columns count to 6 as default, with names
     TableModel.attributes.columns.defaultsTo = 6;
     TableModel.attributes.headerScore.defaultsTo = 
-     'Round 1, Tempo 1, Round 2, Tempo 3, Round 3, Tempo 3';
+     'Round 1, Tempo 1, Round 2, Tempo 2, Round 3, Tempo 3';
 
     // Set default to Portugese on columns
     TableModel.attributes.headerTeam.defaultsTo = 'Equipe';
