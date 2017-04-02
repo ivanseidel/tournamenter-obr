@@ -79,7 +79,7 @@ angular.module('app.importar', [])
         return actions.push({action: 'create', msg: newTeam.name, team: newTeam})
       }
 
-      if (team.name != newTeam.name) {
+      if (team.name != newTeam.name || team.country != newTeam.country) {
         // Update
         var msg = team.name + ' -> ' + newTeam.name
         return actions.push({action: 'update', msg: msg, team: newTeam})
