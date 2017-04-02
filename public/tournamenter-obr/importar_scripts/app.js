@@ -1,8 +1,8 @@
 // v1.01
 var TOURNAMENTER_URL    = '';
-var EXTERNAL_API_BASE   = 'http://58da575cfc6c7e120000a113.mockapi.io';
-var EXTERNAL_API_EVENTS = '/events';
-var EXTERNAL_API_TEAMS  = '/teams';
+var EXTERNAL_API_BASE   = 'http://www.sistemaolimpo.org/webservice/tournamenter';
+var EXTERNAL_API_EVENTS = '/eventos.php';
+var EXTERNAL_API_TEAMS  = '/equipes.php';
 
 moment.locale('pt-BR');
 console.log(moment.locale());
