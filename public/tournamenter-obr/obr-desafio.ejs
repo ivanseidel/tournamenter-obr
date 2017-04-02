@@ -1,0 +1,155 @@
+<link rel="stylesheet" href="/tournamenter-obr/components/font-awesome/font-awesome.css">
+<link rel="stylesheet" href="/tournamenter-obr/components/bootstrap/bootstrap.css">
+<link rel="stylesheet" href="/tournamenter-obr/styles/site.css">
+
+<style type="text/css">
+.ended{
+  background-color: rgba(255,20,20,0.7);
+  background-image: none;
+}
+.hide {
+  display: none;
+}
+</style>
+
+<div data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
+
+  <div class="container hide" ng-class="{hide: !loaded}" ng-controller="DesafioCtrl">
+
+    <h2>Gerenciador de Desafios</h2>
+    <hr/>
+    <p>
+      <small style="color: rgba(0,0,0,0.6);">
+        Selecione a Tabela > Equipe e visualize ou gere desafios para equipes.
+      </small>
+    <p>
+
+    <!-- Gerar Desafios -->
+    <div class="row">
+      <div class="col-md-6 col-sm-6" ng-show="!selectedTable">
+        <h4>1) Selecione a Tabela</h4>
+        <hr/> 
+
+        <div class="alert alert-warning" ng-show="!tables.$resolved">
+          Carregando...
+        </div>
+
+        <div class="list-group">
+          <div
+            style="cursor: pointer;"
+            ng-repeat="table in tables track by table.id"
+            ng-class="selectedTable == table ? 'active' : ''"
+            ng-click="selectTable(table)"
+            class="list-group-item">
+            {{table.name}}
+            <div class="pull-right"><span class="glyphicon glyphicon-chevron-right"></span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-6 col-sm-6" ng-show="selectedTable">
+        <h4>1) Tabela: {{selectedTable.name}}
+        <div class="pull-right">
+          <button class="btn btn-danger btn-sm" type="button" ng-click="selectTable(null)">
+            <span class="glyphicon glyphicon-remove"></span>
+            Modificar Tabela
+          </button>
+        </div>
+        </h4>
+        <hr/> 
+
+        <h4>2) Selecione a Equipe</h4>
+        <hr/> 
+
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Pesquisar" ng-model="search">
+          <span class="input-group-btn">
+            <button class="btn btn-info" type="button" ng-click="search=''">Limpar</button>
+          </span>
+        </div>
+
+        <br/>
+
+        <div class="panel panel-default" style="max-height: 350px; overflow-y: scroll;">
+          <div class="list-group">
+            <div
+              style="cursor: pointer;"
+              ng-repeat="score in selectedTable.scores | filter:search  track by score.id"
+              ng-class="score == selectedScore ? 'active' : ''"
+              ng-click="selectScore(score)"
+              class="list-group-item">
+              <div class="pull-right"><span class="glyphicon glyphicon-chevron-right"></span></div>
+              {{score.team.name || '?'}}<br/> <small style="color: rgba(0,0,0,0.5);">{{score.team.country}}</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-6 col-sm-6" ng-show="selectedTable && selectedScore">
+        <h4>3) Equipe {{selectedScore.team.name || '?'}}</h4>
+        <hr/> 
+
+        <div class="alert alert-danger" ng-show="error">
+          {{error}}
+        </div>
+
+        <!-- Desafios -->
+        <div ng-repeat="id in [1, 2]">
+          <div class="alert alert-warning" ng-show="!selectedScore['desafio'+id]">
+            <div class="pull-right">
+              <button
+                type="button"
+                class="btn btn-success btn-xs"
+                ng-click="generateChallenge(selectedScore, id)">
+                Gerar
+              </button>
+            </div>
+            <span class="fa fa-lock"></span>
+            Desafio {{id}} ainda não gerado.
+          </div>
+
+          <div class="alert alert-success" ng-show="selectedScore['desafio'+id]">
+            <div class="pull-right">
+              <button
+                type="button"
+                class="btn btn-default btn-xs"
+                ng-click="generateChallenge(selectedScore, id)">
+                Gerar novamente
+              </button>
+            </div>
+
+            <span class="fa fa-unlock"></span>
+            Desafio {{id}}: <strong>{{selectedScore['desafio'+id]}}</strong>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+
+
+  </div>
+  <!-- build:js scripts/vendor.js -->
+  <script src="/tournamenter-obr/components/async/async.js"></script>
+  <script src="/tournamenter-obr/components/underscore/underscore.js"></script>
+  <script src="/tournamenter-obr/components/moment/moment.js"></script>
+  <script src="/tournamenter-obr/components/moment/pt-br.js"></script>
+  <script src="/tournamenter-obr/components/jquery/jquery.js"></script>
+  <script src="/tournamenter-obr/components/angular/angular.js"></script>
+  <script src="/tournamenter-obr/components/angular-route/angular-route.js"></script>
+  <script src="/tournamenter-obr/components/angular-animate/angular-animate.js"></script>
+  <script src="/tournamenter-obr/components/angular-resource/angular-resource.js"></script>
+  <script src="/tournamenter-obr/components/angular-bootstrap/ui-bootstrap.js"></script>
+  <script src="/tournamenter-obr/components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:js scripts/site-ui.js -->
+  <!-- endbuild -->
+
+  <script src="/tournamenter-obr/scripts_desafio/app.js"></script>
+  <script src="/tournamenter-obr/scripts_desafio/desafio.js"></script>
+  <!-- endbuild -->
+</div>
+<!-- </html> -->

@@ -32,6 +32,10 @@ module.exports = {
           name: 'Pontuador',
         },
         {
+          path: '/obr-desafio',
+          name: 'Desafio Surpresa',
+        },
+        {
           path: '/obr-config',
           name: 'Configurar (Importar/Exportar)',
         },
@@ -78,6 +82,11 @@ module.exports = {
     // Render Configuration screen
     app.server.get('/obr-config',     auth, function (req, res) {
       return res.render('obr-config', { path: req.route.path });
+    })
+
+    // Render desafio screen
+    app.server.get('/obr-desafio',    auth, function (req, res) {
+      return res.render('obr-desafio', { path: req.route.path });
     })
 
     // Set home screen to show a big huge button to guide judges
