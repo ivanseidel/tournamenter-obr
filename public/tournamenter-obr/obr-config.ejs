@@ -66,10 +66,22 @@
 
         <div class="col-md-6" style="margin-top: 8px;">
           <span
-            ng-show="!!teamsToImport" 
+            ng-show="teamsToImport.$resolved && teamsToImport.length" 
             class="label label-success"
             style="font-size: 16px;">
               {{teamsToImport.length}} Equipes
+          </span>
+          <span
+            ng-show="teamsToImport.$resolved && !teamsToImport.length" 
+            class="label label-danger"
+            style="font-size: 16px;">
+              Falha ao Carregar
+          </span>
+          <span
+            ng-show="teamsToImport && !teamsToImport.$resolved" 
+            class="label label-warning"
+            style="font-size: 16px;">
+              Carregando...
           </span>
         </div>
       </div>
@@ -79,7 +91,7 @@
           <label>
             <input
               ng-model="allowDelete"
-              type="checkbox"> Remover equipes não presentes
+              type="checkbox"> Remover equipes inexistentes no Sistema Olimpo
           </label>
         </div>
       </div>
@@ -214,7 +226,7 @@
             placeholder="URL de envio"/>
         </div>
 
-        <div class="form-group row" ng-show="syncConfig.sync">
+        <!-- <div class="form-group row" ng-show="syncConfig.sync">
           <label>
             Método HTTP de submissão (padrão: PUT)
           </label>
@@ -224,7 +236,7 @@
             <option value="PUT">PUT</option>
             <option value="POST">POST</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="form-group row" ng-show="syncConfig.sync">
           <label>
