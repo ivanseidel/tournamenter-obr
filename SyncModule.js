@@ -5,7 +5,7 @@ var request = require('request')
 exports.default = {
   url: null, 
   sync: false,
-  method: 'PUT',
+  method: 'POST',
   interval: 600,
 }
 
@@ -81,9 +81,15 @@ exports.statusMenu = {
 }
 
 exports.updateBadge = function () {
-  var on = '<span style="color: #33EE30">Ligado</span>'
-  var off = '<span style="color: #ff687d">Desligada</span>'
-  var badge = 'Syncronização: ' + (exports.config.sync ? on : off)
+  var badge = 'Syncronização: '
+
+  if (!exports.config.sync) {
+    badge += '<span style="color: #DDD"> ⚪️ Desligada</span>'
+  } else if (exports.error) {
+    badge += '<span style="color: #ff687d"> 🛑 Falhou </span>'
+  } else {
+    badge += '<span style="color: #33EE30"> 👌 Ligado</span>'
+  }
 
   exports.statusMenu.badge = badge
 }
@@ -113,6 +119,7 @@ exports.didSync = function didSync() {
   })
 }
 
+exports.error = null
 exports.config = null
 exports.interval = null
 
@@ -153,12 +160,24 @@ exports.sync = function (config, next) {
     request({
       url: config.url, 
       json: tables,
-      method: config.method
+      method: 'POST'
     }, function (err, httpResponse, body) {
       if (err) {
         console.log(TAG, 'Failed to sync: ' + err)
+        exports.error = true; exports.updateBadge();
         return next && next((err || '').toString() || body)
       }
+
+      let statusCode = httpResponse.statusCode
+      if (statusCode >= 400) {
+        console.log(TAG, 'Failed to sync', statusCode)
+        exports.error = true; exports.updateBadge();
+        return next && next('Falha na sincronização. Retorno: ' + statusCode + ': ' + body)
+      }
+
+      // Update badge
+      exports.error = false; exports.updateBadge();
+
       // Update timestamp
       exports.didSync()
 
