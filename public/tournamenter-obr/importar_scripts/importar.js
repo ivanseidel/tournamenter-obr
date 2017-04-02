@@ -79,7 +79,7 @@ angular.module('app.importar', [])
         return actions.push({action: 'create', msg: newTeam.name, team: newTeam})
       }
 
-      if (team.name != newTeam.name || team.country != newTeam.country) {
+      if (isDifferent(newTeam, team)) {
         // Update
         var msg = team.name + ' -> ' + newTeam.name
         return actions.push({action: 'update', msg: msg, team: newTeam})
@@ -124,6 +124,19 @@ angular.module('app.importar', [])
       next('Falha ao executar commit: ' + 
         commit.action + ' {id: ' + commit.team.id + ', name: ' + commit.team.name + '}')
     }
+  }
+
+  function isDifferent(a, b) {
+    for (var k in a) {
+      if (!_.isString(a[k]) || !_.isNumber(a[k]))
+        continue;
+      
+      if (a[k] != b[k]) {
+        console.log(a[k], b[k], 'differ')
+        return true
+      }
+    }
+    return false
   }
 
   function updateCommits() {
