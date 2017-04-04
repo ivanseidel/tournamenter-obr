@@ -81,12 +81,12 @@ exports.statusMenu = {
 }
 
 exports.updateBadge = function () {
-  var badge = 'Syncronização: '
+  var badge = 'Sincronização OBR: '
 
   if (!exports.config.sync) {
-    badge += '<span style="color: #DDD"> ⚪️ Desligada</span>'
+    badge += '<span style="color: #DDD"> 😴️ Desligado</span>'
   } else if (exports.error) {
-    badge += '<span style="color: #ff687d"> 🛑 Falhou </span>'
+    badge += '<span style="color: #ff687d"> 👎 Falhou </span>'
   } else {
     badge += '<span style="color: #33EE30"> 👌 Ligado</span>'
   }
@@ -143,6 +143,10 @@ exports.updateDeamon = function (config) {
   
   // Update interval
   exports.interval = setInterval(exports.sync, period)
+  
+  // Call on change
+  exports.sync()
+
   console.log(TAG, 'Deamon updated. ')
 }
 
