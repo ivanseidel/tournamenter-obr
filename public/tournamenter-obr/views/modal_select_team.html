@@ -36,7 +36,7 @@
 		<h2>Selecione o Round</h2>
 		<div class="list-group">
 			<div class="list-group-item"
-				ng-repeat="n in ['ROUND 1', 'ROUND 2', 'Round 3']"
+				ng-repeat="n in ['Round 1', 'Round 2', 'Round 3']"
 				ngold-repeat="n in selected.table.headers.scores"
 				ng-class="{active: selected.round == $index}"
 				ng-click="selectRound($index);">

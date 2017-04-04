@@ -4,12 +4,12 @@
 		ng-class="{ended: timer.data.value > 470*10}">
 		<div class="container">
 
-			<div class="navbar-text pull-left" style="width: 70px; font-size: 22px; margin: 6px;">{{timer.data.value/10}}s</div>
+			<div class="navbar-text pull-left" style="width: 70px; font-size: 22px; margin: 8px;">{{timer.data.value/10 | number:1}}s</div>
 
 			<div class="btn-group pull-left">
-				<div class="btn navbar-btn btn-default disabled" disabled style="min-width: 60px;">
+				<!-- <div class="btn navbar-btn btn-default disabled" disabled style="min-width: 60px;">
 					{{timer.data.value/10}}s
-				</div>
+				</div> -->
 
 				<div class="btn navbar-btn btn-success" ng-click="timer.start();"  ng-class="{disabled: timer.data.state == 'RUNNING'}">
 					<span class="glyphicon glyphicon-play"></span> <span class="hidden-xs">Iniciar</span>
@@ -48,15 +48,22 @@
 				<!-- Split button -->
 				<div class="btn-group">
 					<button type="button" class="btn btn-success" ng-click="selectScoredTeam();" ng-class="{disabled: timer.data.state == 'RUNNING'}">Salvar<span class="hidden-xs"></span></button>
-					<!-- <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-class="{disabled: timer.data.state == 'RUNNING'}">
-						<span class="caret"></span>
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#" ng-click="selectScoredTeam(true);">Carregar score</a></li>
-					</ul> -->
 				</div>
 
+				<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li>
+						<a
+							style="cursor: pointer;"
+							ng-click="selectScoredTeam(true)"
+							ng-class="{disabled: timer.data.state == 'RUNNING'}">
+							Carregar
+						</a>
+					</li>
+				</ul>
 			</div>
 
 			<!-- <div class="navbar-text pull-right badge badge-warning" style="font-size: 24px; min-width: 60px; color: #FFF;">{{scorings.total === null ? 'Invalid' : scorings.total}}</div> -->

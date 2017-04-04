@@ -4,7 +4,7 @@
 	/*
 		Configurations
 	*/
-	var GlobalScorerName = 'RescueScorer2016Regional';
+	var GlobalScorerName = 'RescueScorer2017Regional';
 	var SCORE_WITH_TIME = true;
 
 	angular.module('app.controllers', [])
@@ -64,10 +64,12 @@
 				var selected = $scope.selected;
 				var score = selected.score.scores;
 
-				var number1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
-				var number2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
+				var index1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
+				var index2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
+				var isScoredAlready = score[index1] || (SCORE_WITH_TIME && score[index2])
+				var isLoading = extra.doNotSave
 
-				if(score[number1] || (SCORE_WITH_TIME && score[number2])){
+				if(!isLoading && isScoredAlready){
 					// Score already exist. Confirm that
 					var key = prompt("Parece que esta equipe já possui uma pontuação neste round."+
 						"\nConfirme com o código para substituir.");
@@ -90,6 +92,7 @@
 
 			$scope.scorer = Scorer;
 			$scope.timer = stopwatch;
+			$scope.team = null;
 
 			$scope.scorings = {};
 			$scope.scoreData = {};
@@ -101,6 +104,7 @@
 				}
 				$scope.scoreData = _.deepClone(substitute || Scorer.model);
 				$scope.timer.reset();
+				$scope.team = null
 				$scope.compute();
 			};
 
@@ -150,9 +154,18 @@
 				});
 
 				modalInstance.result.then(function (selected) {
-					if(doNotSave){
+					if(doNotSave && selected && selected.score.id){
+						console.log(selected)
 						var score = selected.score;
-						var scoreData = score.scores[(selected.round - 1) * 2];
+						var index = SCORE_WITH_TIME ? selected.round * 2 : selected.round
+						var scoreData = score.scores[index];
+						var scoreTime = 0;
+
+						// Load time if SCORE_WITH_TIME is true
+						if (SCORE_WITH_TIME) {
+							scoreTime = score.scores[index + 1] && score.scores[index + 1].value || 0
+						}
+						console.log(scoreData, selected.round, scoreTime)
 						// var scoreTime = score.scores[(selected.round - 1) * 2 + 1];
 
 						var parsedData = JSON.parse(scoreData.data);
@@ -160,64 +173,64 @@
 
 						setTimeout(function (){
 							scp.scoreData = parsedData;
+							scp.timer.data.value = scoreTime * 10
+							scp.team = score.team && score.team.name || '<Equipe sem nome>'
 							scp.$apply();
 
 						}, 50);
+						return;
+					}
 
+					// Saves if doNotSave flag is false
+					if(!doNotSave && selected && selected.score.id){
 
-					}else{
-						// Saves
-						if(selected && selected.score.id){
+						var number1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
+						var number2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
 
-							var number1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
-							var number2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
+						// Save Data
+						Score.saveScore({
+							number: number1,
+							id: selected.score.id,
+							data: $scope.scoreData,
+							value: selected.total,
+						}, function (){
 
-							// Save Data
-							Score.saveScore({
-								number: number1,
-								id: selected.score.id,
-								data: $scope.scoreData,
-								value: selected.total,
-							}, function (){
-
-								if(SCORE_WITH_TIME){
-									// Save Time
-									Score.saveScore({
-										number: number2,
-										id: selected.score.id,
-										data: $scope.scoreData,
-										value: selected.time,
-									}, function (){
-
-										checkScore();
-
-									}, function (){window.alert('FALHA AO SALVAR #2. REFAÇA A OPERAÇÃO.')});
-								}else{
-									checkScore();
-								}
-
-							}, function (){window.alert('FALHA AO SALVAR #1. REFAÇA A OPERAÇÃO.')});
-
-							function checkScore(){
-								Score.get({
-									id: selected.score.id
-								}, function (score){
-									console.log(score);
-									console.log(selected.total, score.scores[number1]);
-									console.log(score.scores[number2].value, Math.round(selected.time));
-									if(score.scores[number1].value != selected.total){
-										window.alert('FALHA AO SALVAR #3. REFAÇA A OPERAÇÃO.');
-									}else if(SCORE_WITH_TIME && score.scores[number2].value != Math.floor(selected.time)){
-										window.alert('FALHA AO SALVAR #4. REFAÇA A OPERAÇÃO.');
-									}else{
-										window.alert('OK! Salvo com sucesso.');
-									}
+							if(SCORE_WITH_TIME){
+								// Save Time
+								Score.saveScore({
+									number: number2,
+									id: selected.score.id,
+									data: $scope.scoreData,
+									value: selected.time,
 								}, function (){
-									window.alert('FALHA AO SALVAR #6. REFAÇA A OPERAÇÃO.');
-								})
-							}
-						}
 
+									checkScore();
+
+								}, function (){window.alert('FALHA AO SALVAR #2. REFAÇA A OPERAÇÃO.')});
+							}else{
+								checkScore();
+							}
+
+						}, function (){window.alert('FALHA AO SALVAR #1. REFAÇA A OPERAÇÃO.')});
+
+						function checkScore(){
+							Score.get({
+								id: selected.score.id
+							}, function (score){
+								console.log(score);
+								console.log(selected.total, score.scores[number1]);
+								console.log(score.scores[number2].value, Math.round(selected.time));
+								if(score.scores[number1].value != selected.total){
+									window.alert('FALHA AO SALVAR #3. REFAÇA A OPERAÇÃO.');
+								}else if(SCORE_WITH_TIME && score.scores[number2].value != Math.floor(selected.time)){
+									window.alert('FALHA AO SALVAR #4. REFAÇA A OPERAÇÃO.');
+								}else{
+									window.alert('OK! Salvo com sucesso.');
+								}
+							}, function (){
+								window.alert('FALHA AO SALVAR #6. REFAÇA A OPERAÇÃO.');
+							})
+						}
 					}
 
 
