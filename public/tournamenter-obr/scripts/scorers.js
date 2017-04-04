@@ -30,6 +30,7 @@ var app = angular.module('app.scorers', [])
       '1a': 0,
       '2a': 0,
       '3a': 0,
+      'desafio': 0,
     },
   };
 
