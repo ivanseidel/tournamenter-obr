@@ -44,7 +44,7 @@ var app = angular.module('app.scorers', [])
     intersection: [0,15],
     passage: [0, 10],
 
-    victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+    victims: [0, 60, 40, 20],
   }
 
   return {
