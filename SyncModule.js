@@ -14,13 +14,15 @@ exports.default = {
  */
 exports.init = function (app) {
   // Generate 'obr-sync' config in database
-  app.models.Config.findOrCreate(_.defaults({
+  // app.models.Config.destroy({id: 'obr-sync'}, console.log)
+  app.models.Config.findOrCreate({id: 'obr-sync'}, _.defaults({
     id:'obr-sync',
   }, exports.default), function (err, config){
     if (err) {
       return console.log('Falha ao criar configuração da `obr-sync`!');
     }
 
+    console.log(TAG, 'init:', config.sync ? 'Ligado' : 'Desligado')
     exports.updateDeamon(config)
   })
 
