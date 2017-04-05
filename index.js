@@ -39,6 +39,10 @@ module.exports = {
           path: '/obr-config',
           name: 'Configurar (Importar/Exportar)',
         },
+        {
+          path: '/ManualOBRTournamenter.pdf',
+          name: 'Manual (.pdf)',
+        },
       ],
       order: 6
     },
