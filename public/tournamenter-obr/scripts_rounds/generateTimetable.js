@@ -204,7 +204,7 @@ function generateTimetable(config, table) {
   // Salva horário de término de cada rodada
   for (var rodada = 1; rodada <= 3; rodada++){
     // Soma com uma duração, pois eles representam inicios
-    result.finalRodadas[rodada] = _.last(horarios[rodada])
+    result.finalRodadas[rodada] = _.last(horarios[rodada]) + config.duration
   }
 
   // Gerar a tabela baseado em `allocations` e `horarios`
