@@ -33,7 +33,7 @@ var app = angular.module('app', [
 
 .controller('RoundsCtrl', function ($scope, Table) {
   $scope.tables = Table.all()
-  $scope.selTable = 0
+  $scope.selTable = null
   
   $scope.config = {
     arenas: [],
