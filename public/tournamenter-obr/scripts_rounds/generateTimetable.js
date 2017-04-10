@@ -55,7 +55,7 @@ function generateTimetable(config, table) {
   var teams = table.teams = table.teams || _.map(table.scores, function (team) {
     return {
       id: team.team && team.team.id || '?',
-      name: team.team && team.team.name || '<Sem nome>',
+      name: team.team && team.team.name.replace(/^(1|2) - /gi, '') || '<Sem nome>',
     }
   })
 
@@ -179,40 +179,53 @@ function generateTimetable(config, table) {
 
   // Salva horário de término de cada rodada
   for (var rodada = 1; rodada <= 3; rodada++){
-    result.finalRodadas[rodada] = 
-      _.chain(horarios[rodada])
-       .values()
-       .map(_.last)
-       .filter(_.isNumber)
-       .max()
-       .value() + config.duration // Soma com uma duração, pois eles representam inicios
+    // Soma com uma duração, pois eles representam inicios
+    result.finalRodadas[rodada] = _.last(horarios[rodada])
   }
 
   // Gerar a tabela baseado em `allocations` e `horarios`
   var tables = []
 
   for (var rodada = 1; rodada <= 3; rodada++) {
+    var allocation = allocations[rodada]
     var table = []
 
     // Cria Header (Primeira coluna para horário)
     table.push([''].concat(config.arenas))
     
     // Descobre quantidade de linhas
-    var rows = _.chain(allocations[rodada]).values().pluck('length').max().value()
+    var rows = horarios[rodada].length
 
     for (var row = 0; row < rows; row++) {
-      var horario = horarios[rodada][]
-      var line = []
+      var horario = minuteToTime(horarios[rodada][row])
+      var line = [horario]
+
       // Cria linhas de conteudos (para cada coluna)
       for (var arena = 0; arena < config.arenas.length; arena++) {
-
+        if (allocation[arena] && allocation[arena][row]) {
+          line.push(allocation[arena][row].name)
+        }else {
+          line.push('-')
+        }
       }
+      table.push(line)
     }
+    tables.push(table)
   }
+  result.tables = tables
 
-  // var teams = config.table.map
   window.result = result
   return result
+}
+
+/*
+  Converte de minutos para horario no tipo "hh:mm"
+ */
+function minuteToTime(value) {
+  var h = Math.floor(value / 60)
+  var m = value % 60
+  var t = (h < 10 ? '0'+h : h) + ':' + (m < 10 ? '0'+m : m)
+  return t
 }
 
 

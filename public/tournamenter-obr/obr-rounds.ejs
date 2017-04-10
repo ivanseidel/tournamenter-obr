@@ -26,7 +26,7 @@
 
     <div class="row">
       <!-- Configurations -->
-      <div class="col-md-6 col-sm-6">
+      <div class="col-md-5 col-sm-6">
 
         <!-- Tabela para gerar -->
         <label>Tabela do Tournamenter para gerar: (Nível)</label>
@@ -47,7 +47,7 @@
         <br/>
 
         <!-- Número de arenas total -->
-        <label>Arenas disponíveis: 
+        <label>Arenas disponíveis: <br/>
           <small style="font-weight: normal;">
           (Ex: "1, 2, 3, 4, 5, 6" ou "D, E, F, G")
           </small>
@@ -139,13 +139,13 @@
 
                 <span class="input-group-addon"><small>{{arena}}</small></span>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
-                  btn-radio="0" ng-change="generateTimetable()">Sem Uso</label>
+                  btn-radio="0" ng-change="generateTimetable()"><small>Vazia</small></label>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
-                  btn-radio="1" ng-change="generateTimetable()">Fácil</label>
+                  btn-radio="1" ng-change="generateTimetable()"><small>Fácil</small></label>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
-                  btn-radio="2" ng-change="generateTimetable()">Médio</label>
+                  btn-radio="2" ng-change="generateTimetable()"><small>Médio</small></label>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
-                  btn-radio="3" ng-change="generateTimetable()">Difícil</label>
+                  btn-radio="3" ng-change="generateTimetable()"><small>Difícil</small></label>
               </div>
             </div>
           </div>
@@ -154,11 +154,25 @@
       </div>
 
       <!-- Resultado -->
-      <div class="col-md-6 col-sm-6">
+      <div class="col-md-7 col-sm-6">
         <div 
           ng-repeat="error in result.errors"
           class="alert alert-danger">
           {{error}}
+        </div>
+
+        <div 
+          ng-repeat="table in result.tables"
+          class="panel panel-default">
+          <!-- Default panel contents -->
+          <div class="panel-heading">{{tables[selTable].name}} - Rodada {{$index + 1}}</div>
+
+          <!-- Table -->
+          <table class="table table-condensed table-bordered">
+            <tr ng-repeat="row in table">
+              <td ng-repeat="col in row"><small>{{col}}</small></td>
+            </tr>
+          </table>
         </div>
       </div>
 
