@@ -162,7 +162,7 @@
         </div>
 
         <div 
-          ng-repeat="table in result.tables"
+          ng-repeat="table in result.tables track by $index"
           class="panel panel-default">
           <!-- Default panel contents -->
           <div class="panel-heading">{{tables[selTable].name}} - Rodada {{$index + 1}}</div>

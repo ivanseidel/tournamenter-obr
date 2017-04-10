@@ -57,20 +57,19 @@ var app = angular.module('app', [
      */
     uso: {
       '1': {
-        0: 1,
-        1: 1,
-        2: 1,
+        // 0: 1,
+        // 1: 1,
+        // 2: 1,
       },
       '2': {
-
-        0: 2,
-        1: 2,
-        2: 2,
+        // 0: 2,
+        // 1: 2,
+        // 2: 2,
       },
       '3': {
-        0: 3,
-        1: 2,
-        2: 3,
+        // 0: 3,
+        // 1: 2,
+        // 2: 3,
       },
     },
 
@@ -100,7 +99,7 @@ var app = angular.module('app', [
     // Apply changes to scope if not in digest phase
     if(!$scope.$$phase)
       $scope.$apply();
-  }, 100, {leading: false, trailing: true})
+  }, 400, {leading: false, trailing: true})
 
   // Trigger timetable generation on configs and selTable
   $scope.$watch('selTable', $scope.generateTimetable)
