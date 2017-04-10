@@ -115,7 +115,7 @@ table .header {
             class="panel-body">
             <!-- Time selection -->
             <div
-              ng-class="config.inicios[$index] ? 'has-success' : 'has-error'"
+              ng-class="config.inicios[$index] && !result.finalRodadasErrors[rodada] ? 'has-success' : 'has-error'"
               class="form-group">
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">

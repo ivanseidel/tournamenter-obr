@@ -207,6 +207,16 @@ function generateTimetable(config, table) {
     result.finalRodadas[rodada] = _.last(horarios[rodada]) + config.duration
   }
 
+  // Verifica conflitos de horários
+  result.finalRodadasErrors = {}
+  for (var rodada = 2; rodada <= 3; rodada++){
+    if (result.finalRodadas[rodada-1] > _.first(horarios[rodada])){
+      result.errors.push('Conflito de horários. O horário inicial da Rodada ' + 
+        rodada + ' é anterior ao término da Rodada ' + (rodada - 1))
+      result.finalRodadasErrors[rodada] = true
+    }
+  }
+
   // Gerar a tabela baseado em `allocations` e `horarios`
   var tables = []
 
