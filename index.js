@@ -3,8 +3,13 @@
 */
 var _ = require('lodash');
 var path = require('path');
-var SyncModule = require('./SyncModule')
+var request = require('request')
+
 var auth = app.helpers.isAuthenticated
+var package = require('./package.json')
+var SyncModule = require('./SyncModule')
+
+var hasUpdate = null
 
 module.exports = {
   type: ['menu'],
@@ -104,11 +109,37 @@ module.exports = {
 
     // Set home screen to show a big huge button to guide judges
     app.server.get('/',     auth, function (req, res) {
-      return res.render('obr-home', { path: req.route.path });
+      return res.render('obr-home', { path: req.route.path, newestVersion: hasUpdate});
     })
 
     // Init SyncModule
     SyncModule.init(app)
+
+    // Check uptades on this package
+    request({
+      url: 'http://registry.npmjs.org/' + package.name,
+      json: true,
+    }, function (err, response, body){
+      if (err){
+        // Just check for updates if internet...
+        return;
+      }
+      if (response.statusCode != 200 || !body) {
+        // No problem. Just ignore
+        return;
+      }
+
+      var currentVersion = package.version
+      var newestVersion = body && body['dist-tags'] && body['dist-tags'].latest
+
+      if (newestVersion != currentVersion) {
+        hasUpdate = newestVersion
+        console.log()
+        console.log('>>>>>>>>>> NOVO UPDATE PARA O tournamenter-obr')
+        console.log('>>>>>>>>>> Versão: '+newestVersion)
+        console.log()
+      }
+    })
   },
 
   render: function(req, res, next, locals){
