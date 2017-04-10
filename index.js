@@ -41,7 +41,7 @@ module.exports = {
         },
         {
           path: '/obr-rounds',
-          name: 'Gerar Rounds',
+          name: 'Gerar Tabela de Horários',
         },
         {
           path: '/ManualOBRTournamenter.pdf',
