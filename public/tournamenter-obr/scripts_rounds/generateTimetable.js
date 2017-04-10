@@ -62,6 +62,7 @@ function generateTimetable(config, table) {
   // Clear niveis
   teams.forEach(function (team) {
     team.niveis = [null, null, null]
+    team.startOfSearch = 0
   })
 
   // Pares de uso dos rounds (niveis) Cacheado
@@ -104,25 +105,25 @@ function generateTimetable(config, table) {
         _.isNumber(team.niveis[1]) ? 1 : null,
         _.isNumber(team.niveis[2]) ? 2 : null,
       ]
-
       var niveisDisponiveis = _.difference(niveisDaRodada[rodada], niveisFeitos)
-      // console.log('disponivel: ',niveisFeitos, niveisDisponiveis)
-
+      
       if (niveisDisponiveis.length <= 0) {
         // Nenhum nivel disponível para competir. Não pode prosseguir...
         result.errors.push(
           '#1 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
           '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.'
         )
-        console.log(team)
         return result
       }
 
       // Encontra melhor nível para atribuir equipe
       // Euristica: Arena rodando nível com menos equipes
+      var startOfSearch = team.startOfSearch
       var allocatedArena = null
       var allocatedArenaTeams = Infinity
-      for (var arena = 0; arena < arenas; arena++) {
+      var k = 0;
+      for (k = 0; k < arenas; k++) {
+        var arena = (k + team.startOfSearch) % arenas
         var nivelDaArena = config.uso[rodada][arena]
 
         // Arena não deve ser utilizada. Pule...
@@ -139,6 +140,7 @@ function generateTimetable(config, table) {
           // Salva opção
           allocatedArena = arena
           allocatedArenaTeams = equipes
+          team.startOfSearch = (arena ) % arenas
         }
       }
 
@@ -148,7 +150,6 @@ function generateTimetable(config, table) {
           '#2 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
           '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.'
         )
-        console.log(team)
         return result
       }
 
@@ -156,68 +157,11 @@ function generateTimetable(config, table) {
       var nivel = config.uso[rodada][allocatedArena] - 1
       team.niveis[nivel] = allocatedArena
       allocations[rodada][allocatedArena].push(team)
-
-      // Tenta Distribuir entre arenas
-      // for (var relativeArena = 0; relativeArena < arenas.length; relativeArena++) {
-      //   // Look forward 
-      //   var localArenaIndex = (arenaIndex + relativeArena) % arenas.length
-      //   var nivel = config.uso[rodada][localArenaIndex]
-      //   // console.log('Rodada', rodada, 'Arena', localArenaIndex, 'Nivel', nivel, ' | ', team.name)
-
-      //   // Tenta alocar na melhor arena deste nivel da rodada(com menos equipes)
-      //   var bestArenaIndex = localArenaIndex
-      //   var bestMinEquipes = _.size(allocations[rodada][localArenaIndex])
-      //   for (var arena in config.uso[rodada]) {
-      //     // É a mesma arena, pula...
-      //     if (arena == bestArenaIndex)
-      //       continue;
-      //     var checkNivel = config.uso[rodada][arena]
-          
-      //     // Nivel diferente, pula...
-      //     if (checkNivel != nivel)
-      //       continue
-
-      //     // Não possui menos equipes, pula...
-      //     var checkEquipes = _.size(allocations[rodada][arena])
-      //     // console.log('Check best', arena, checkNivel, checkEquipes, ' <= ', bestMinEquipes)
-      //     if (bestMinEquipes <= checkEquipes)
-      //       continue
-
-      //     bestArenaIndex = arena
-      //     bestMinEquipes = checkEquipes
-      //   }
-
-
-      //   // Pula se arena não puder ser usada
-      //   if (!nivel)
-      //     continue;
-
-      //   // Checa se a equipe ainda não participou de uma rodada com este nivel
-      //   if (team.niveis[nivel - 1] !== null)
-      //     continue;
-
-      //   // Aloca 
-      //   allocatedArena = bestArenaIndex
-      //   team.niveis[nivel - 1] = bestArenaIndex
-        
-      //   // Init array if none
-      //   allocations[rodada][bestArenaIndex] = allocations[rodada][bestArenaIndex] || []
-      //   allocations[rodada][bestArenaIndex].push(team)
-        
-      //   break;
-      // }
-      // if (allocatedArena === null) {
-      // }
-      // arenaIndex = (arenaIndex + 1) % arenas.length
     }
   }
 
   console.log(' ')
-  console.log(' ')
-  console.log(' ')
-  console.log(' ')
-  console.log(' ')
-  console.log(' ')
+  console.log('======== Estatisticas ========')
   for(var rodada = 1; rodada <= 3; rodada++){
     console.log('======== Rodada', rodada, ' ========')
     for(var k = 0; k < arenas; k++) {
