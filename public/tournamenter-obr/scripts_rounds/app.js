@@ -157,8 +157,9 @@ var app = angular.module('app', [
   })
 
   // Copy to markdown
-  $scope.copyMarkdown = function (table) {
+  $scope.copyMarkdown = function (table, nivel, rodada) {
     var str = markdownTable(table)
+    str = '# '+nivel + ': Rodada ' + rodada + '\n' + str
     window.prompt('Tecle `ctrl + c` para copiar a tabela abaixo. Depois, cole em uma "MessageView" para mostrar as equipes os horários.', str)
   }
 
