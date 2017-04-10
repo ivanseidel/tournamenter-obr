@@ -171,7 +171,18 @@ table .header {
           <!-- Default panel contents -->
           <div class="panel-heading">
             <div class="pull-right" style="margin-top: -2px;">
-              <button class="btn btn-info btn-xs" ng-click="copyMarkdown(table, tables[selTable].name, $index + 1)">Copiar Markdown</button>
+              <button 
+                ng-click="downloadCSV(table, tables[selTable].name, $index + 1)"
+                class="btn btn-info btn-xs" >
+                <span class="glyphicon glyphicon-download-alt"></span>
+                Baixar CSV
+              </button>
+              <button 
+                ng-click="copyMarkdown(table, tables[selTable].name, $index + 1)"
+                class="btn btn-info btn-xs" >
+                <span class="glyphicon glyphicon-scissors"></span>
+                Copiar Markdown (Views)
+              </button>
             </div>
             <h3 class="panel-title">
               {{tables[selTable].name}} - Rodada {{$index + 1}}
