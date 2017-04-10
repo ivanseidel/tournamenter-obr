@@ -169,8 +169,8 @@
 
           <!-- Table -->
           <table class="table table-condensed table-bordered">
-            <tr ng-repeat="row in table">
-              <td ng-repeat="col in row"><small>{{col}}</small></td>
+            <tr ng-repeat="row in table track by $index">
+              <td ng-repeat="col in row track by $index"><small>{{col}}</small></td>
             </tr>
           </table>
         </div>
