@@ -166,7 +166,8 @@ var app = angular.module('app', [
   // Export CSV (Download)
 
   $scope.downloadCSV = function (table, nivel, rodada) {
-    var csvFile = exportToCsv(table)
+    var BOM = "\uFEFF";
+    var csvFile = BOM + exportToCsv(table)
     var filename = nivel + ': Rodada ' + rodada
 
     var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
