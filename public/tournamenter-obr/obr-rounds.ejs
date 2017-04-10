@@ -1,0 +1,189 @@
+<link rel="stylesheet" href="/tournamenter-obr/components/font-awesome/font-awesome.css">
+<link rel="stylesheet" href="/tournamenter-obr/components/bootstrap/bootstrap.css">
+<link rel="stylesheet" href="/tournamenter-obr/styles/site.css">
+
+<style type="text/css">
+.ended{
+  background-color: rgba(255,20,20,0.7);
+  background-image: none;
+}
+.hide {
+  display: none;
+}
+</style>
+
+<div data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
+
+  <div class="container hide" ng-class="{hide: !loaded}" ng-controller="RoundsCtrl">
+
+    <h2>Gerador de horários de Rounds</h2>
+    <hr/>
+    <p>
+      <small style="color: rgba(0,0,0,0.6);">
+        Gere tabelas de horários para cada um os 3 rounds, com suas configurações.
+      </small>
+    <p>
+
+    <div class="row">
+      <!-- Configurations -->
+      <div class="col-md-6 col-sm-6">
+
+        <!-- Tabela para gerar -->
+        <label>Tabela do Tournamenter para gerar: (Nível)</label>
+        <select class="form-control" ng-model="selTable">
+          <option ng-value="$index" ng-repeat="table in tables track by table.id">
+            {{table.name}} ({{table.scores.length}} equipes)
+          </option>
+        </select>
+        <br/>
+
+        <!-- Duração do round -->
+        <label>Duração do round total, em minutos:</label>
+        <input
+          type="number"
+          class="form-control"
+          ng-model="config.duration"
+          placeholder="Duração do round em minutos"/>
+        <br/>
+
+        <!-- Número de arenas total -->
+        <label>Arenas disponíveis: 
+          <small style="font-weight: normal;">
+          (Ex: "1, 2, 3, 4, 5, 6" ou "D, E, F, G")
+          </small>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          ng-model="arenasRaw"
+          placeholder="Arenas disponíveis"/>
+        <br/>
+
+        <!-- Horários de pausa -->
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Horários de Pausa
+            </h3>
+          </div>
+
+          <div class="panel-body">
+            <p>
+              <small style="color: rgba(0,0,0,0.6);">
+                Insira os períodos de pausa, ex: "12:00-13:00, 16:00-16:30". <br/>
+                Estes horários serão descartados no momento de gerar os rounds.
+              </small>
+            <p>
+
+            <div
+              ng-class="{'has-error': !periodosRawValid}"
+              class="form-group">
+              <input
+                type="text"
+                ng-model="periodosRaw"
+                class="form-control input-xs">
+            </div>
+
+            <span
+              style="margin-right: 10px;"
+              ng-repeat="pausa in config.periodos"
+              class="label label-warning">
+              {{pausa[0] | minuteToTime}} até {{pausa[1] | minuteToTime}}
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- Alocação de níveis -->
+        <div
+          ng-repeat="rodada in [1, 2, 3]"
+          class="panel panel-primary">
+
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Rodada {{rodada}}
+            </h3>
+          </div>
+
+          <div
+            style="padding-bottom: 0;"
+            class="panel-body">
+            <!-- Time selection -->
+            <div
+              ng-class="config.inicios[$index] ? 'has-success' : 'has-error'"
+              class="form-group">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-time"></span> Horário Inicial
+                </span>
+                <input
+                  type="text"
+                  ng-model="iniciosRaw[$index]"
+                  placeholder="hh:mm"
+                  class="form-control">
+
+                <span class="input-group-addon">
+                  Término: {{ result.finalRodadas[rodada] | minuteToTime:'Inválido'}}
+                </span>
+              </div>
+            </div>
+
+            <!-- Nivel Matrix -->
+            <div 
+              ng-class="config.uso[rodada][$index] === undefined ? 'has-error' : 'has-success'"
+              ng-repeat="arena in config.arenas track by $index"
+              class="form-group">
+              <div
+                class="btn-group btn-group-justified">
+
+                <span class="input-group-addon"><small>{{arena}}</small></span>
+                <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
+                  btn-radio="0" ng-change="generateTimetable()">Sem Uso</label>
+                <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
+                  btn-radio="1" ng-change="generateTimetable()">Fácil</label>
+                <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
+                  btn-radio="2" ng-change="generateTimetable()">Médio</label>
+                <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
+                  btn-radio="3" ng-change="generateTimetable()">Difícil</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resultado -->
+      <div class="col-md-6 col-sm-6">
+        <div 
+          ng-repeat="error in result.errors"
+          class="alert alert-danger">
+          {{error}}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- build:js scripts/vendor.js -->
+  <script src="/tournamenter-obr/components/async/async.js"></script>
+  <script src="/tournamenter-obr/components/underscore/underscore.js"></script>
+  <script src="/tournamenter-obr/components/moment/moment.js"></script>
+  <script src="/tournamenter-obr/components/moment/pt-br.js"></script>
+  <script src="/tournamenter-obr/components/jquery/jquery.js"></script>
+  <script src="/tournamenter-obr/components/angular/angular.js"></script>
+  <script src="/tournamenter-obr/components/angular-route/angular-route.js"></script>
+  <script src="/tournamenter-obr/components/angular-animate/angular-animate.js"></script>
+  <script src="/tournamenter-obr/components/angular-resource/angular-resource.js"></script>
+  <script src="/tournamenter-obr/components/angular-bootstrap/ui-bootstrap.js"></script>
+  <script src="/tournamenter-obr/components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:js scripts/site-ui.js -->
+  <!-- endbuild -->
+
+  <script src="/tournamenter-obr/scripts_api/api.js"></script>
+  <script src="/tournamenter-obr/scripts_rounds/app.js"></script>
+  <script src="/tournamenter-obr/scripts_rounds/generateTimetable.js"></script>
+  <!-- endbuild -->
+</div>
+<!-- </html> -->

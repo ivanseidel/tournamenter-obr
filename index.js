@@ -40,6 +40,10 @@ module.exports = {
           name: 'Configurar (Importar/Exportar)',
         },
         {
+          path: '/obr-rounds',
+          name: 'Gerar Rounds',
+        },
+        {
           path: '/ManualOBRTournamenter.pdf',
           name: 'Manual (.pdf)',
         },
@@ -91,6 +95,11 @@ module.exports = {
     // Render desafio screen
     app.server.get('/obr-desafio',    auth, function (req, res) {
       return res.render('obr-desafio', { path: req.route.path });
+    })
+
+    // Render Gerador de rounds screen
+    app.server.get('/obr-rounds',    auth, function (req, res) {
+      return res.render('obr-rounds', { path: req.route.path });
     })
 
     // Set home screen to show a big huge button to guide judges
