@@ -10,15 +10,19 @@
 .hide {
   display: none;
 }
+table .header {
+  font-weight: bold;
+}
 </style>
 
 <div data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
 
   <div class="container hide" ng-class="{hide: !loaded}" ng-controller="RoundsCtrl">
 
-    <h2>Gerador de horários de Rounds</h2>
+    <h2 class="hidden-print">Gerador de horários de Rounds</h2>
+    <h2 class="visible-print-inline">Horários das Rodadas: {{tables[selTable].name}}</h2>
     <hr/>
-    <p>
+    <p class="hidden-print">
       <small style="color: rgba(0,0,0,0.6);">
         Gere tabelas de horários para cada um os 3 rounds, com suas configurações.
       </small>
@@ -26,7 +30,7 @@
 
     <div class="row">
       <!-- Configurations -->
-      <div class="col-md-5 col-sm-6">
+      <div class="col-md-5 col-sm-6 hidden-print">
 
         <!-- Tabela para gerar -->
         <label>Tabela do Tournamenter para gerar: (Nível)</label>
@@ -163,13 +167,20 @@
 
         <div 
           ng-repeat="table in result.tables track by $index"
-          class="panel panel-default">
+          class="panel panel-info">
           <!-- Default panel contents -->
-          <div class="panel-heading">{{tables[selTable].name}} - Rodada {{$index + 1}}</div>
+          <div class="panel-heading">
+            <div class="pull-right" style="margin-top: -2px;">
+              <button class="btn btn-info btn-xs" ng-click="copyMarkdown(table)">Copiar Markdown</button>
+            </div>
+            <h3 class="panel-title">
+              {{tables[selTable].name}} - Rodada {{$index + 1}}
+            </h3>
+          </div>
 
           <!-- Table -->
           <table class="table table-condensed table-bordered">
-            <tr ng-repeat="row in table track by $index">
+            <tr ng-repeat="row in table track by $index" ng-class="{'header': $index == 0}">
               <td ng-repeat="col in row track by $index"><small>{{col}}</small></td>
             </tr>
           </table>
@@ -198,6 +209,7 @@
   <script src="/tournamenter-obr/scripts_api/api.js"></script>
   <script src="/tournamenter-obr/scripts_rounds/app.js"></script>
   <script src="/tournamenter-obr/scripts_rounds/generateTimetable.js"></script>
+  <script src="/tournamenter-obr/scripts_rounds/markdownTable.js"></script>
   <!-- endbuild -->
 </div>
 <!-- </html> -->

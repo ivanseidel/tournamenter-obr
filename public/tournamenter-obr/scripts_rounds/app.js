@@ -57,19 +57,19 @@ var app = angular.module('app', [
      */
     uso: {
       '1': {
-        // 0: 1,
-        // 1: 1,
-        // 2: 1,
+        0: 1,
+        1: 2,
+        2: 3,
       },
       '2': {
-        // 0: 2,
-        // 1: 2,
-        // 2: 2,
+        0: 1,
+        1: 2,
+        2: 3,
       },
       '3': {
-        // 0: 3,
-        // 1: 2,
-        // 2: 3,
+        0: 1,
+        1: 2,
+        2: 3,
       },
     },
 
@@ -155,6 +155,12 @@ var app = angular.module('app', [
     // Save periodos
     $scope.config.periodos = periodos
   })
+
+  // Copy to markdown
+  $scope.copyMarkdown = function (table) {
+    var str = markdownTable(table)
+    window.prompt('Tecle `ctrl + c` para copiar a tabela abaixo. Depois, cole em uma "MessageView" para mostrar as equipes os horários.', str)
+  }
 
 
   // Parses a period in form of 'hh:mm-hh-mm'
