@@ -52,10 +52,11 @@ function generateTimetable(config, table) {
   }
 
   // Gera equipes e salve em tabela (cache)
+  var k = 1
   var teams = table.teams = table.teams || _.map(table.scores, function (team) {
     return {
       id: team.team && team.team.id || '?',
-      name: team.team && team.team.name.replace(/^(1|2) - /gi, '') || '<Sem nome>',
+      name: (team.team && team.team.name.replace(/^(1|2) - /gi, '') || '<Sem nome>'),
     }
   })
 
@@ -63,6 +64,8 @@ function generateTimetable(config, table) {
   teams.forEach(function (team) {
     team.niveis = [null, null, null]
     team.startOfSearch = 0
+    // Equipe que precede
+    team.before = null
   })
 
   // Pares de uso dos rounds (niveis) Cacheado
@@ -72,7 +75,6 @@ function generateTimetable(config, table) {
     2: _.map(_.uniq(_.values(config.uso[2])), subtract1),
     3: _.map(_.uniq(_.values(config.uso[3])), subtract1),
   }
-  console.log(niveisDaRodada)
 
   // Start basic allocation and distribution
   var allocations = {
@@ -118,7 +120,6 @@ function generateTimetable(config, table) {
 
       // Encontra melhor nível para atribuir equipe
       // Euristica: Arena rodando nível com menos equipes
-      var startOfSearch = team.startOfSearch
       var allocatedArena = null
       var allocatedArenaTeams = Infinity
       var k = 0;
@@ -133,14 +134,34 @@ function generateTimetable(config, table) {
         // Checa se o nível da arena está em niveisDisponiveis
         if (niveisDisponiveis.indexOf(nivelDaArena - 1) < 0)
           continue
+        
+        // Verifica se a equipe anterior é a equipe de de fila indiana da equipe atual
+        var equipes = allocations[rodada][arena].length
+        var ultimaEquipe = _.last(allocations[rodada][arena]) || null
+
+        if (ultimaEquipe === team.before) {
+          allocatedArena = arena
+          // allocatedArenaTeams = equipes - 5
+          // console.log('match before', team.name, '|', team.before && team.before.name)
+          // team.startOfSearch = (arena + 1) % arenas
+          break
+        }
+
+        if (ultimaEquipe === null && team.before === null){
+          allocatedArena = arena
+          // team.startOfSearch = (arena + 1) % arenas
+          break
+        }
+        // console.log('OPS', ultimaEquipe, team.before)
 
         // Verifica se é uma opção melhor...
-        var equipes = allocations[rodada][arena].length
         if (equipes < allocatedArenaTeams) {
           // Salva opção
           allocatedArena = arena
           allocatedArenaTeams = equipes
-          team.startOfSearch = (arena ) % arenas
+          // team.startOfSearch = (arena + 1) % arenas
+          // team.before = ultimaEquipe
+          // console.log('match heuris', team.name, team.before && team.before.name)
         }
       }
 
@@ -155,7 +176,9 @@ function generateTimetable(config, table) {
 
       // Atribui arena à equipe no nivel especificado
       var nivel = config.uso[rodada][allocatedArena] - 1
+      team.startOfSearch = allocatedArena
       team.niveis[nivel] = allocatedArena
+      team.before = _.last(allocations[rodada][allocatedArena]) || null
       allocations[rodada][allocatedArena].push(team)
     }
   }
