@@ -68,14 +68,6 @@ function generateTimetable(config, table) {
     team.before = null
   })
 
-  // Pares de uso dos rounds (niveis) Cacheado
-  function subtract1(val) {return val - 1}
-  var niveisDaRodada = {
-    1: _.map(_.uniq(_.values(config.uso[1])), subtract1),
-    2: _.map(_.uniq(_.values(config.uso[2])), subtract1),
-    3: _.map(_.uniq(_.values(config.uso[3])), subtract1),
-  }
-
   // Start basic allocation and distribution
   var allocations = {
     // Rodada 1
@@ -97,24 +89,65 @@ function generateTimetable(config, table) {
       allocations[rodada][arena] = []
     }
 
+    /*
+     * Transforma o map table da tabela de uso em 
+     * um array de níveis das arenas desta rodada.
+     * Remove nível `0`: "Arena vazia"
+     * Subtrai 1 de todos, de modo que:
+     * 'facil' = 0, 'medio' = 1, 'dificil' = 2
+     */
+    function subtract1(val) {return val - 1}
+    var niveisDaRodada = 
+      _.chain(config.uso[rodada])
+       .values()
+       .without(0)
+       .map(subtract1)
+       .value()
+
+    /*
+     * Para garantir que as colunas se movimentem integralmente, precisamos
+     * garantir que nenhuma coluna irá utilizar uma arena em que uma outra
+     * coluna precise prioritariamente. Ex:
+     * - Temos arenas 1, 2, 3 e 4.
+     *
+     * - Temos os níveis [Rodada 1]:
+     *                1, 2, 3 e 1
+     *
+     * - Temos os níveis [Rodada 2]:
+     *                1, 2, 3 e 2
+     *
+     * - Temos grupos A, B, C e D (colunas)
+     * = Rodada 1:    1:A   2:B   3:C   4:D
+     * = Rodada 2:
+     *    Passo 1:    1:?   2:A   3:?   4:?
+     *    Passo 2:    1:?   2:A   3:B   4:?
+     *    Passo 3:    1:?   2:A   3:B   4:C
+     *    Passo 4:    1:!   2:A   3:B   4:C
+     *    Haverá um problema em inserir o grupo, pois o grupo D já
+     *    participou em uma arena fácil, e apenas sobrou ela.
+     *
+     * Para resolver, precisamos dar prioridade às primeiras equipes 
+     * (equipes cabeças do grupo) com "menos" opções.
+     */
+    var firstTeams = toAllocate.splice(0, niveisDaRodada.length)
+    firstTeams = _.sortBy(firstTeams, function compare(team) {
+      return - missingNiveis(team.niveis, niveisDaRodada).length
+    })
+
+    // Coloca equipes de volta no array, desta vez organizadas
+    toAllocate = firstTeams.concat(toAllocate)
+
     // Carrega uma equipe
     var team = null
     while (team = toAllocate.shift()) {
-
       // Dos níveis que a equipe ainda não participou, qual dos disponíveis pode participar?
-      var niveisFeitos = [
-        _.isNumber(team.niveis[0]) ? 0 : null,
-        _.isNumber(team.niveis[1]) ? 1 : null,
-        _.isNumber(team.niveis[2]) ? 2 : null,
-      ]
-      var niveisDisponiveis = _.difference(niveisDaRodada[rodada], niveisFeitos)
+      var niveisDisponiveis = missingNiveis(team.niveis, niveisDaRodada)
       
       if (niveisDisponiveis.length <= 0) {
         // Nenhum nivel disponível para competir. Não pode prosseguir...
         result.errors.push(
           '#1 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
-          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.'
-        )
+          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.')
         return result
       }
 
@@ -122,9 +155,10 @@ function generateTimetable(config, table) {
       // Euristica: Arena rodando nível com menos equipes
       var allocatedArena = null
       var allocatedArenaTeams = Infinity
-      var k = 0;
-      for (k = 0; k < arenas; k++) {
+
+      for (var k = 0; k < arenas; k++) {
         var arena = (k + team.startOfSearch) % arenas
+        // var arena = sortedArenas[k] * 1
         var nivelDaArena = config.uso[rodada][arena]
 
         // Arena não deve ser utilizada. Pule...
@@ -135,42 +169,38 @@ function generateTimetable(config, table) {
         if (niveisDisponiveis.indexOf(nivelDaArena - 1) < 0)
           continue
         
-        // Verifica se a equipe anterior é a equipe de de fila indiana da equipe atual
+        // Número de equipes alocadas na arena que estamos verificando
         var equipes = allocations[rodada][arena].length
-        var ultimaEquipe = _.last(allocations[rodada][arena]) || null
 
+        // Ultima equipe alocada para esta rodada na arena que estamos verificando
+        var ultimaEquipe = _.last(allocations[rodada][arena]) || null
+        
+        // Verifica se a equipe anterior é a equipe de de fila indiana da equipe atual
         if (ultimaEquipe === team.before) {
           allocatedArena = arena
-          // allocatedArenaTeams = equipes - 5
-          // console.log('match before', team.name, '|', team.before && team.before.name)
-          // team.startOfSearch = (arena + 1) % arenas
           break
         }
 
+        // Uma das primeiras equipes sendo alocadas, escolhe a primeira arena
         if (ultimaEquipe === null && team.before === null){
           allocatedArena = arena
-          // team.startOfSearch = (arena + 1) % arenas
           break
         }
-        // console.log('OPS', ultimaEquipe, team.before)
 
-        // Verifica se é uma opção melhor...
+        // Verifica se é uma opção melhor (menos equipes)...
         if (equipes < allocatedArenaTeams) {
           // Salva opção
           allocatedArena = arena
           allocatedArenaTeams = equipes
-          // team.startOfSearch = (arena + 1) % arenas
-          // team.before = ultimaEquipe
-          // console.log('match heuris', team.name, team.before && team.before.name)
         }
       }
 
+      // Nenhuma arena pode ser alocada para a equipe. É erro nela!
       if (allocatedArena === null) {
         // Nenhum nivel disponível para competir. Não pode prosseguir...
         result.errors.push(
           '#2 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
-          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.'
-        )
+          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.')
         return result
       }
 
@@ -262,6 +292,20 @@ function minuteToTime(value) {
   return t
 }
 
+
+/*
+  Retorna a lista de níveis do qual uma equipe ainda precisa participar.
+  Recebe um map list com os níveis feitos (valor != null == feito) "[null, 0, 1]" 
+  E também uma lista de níveis que a rodada atual oferece (não mapeada)
+ */
+function missingNiveis(teamNiveis, niveisDaRodada) {
+  var niveisFeitos = [
+    _.isNumber(teamNiveis[0]) ? 0 : null,
+    _.isNumber(teamNiveis[1]) ? 1 : null,
+    _.isNumber(teamNiveis[2]) ? 2 : null,
+  ]
+  return _.difference(niveisDaRodada, niveisFeitos)
+}
 
 /*
   Dada uma lista de allocations:
