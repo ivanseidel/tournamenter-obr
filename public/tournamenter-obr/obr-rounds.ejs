@@ -13,6 +13,28 @@
 table .header {
   font-weight: bold;
 }
+
+@media print {
+  #wrap > .container {
+    padding-top: 0;
+  }
+
+  #footer{
+    display: none;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  .print-full-width{
+    width: 100%;
+  }
+
+  .print-avoid-break{
+    page-break-inside: avoid;
+  }
+}
 </style>
 
 <div data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
@@ -20,8 +42,8 @@ table .header {
   <div class="container hide" ng-class="{hide: !loaded}" ng-controller="RoundsCtrl">
 
     <h2 class="hidden-print">Gerador de horários de Rounds</h2>
-    <h2 class="visible-print-inline">Horários das Rodadas: {{tables[selTable].name}}</h2>
-    <hr/>
+    <!-- <h2 class="visible-print-inline">Horários: {{tables[selTable].name}}</h2> -->
+    <hr class="hidden-print"/>
     <p class="hidden-print">
       <small style="color: rgba(0,0,0,0.6);">
         Gere tabelas de horários para cada um os 3 rounds, com suas configurações.
@@ -158,7 +180,18 @@ table .header {
       </div>
 
       <!-- Resultado -->
-      <div class="col-md-7 col-sm-6">
+      <div class="col-md-7 col-sm-6 print-full-width">
+
+        <div class="hidden-print" ng-show="result.tables">
+          <button
+            ng-click="print(null)"
+            class="btn btn-warning btn-sm pull-right">
+            <span class="glyphicon glyphicon-print"></span> Imprimir Tabelas
+          </button>
+        </div>
+        <div class="clearfix hidden-print"></div>
+        <br/>
+
         <div 
           ng-repeat="error in result.errors"
           class="alert alert-danger">
@@ -166,11 +199,12 @@ table .header {
         </div>
 
         <div 
+          ng-class="{'hidden-print': printTable !== null && printTable !== $index}"
           ng-repeat="table in result.tables track by $index"
-          class="panel panel-info">
+          class="panel panel-info print-avoid-break">
           <!-- Default panel contents -->
           <div class="panel-heading">
-            <div class="pull-right" style="margin-top: -2px;">
+            <div class="pull-right hidden-print" style="margin-top: -2px;">
               <button 
                 ng-click="downloadCSV(table, tables[selTable].name, $index + 1)"
                 class="btn btn-info btn-xs" >
@@ -182,6 +216,12 @@ table .header {
                 class="btn btn-info btn-xs" >
                 <span class="glyphicon glyphicon-scissors"></span>
                 Copiar Markdown (Views)
+              </button>
+              <button 
+                ng-click="print($index)"
+                class="btn btn-info btn-xs" >
+                <span class="glyphicon glyphicon-print"></span>
+                Imprimir
               </button>
             </div>
             <h3 class="panel-title">

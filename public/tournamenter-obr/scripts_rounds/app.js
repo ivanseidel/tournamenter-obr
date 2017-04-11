@@ -41,6 +41,9 @@ var app = angular.module('app', [
   $scope.periodosRaw = '12:00-13:00'
   $scope.periodosRawValid = false
   
+  // Used to hide tables when printing
+  $scope.printTable = null
+
   $scope.config = {
     arenas: [],
     /*
@@ -175,6 +178,13 @@ var app = angular.module('app', [
             document.body.removeChild(link);
         }
     }
+  }
+
+  // Calls the print method on browser
+  $scope.print = function (table) {
+    $scope.printTable = table
+
+    setTimeout(window.print, 100)
   }
 
 
