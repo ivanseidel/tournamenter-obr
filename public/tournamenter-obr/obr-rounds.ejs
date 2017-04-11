@@ -52,7 +52,7 @@ table .header {
 
     <div class="row">
       <!-- Configurations -->
-      <div class="col-md-5 col-sm-6 hidden-print">
+      <div class="col-md-4 col-sm-5 hidden-print">
 
         <!-- Tabela para gerar -->
         <label>Tabela do Tournamenter para gerar: (Nível)</label>
@@ -137,11 +137,16 @@ table .header {
             class="panel-body">
             <!-- Time selection -->
             <div
+              ng-show="result.finalRodadasErrors[rodada]"
+              class="alert alert-danger">
+              <small>O horário de início desta rodada é anterior ao término da rodada {{rodada-1}}</small>
+            </div>
+            <div
               ng-class="config.inicios[$index] && !result.finalRodadasErrors[rodada] ? 'has-success' : 'has-error'"
               class="form-group">
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">
-                  <span class="glyphicon glyphicon-time"></span> Horário Inicial
+                  <span class="glyphicon glyphicon-time"></span> Início
                 </span>
                 <input
                   type="text"
@@ -163,7 +168,7 @@ table .header {
               <div
                 class="btn-group btn-group-justified">
 
-                <span class="input-group-addon"><small>{{arena}}</small></span>
+                <span class="input-group-addon" style="font-size: 70%;">{{arena}}</span>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
                   btn-radio="0" ng-change="generateTimetable()"><small>Vazia</small></label>
                 <label class="btn btn-default btn-xs" ng-model="config.uso[rodada][$index]"
@@ -180,7 +185,7 @@ table .header {
       </div>
 
       <!-- Resultado -->
-      <div class="col-md-7 col-sm-6 print-full-width">
+      <div class="col-md-8 col-sm-7 print-full-width">
 
         <div class="hidden-print" ng-show="result.tables">
           <button
