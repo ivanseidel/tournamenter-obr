@@ -35,6 +35,12 @@ var app = angular.module('app', [
   $scope.tables = Table.all()
   $scope.selTable = null
   
+  $scope.result = {}
+  $scope.arenasRaw = '1, 2, 3'
+  $scope.iniciosRaw = ['09:00', '13:00', '16:00']
+  $scope.periodosRaw = '12:00-13:00'
+  $scope.periodosRawValid = false
+  
   $scope.config = {
     arenas: [],
     /*
@@ -46,31 +52,21 @@ var app = angular.module('app', [
       {
         // Rodada 1
         1: {
-          // Arena 1
+          // Arena 1, nível fácil (1)
           0: '1'
-          // Arena 2
+          // Arena 2, nível médio (2)
           1: '2'
-          // Arena 3
-          1: '2'
+          // Arena 3, nível médio (2)
+          2: '2'
+          // Arena 4, nível difícil (3)
+          3: '3'
         } 
       }
      */
     uso: {
-      '1': {
-        0: 1,
-        1: 2,
-        2: 3,
-      },
-      '2': {
-        0: 1,
-        1: 2,
-        2: 3,
-      },
-      '3': {
-        0: 1,
-        1: 2,
-        2: 3,
-      },
+      '1': { 0: 1, 1: 2, 2: 3, 3: 1, 4: 2, 5: 3, },
+      '2': { 0: 1, 1: 2, 2: 3, 3: 1, 4: 2, 5: 3, },
+      '3': { 0: 1, 1: 2, 2: 3, 3: 1, 4: 2, 5: 3, },
     },
 
     /*
@@ -85,8 +81,6 @@ var app = angular.module('app', [
 
     duration: 10,
   }
-
-  $scope.result = {}
 
   // Watches config for change and update results with generated timetable
   $scope.generateTimetable = _.throttle(function (){
@@ -105,9 +99,7 @@ var app = angular.module('app', [
   $scope.$watch('selTable', $scope.generateTimetable)
   $scope.$watchCollection('config', $scope.generateTimetable)
 
-
   // Listen to raw arenas names and generate arenas names in configs
-  $scope.arenasRaw = '1, 2, 3'
   $scope.$watch('arenasRaw', function (value) {
     var arenas = value.split(',')
 
@@ -124,14 +116,11 @@ var app = angular.module('app', [
   })
 
   // Listen to raw inicios (Inicios de rodadas)
-  $scope.iniciosRaw = ['09:00', '13:00', '16:00']
   $scope.$watchCollection('iniciosRaw', function (value) {
     $scope.config.inicios = value.map(parseTime)
   })
 
   // Listen to raw Periodos and generate periods inside configs
-  $scope.periodosRaw = '12:00-13:00'
-  $scope.periodosRawValid = false
   $scope.$watch('periodosRaw', function (value) {
     var periodos = value.split(',')
 
