@@ -184,7 +184,17 @@ var app = angular.module('app', [
   $scope.print = function (table) {
     $scope.printTable = table
 
+    // Give some time to scoppy be applied
     setTimeout(window.print, 100)
+
+    // Reset print to all the pages (default)
+    setTimeout(function (){
+      $scope.printTable = null
+
+      // Apply changes to scope if not in digest phase
+      if(!$scope.$$phase)
+        $scope.$apply();
+    }, 2000)
   }
 
 
