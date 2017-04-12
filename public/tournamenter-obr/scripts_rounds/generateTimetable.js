@@ -100,6 +100,7 @@ function generateTimetable(config, table) {
     var niveisDaRodada = 
       _.chain(config.uso[rodada])
        .values()
+       .slice(0, arenas)
        .without(0)
        .map(subtract1)
        .value()
@@ -130,9 +131,13 @@ function generateTimetable(config, table) {
      * (equipes cabeças do grupo) com "menos" opções.
      */
     var firstTeams = toAllocate.splice(0, niveisDaRodada.length)
+    // console.log(_.pluck(firstTeams, 'name'))
     firstTeams = _.sortBy(firstTeams, function compare(team) {
-      return - missingNiveis(team.niveis, niveisDaRodada).length
+      var niveis = missingNiveis(team.niveis, niveisDaRodada)
+      // console.log(team.name, niveis)
+      return niveis.length
     })
+    // console.log(_.pluck(firstTeams, 'name'))
 
     // Coloca equipes de volta no array, desta vez organizadas
     toAllocate = firstTeams.concat(toAllocate)
