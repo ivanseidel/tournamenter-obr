@@ -1,6 +1,6 @@
 {
   "name": "tournamenter-obr",
-  "version": "3.3.8",
+  "version": "3.4.0",
   "description": "Plugin da OBR Regional para o Tournamenter. Importa e exporta diretamente do Sistema olimpo.",
   "main": "index.js",
   "scripts": {
