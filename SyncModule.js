@@ -158,14 +158,26 @@ exports.updateDeamon = function (config) {
 exports.sync = function (config, next) {
   config = config || exports.config
 
+  // Check tournamenter is compatible...
+  if (! ('ConvertTableToMatrix' in app.helpers) )
+    return next('A versão do TournamenterApp precisa estar acima de 1.7.0')
+
   // Sync
   console.log(TAG, 'Sync data...')
 
   // Get tables
   app.controllers.Table._findAssociated(null, function (tables) {
+
+    var matrixTables = tables.map(app.helpers.ConvertTableToMatrix)
+
+    var data = {
+      blobs: null,
+      tables: matrixTables
+    }
+
     request({
       url: config.url, 
-      json: tables,
+      json: data,
       method: 'POST'
     }, function (err, httpResponse, body) {
       if (err) {
