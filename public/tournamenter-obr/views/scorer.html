@@ -1,7 +1,12 @@
 <!-- v1.01 -->
+<style type="text/css">
+	.progressEnding {
+		background-color: #DD3322 !important;
+	}
+</style>
 <div ng-controller="RescueScorer">
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation"
-		ng-class="{ended: timer.data.value > 295*10}">
+		ng-class="{ended: timer.data.value > scorer.totalTime*10}">
 		<div class="container">
 
 			<div class="navbar-text pull-left" style="width: 70px; font-size: 22px; margin: 8px;">{{timer.data.value/10 | number:1}}s</div>
@@ -67,6 +72,14 @@
 			</div>
 
 			<!-- <div class="navbar-text pull-right badge badge-warning" style="font-size: 24px; min-width: 60px; color: #FFF;">{{scorings.total === null ? 'Invalid' : scorings.total}}</div> -->
+		</div>
+		<div 
+			style="background-color: #dadada; height: 4px;">
+			<div 
+				ng-style="{width: timer.data.value / (scorer.totalTime / 10) + '%' }"
+				ng-class="{progressEnding: timer.data.value > scorer.totalTime * 10 - 150}"
+				style="background-color: #1bb50d; height: 4px; max-width: 100%;">
+			</div>
 		</div>
 	</nav>
 
