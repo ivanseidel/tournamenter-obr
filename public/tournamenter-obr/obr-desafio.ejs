@@ -79,8 +79,28 @@
               ng-class="score == selectedScore ? 'active' : ''"
               ng-click="selectScore(score)"
               class="list-group-item">
-              <div class="pull-right"><span class="glyphicon glyphicon-chevron-right"></span></div>
-              {{score.team.name || '?'}}<br/> <small style="color: rgba(0,0,0,0.5);">{{score.team.country}}</small>
+              <div class="pull-right">
+                <span
+                  style="margin-right: 8px"
+                  ng-class="score.desafio1 ? 'label-success' : 'label-warning'"
+                  class="label">
+                  <span
+                    ng-class="score.desafio1 ? 'glyphicon-ok' : 'glyphicon-lock'"
+                    class="glyphicon"></span>
+                </span>
+                <span
+                  style="margin-right: 8px"
+                  ng-class="score.desafio2 ? 'label-success' : 'label-warning'"
+                  class="label">
+                  <span
+                    ng-class="score.desafio2 ? 'glyphicon-ok' : 'glyphicon-lock'"
+                    class="glyphicon"></span>
+                </span>
+
+                <!-- <span class="glyphicon glyphicon-chevron-right"></span> -->
+              </div>
+              {{score.team.name || '?'}}<br/>
+              <small style="color: rgba(0,0,0,0.5);">{{score.team.country}}</small>
             </div>
           </div>
         </div>
