@@ -51,7 +51,7 @@ var app = angular.module('app.scorers', [])
     view: 'views/rescue_scorer_2017_regional.html?r='+Math.random(),
     model: model,
     scorings: scorings,
-    totalTime: 60,
+    totalTime: 300,
     score: function (model){
       var scored = {
         total: 0,
