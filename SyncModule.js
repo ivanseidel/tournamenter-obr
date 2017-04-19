@@ -168,11 +168,11 @@ exports.sync = function (config, next) {
   // Get tables
   app.controllers.Table._findAssociated(null, function (tables) {
 
-    var matrixTables = tables.map(app.helpers.ConvertTableToMatrix)
+    var matrixTables = tables.map(ConvertTableToMatrix)
 
     var data = {
-      blobs: null,
-      tables: matrixTables
+      tables: matrixTables,
+      blobs: tables,
     }
 
     request({
@@ -203,4 +203,43 @@ exports.sync = function (config, next) {
       next && next(null, body)
     })
   })
+}
+
+/*
+ * Convert table to matrix
+ */
+function ConvertTableToMatrix(table) {
+  if (!table)
+    return null;
+
+  var scores = table.scores
+  var headers = table.headers
+  var scoreColumns = parseInt(table.columns)
+  var headerColumns = 3 // RANK, NAME and FINAL
+
+  // Generate rows
+  var rows = []
+
+  // Push Header
+  var header = _.flatten([headers.rank, headers.team, headers.scores, headers.final])
+  console.log(header)
+  rows.push(header)
+
+  // Push data
+  scores.forEach(function (line) {
+    var row = [line.rank, line.team ? line.team : null]
+    
+    // Add scores (Makes sure the size is fixed)
+    _.times(scoreColumns, function (n) {
+      row.push(n in line.scores ? line.scores[n].value : '-')
+    })
+
+    // Add final score
+    row.push(line.final)
+
+    // Add to rows
+    rows.push(row)
+  })
+
+  return rows
 }
