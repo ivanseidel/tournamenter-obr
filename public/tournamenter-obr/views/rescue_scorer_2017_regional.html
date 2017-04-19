@@ -35,8 +35,7 @@
       ng-init="k = 'first'">
 
       <div class="thumbnail">
-        <h4>Marcador 1</h4>
-
+        <h5>Marcador 1</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rooms['first']"
             btn-radio="0">Nop</label>
@@ -51,8 +50,7 @@
           <span class="input-group-addon">{{scorings.rooms['first'] || 0}} pts</span>
         </div>
 
-        <h4>Marcador 2</h4>
-
+        <h5>Marcador 2</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rooms['secc']"
             btn-radio="0">Nop</label>
@@ -121,6 +119,13 @@
               {{k}}
           </label>
           <span class="input-group-addon">{{sumSpecial(scorings.passage, ['A'])}} pts</span>
+        </div>
+
+        <h5>Desafio Surpresa</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims['desafio']" btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['desafio']" btn-radio="1">Fez</label>
+          <span class="input-group-addon">{{scorings.victims['desafio'] || 0}} pts</span>
         </div>
       </div>
     </div>
@@ -191,15 +196,7 @@
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="3">3ª</label>
           <span class="input-group-addon">{{scorings.victims['3a'] || 0}} pts</span>
         </div>
-
-        <h5>Desafio Surpresa</h5>
-        <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.victims['desafio']" btn-radio="0">Nop</label>
-          <label class="btn btn-default" ng-model="scoreData.victims['desafio']" btn-radio="1">Fez</label>
-          <span class="input-group-addon">{{scorings.victims['desafio'] || 0}} pts</span>
-        </div>
-
-        <div class="btn btn-lg btn-block navbar-btn btn-danger" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
+        <div style="margin-top: 44px;" class="btn btn-lg btn-block navbar-btn btn-danger" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
           <span class="glyphicon glyphicon-pause"></span> Parar Tempo
         </div>
 
