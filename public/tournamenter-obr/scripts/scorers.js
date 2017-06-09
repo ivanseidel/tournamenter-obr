@@ -41,7 +41,7 @@ var app = angular.module('app.scorers', [])
 
     obstacles: [0,10],
     speedbump: [0, 5],
-    intersection: [0,15],
+    intersection: [0,10],
     passage: [0, 10],
 
     victims: [0, 60, 40, 20],

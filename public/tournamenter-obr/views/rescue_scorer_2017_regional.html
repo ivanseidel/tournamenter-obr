@@ -103,11 +103,11 @@
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.gaps[k]"
-            ng-repeat="k in ['A','B']"
+            ng-repeat="k in ['A','B','C','D']"
             btn-checkbox>
               {{k}}
           </label>
-          <span class="input-group-addon">{{sumSpecial(scorings.gaps, ['A','B'])}} pts</span>
+          <span class="input-group-addon">{{sumSpecial(scorings.gaps, ['A','B','C','D'])}} pts</span>
         </div>
 
         <h5>Passagem</h5>
@@ -139,7 +139,7 @@
           <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="1">1ª</label>
           <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="2">2ª</label>
           <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="3">3ª</label>
-          <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="4">4ª</label>
+          <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="4">Desistiu</label>
           <span class="input-group-addon">{{scorings.corridors['ramp'] || 0}} pts</span>
         </div>
 
