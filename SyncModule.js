@@ -202,6 +202,8 @@ exports.sync = function (config, next) {
       // Push to url as post
       next && next(null, body)
     })
+  }, {
+    isView: true,
   })
 }
 
