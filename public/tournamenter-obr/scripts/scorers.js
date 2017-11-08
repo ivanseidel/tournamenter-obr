@@ -1,5 +1,143 @@
 var app = angular.module('app.scorers', [])
 
+.factory('RescueScorer2017Nacional', function (){
+
+  var model = {
+    rooms: {
+      'first': 0,
+      'secc': 0,
+    },
+    corridors: {
+      'ramp': 0,
+    },
+    gaps: {
+
+    },
+    squares1: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    squares2: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    squares3: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    obstacles: {
+
+    },
+    speedbump: {
+
+    },
+    intersection: {
+
+    },
+    passage: {
+
+    },
+    becos: {
+
+    },
+
+    saiu_salvamento: {
+
+    },
+
+    victims: {
+      '1a': 0,
+      '2a': 0,
+      '3a': 0,
+    },
+
+    victims_lower_dead: {
+      '1a': 0,
+    },
+
+    victims_lower_live: {
+      '1a': 0,
+    },
+
+    victims_upper_dead: {
+      '1a': 0,
+    },
+
+    victims_upper_live: {
+      '1a': 0,
+    },
+  };
+
+  var scorings ={
+    rooms: [0, 60, 40, 20, 0],
+    corridors: [0,30,20,10,0],
+    gaps: [0,10],
+
+    squares1: 3,
+    squares2: 2,
+    squares3: 1,
+
+    obstacles: [0,10],
+    speedbump: [0, 5],
+    intersection: [0,15],
+    passage: [0, 10],
+
+    becos: [0, 15],
+
+    saiu_salvamento: [0, 20],
+
+    victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+
+    victims_lower_dead: [0, 15, 30, 45,  60,  75,  90, 105, 120],
+    victims_lower_live: [0, 30, 60, 90, 120, 150, 180, 210, 240],
+
+    victims_upper_dead: [0, 20, 40,  60,  80, 100, 120, 140, 160],
+    victims_upper_live: [0, 40, 80, 120, 160, 200, 240, 280, 320],
+  }
+
+  return {
+    view: 'views/rescue_scorer_2017_nacional.html?r='+Math.random(),
+    model: model,
+    scorings: scorings,
+    score: function (model){
+      var scored = {
+        total: 0,
+      };
+
+      for(var k in model){
+        scored[k] = {};
+        var group = model[k];
+
+        for(var i in group){
+          var mission = group[i];
+          if(mission === false) mission = 0;
+          if(mission === true) mission = 1;
+
+          var pointsGroup = scorings[k];
+          var points;
+          if(typeof pointsGroup == 'number'){
+            points = pointsGroup * mission;
+          }else{
+            points = scorings[k][mission];
+          }
+
+          scored[k][i] = points
+          scored.total += points || 0;
+        }
+      }
+
+      return scored;
+    }
+  }
+})
+
+
 .factory('RescueScorer2017Regional', function (){
 
   var model = {
