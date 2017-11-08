@@ -48,7 +48,7 @@ var app = angular.module('app.scorers', [])
     },
 
     saiu_salvamento: {
-
+      'final': 0,
     },
 
     victims: {
