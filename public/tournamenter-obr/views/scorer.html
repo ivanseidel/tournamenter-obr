@@ -29,7 +29,7 @@
 				</div>
 			</div>
 
-			<div class="btn-group pull-left" style="margin-left: 10px;">
+			<!-- <div class="btn-group pull-left" style="margin-left: 10px;">
 
 				<div class="btn navbar-btn btn-default" ng-click="timer.increment(-60)" ng-class="{disabled: timer.data.value == 0}">
 					-1 Min
@@ -39,7 +39,7 @@
 					+1 Min
 				</div>
 
-			</div>
+			</div> -->
 
 			<div class="btn-group navbar-btn pull-right">
 				<div class="btn btn-default disabled" disabled style="min-width: 50px;">
@@ -77,7 +77,7 @@
 			style="background-color: #dadada; height: 4px;">
 			<div 
 				ng-style="{width: timer.data.value / (scorer.totalTime / 10) + '%' }"
-				ng-class="{progressEnding: timer.data.value > scorer.totalTime * 10 - 150}"
+				ng-class="{progressEnding: timer.data.value > scorer.totalTime * 10 - 300}"
 				style="background-color: #1bb50d; height: 4px; max-width: 100%;">
 			</div>
 		</div>
