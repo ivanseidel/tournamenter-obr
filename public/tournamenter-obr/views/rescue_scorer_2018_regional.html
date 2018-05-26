@@ -92,11 +92,11 @@
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.intersection[k]"
-            ng-repeat="k in ['A','B','C','D','E','F','G','H']"
+            ng-repeat="k in ['A','B','C','D','E','F','G','H','I','J']"
             btn-checkbox>
               {{k}}
           </label>
-          <span class="input-group-addon">{{sumSpecial(scorings.intersection, ['A','B','C','D','E','F','G','H'])}} pts</span>
+          <span class="input-group-addon">{{sumSpecial(scorings.intersection, ['A','B','C','D','E','F','G','H','I','J'])}} pts</span>
         </div>
 
         <h5>Beco sem Saída</h5>
@@ -181,7 +181,7 @@
 
         <!-- <h4></h4> -->
 
-        <h5>Resgate: 1ª Vítima</h5>
+        <h5>Resgate: 1ª Vítima (Viva)</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['1a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['1a']" btn-radio="1">1ª</label>
@@ -190,7 +190,7 @@
           <span class="input-group-addon">{{scorings.victims['1a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 2ª Vítima</h5>
+        <h5>Resgate: 2ª Vítima (Viva)</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['2a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['2a']" btn-radio="1">1ª</label>
@@ -199,7 +199,7 @@
           <span class="input-group-addon">{{scorings.victims['2a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 3ª Vítima</h5>
+        <h5>Resgate: 3ª Vítima (Viva)</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="1">1ª</label>
@@ -207,6 +207,35 @@
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="3">3ª</label>
           <span class="input-group-addon">{{scorings.victims['3a'] || 0}} pts</span>
         </div>
+        
+        <h5 style="margin-top: 32px;">Resgate: 1ª Vítima (Morta)</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="1">1ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="2">2ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="3">3ª</label>
+          <span class="input-group-addon">{{scorings.victims_dead['1a'] || 0}} pts</span>
+        </div>
+
+        <h5>Resgate: 2ª Vítima (Morta)</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="1">1ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="2">2ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="3">3ª</label>
+          <span class="input-group-addon">{{scorings.victims_dead['2a'] || 0}} pts</span>
+        </div>
+
+        <h5>Resgate: 3ª Vítima (Morta)</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="1">1ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="2">2ª</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="3">3ª</label>
+          <span class="input-group-addon">{{scorings.victims_dead['3a'] || 0}} pts</span>
+        </div>
+
+
         <div style="margin-top: 44px;" class="btn btn-lg btn-block navbar-btn btn-danger" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
           <span class="glyphicon glyphicon-pause"></span> Parar Tempo
         </div>

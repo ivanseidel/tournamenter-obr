@@ -35,6 +35,11 @@ var app = angular.module('app.scorers', [])
       '3a': 0,
       'desafio': 0,
     },
+    victims_dead: {
+      '1a': 0,
+      '2a': 0,
+      '3a': 0,
+    }
   };
 
   var scorings ={
@@ -49,6 +54,7 @@ var app = angular.module('app.scorers', [])
     beco: [0, 10],
 
     victims: [0, 60, 40, 20],
+    victims_dead: [0, 50, 30, 10],
   }
 
   return {
