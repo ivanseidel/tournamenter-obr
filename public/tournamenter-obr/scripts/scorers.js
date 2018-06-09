@@ -29,6 +29,10 @@ var app = angular.module('app.scorers', [])
 
     },
 
+    saiu_salvamento: {
+      'final': 0,
+    },
+
     victims: {
       '1a': 0,
       '2a': 0,
@@ -52,6 +56,8 @@ var app = angular.module('app.scorers', [])
     intersection: [0,10],
     passage: [0, 10],
     beco: [0, 10],
+
+    saiu_salvamento: [0, 20],
 
     victims: [0, 60, 40, 20],
     victims_dead: [0, 50, 30, 10],
