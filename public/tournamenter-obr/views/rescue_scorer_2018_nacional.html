@@ -127,7 +127,7 @@
           <span class="input-group-addon">{{sumSpecial(scorings.speedbump, [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25])}} pts</span>
         </div>
 
-        <h5>Interceções</h5>
+        <h5>Intercessões</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.intersection[k]"
@@ -302,8 +302,69 @@
       <div class="thumbnail">
         <h2>Vítmas resgatadas</h2>
 
+        <h4>Nível</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.altura['final']" btn-radio="0">Baixo</label>
+          <label class="btn btn-default" ng-model="scoreData.altura['final']" btn-radio="1">Alto</label>
+          <span class="input-group-addon">{{scorings.altura['final'] || 0}} pts</span>
+        </div>
+
+        <h4>Total de Vítimas Vivas existentes</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="1">1</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="2">2</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="3">3</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="4">4</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="5">5</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="6">6</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="7">7</label>
+          <label class="btn btn-default" ng-model="scoreData.victims['total']" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims['total'] || 0}} pts</span>
+        </div>
+
+        <h4>Total de Tentativas</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="1">1</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="2">2</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="3">3</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="4">4</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="5">5</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="6">6</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="7">7</label>
+          <label class="btn btn-default" ng-model="scoreData.victims.attempts" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims.attempts || 0}} pts</span>
+        </div>
+
+        <p>.</p>
+
+        <h4>Vitmas Vivas Resgatadas</h4>
+        <div class="btn-group btn-group-justified">
+          <label ng-show="scoreData.victims['total'] >= 1" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="1">1</label>
+          <label ng-show="scoreData.victims['total'] >= 2" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="2">2</label>
+          <label ng-show="scoreData.victims['total'] >= 3" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="3">3</label>
+          <label ng-show="scoreData.victims['total'] >= 4" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="4">4</label>
+          <label ng-show="scoreData.victims['total'] >= 5" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="5">5</label>
+          <label ng-show="scoreData.victims['total'] >= 6" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="6">6</label>
+          <label ng-show="scoreData.victims['total'] >= 7" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="7">7</label>
+          <label ng-show="scoreData.victims['total'] >= 8" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims_alive.total || 0}} pts</span>
+        </div>
+
+        <h4>Vitmas Mortas Resgatadas</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="1">1</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="2">2</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="3">3</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="4">4</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="5">5</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="6">6</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="7">7</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims_dead.total || 0}} pts</span>
+        </div>
+
         <!-- <h5>1ª Vítima</h5> -->
-        <h4>Nivel B - Baixas > Vivas</h4>
+        <!-- <h4>Nivel B - Baixas > Vivas</h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_lower_live['1a']" btn-radio="0">0</label>
           <label class="btn btn-default" ng-model="scoreData.victims_lower_live['1a']" btn-radio="1">1</label>
@@ -357,7 +418,7 @@
           <label class="btn btn-default" ng-model="scoreData.victims_upper_dead['1a']" btn-radio="7">7</label>
           <label class="btn btn-default" ng-model="scoreData.victims_upper_dead['1a']" btn-radio="8">8</label>
           <span style="width: 2%" class="input-group-addon">{{scorings.victims_upper_dead['1a'] || 0}} pts</span>
-        </div>
+        </div> -->
 
         <h5>Saiu da sala de salvamento</h5>
         <div class="btn-group btn-group-justified">

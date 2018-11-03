@@ -54,27 +54,34 @@ var app = angular.module('app.scorers', [])
       'final': 0,
     },
 
+    altura: {
+      'final': 0,
+    },
+
     victims: {
-      '1a': 0,
-      '2a': 0,
-      '3a': 0,
+      'total': 1,
+      'attempts': 1,
     },
 
-    victims_lower_dead: {
-      '1a': 0,
+    victims_alive: {
+      'total': 0,
     },
 
-    victims_lower_live: {
-      '1a': 0,
+    victims_dead: {
+      'total': 0,
     },
 
-    victims_upper_dead: {
-      '1a': 0,
-    },
+    // victims_lower_live: {
+    //   '1a': 0,
+    // },
 
-    victims_upper_live: {
-      '1a': 0,
-    },
+    // victims_upper_dead: {
+    //   '1a': 0,
+    // },
+
+    // victims_upper_live: {
+    //   '1a': 0,
+    // },
   };
 
   var scorings ={
@@ -96,13 +103,45 @@ var app = angular.module('app.scorers', [])
 
     saiu_salvamento: [0, 20],
 
-    victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+    altura: function(val, scorings, model) {
+      return 0
+    },
 
-    victims_lower_dead: [0, 15, 30, 45,  60,  75,  90, 105, 120],
-    victims_lower_live: [0, 30, 60, 90, 120, 150, 180, 210, 240],
+    victims: function(sub, val, scorings, model) {
+      return 0
+    },
 
-    victims_upper_dead: [0, 20, 40,  60,  80, 100, 120, 140, 160],
-    victims_upper_live: [0, 40, 80, 120, 160, 200, 240, 280, 320],
+    victims_alive: function(sub, val, scorings, model) {
+      var salvou_todas_vivas = model.victims.total <= model.victims_alive.total
+      var tentativa = model.victims.attempts - 1
+      var nivel_alto = model.altura.final
+      var pontos_base = nivel_alto ? 40 : 30
+      var pontos = val * Math.max(pontos_base - (5 * tentativa), 0)
+      // if (salvou_todas_vivas) {
+      //   return val * 
+      // }
+      return pontos
+    },
+
+    victims_dead: function(sub, val, scorings, model) {
+      var salvou_todas_vivas = model.victims.total <= model.victims_alive.total
+      var tentativa = model.victims.attempts - 1
+      var nivel_alto = model.altura.final
+      var pontos_base = nivel_alto ? 30 : 20
+      if (!salvou_todas_vivas) {
+        pontos_base = 5
+      }
+      var pontos = val * Math.max(pontos_base - (5 * tentativa), 0)
+      return pontos
+    },
+
+    // victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+
+    // victims_lower_dead: [0, 15, 30, 45,  60,  75,  90, 105, 120],
+    // victims_lower_live: [0, 30, 60, 90, 120, 150, 180, 210, 240],
+
+    // victims_upper_dead: [0, 20, 40,  60,  80, 100, 120, 140, 160],
+    // victims_upper_live: [0, 40, 80, 120, 160, 200, 240, 280, 320],
   }
 
   return {
@@ -126,9 +165,11 @@ var app = angular.module('app.scorers', [])
 
           var pointsGroup = scorings[k];
           var points;
-          if(typeof pointsGroup == 'number'){
+          if (typeof pointsGroup == 'function') {
+            points = pointsGroup(i, mission, scorings, model)
+          } else if(typeof pointsGroup == 'number'){
             points = pointsGroup * mission;
-          }else{
+          } else {
             points = scorings[k][mission];
           }
 
