@@ -132,8 +132,8 @@
 
 				if(SCORE_WITH_TIME){
 					finalTime = $scope.timer.data.value / 10;
-					if($scope.scorings.saiu_salvamento['final'] <= 0 || finalTime > 300)
-						finalTime = 300;
+					if($scope.scorings.saiu_salvamento['final'] <= 0 || finalTime > Scorer.totalTime)
+						finalTime = Scorer.totalTime;
 				}
 
 				var modalInstance = $modal.open({

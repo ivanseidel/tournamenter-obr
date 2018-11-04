@@ -69,6 +69,7 @@ module.exports = {
     
     // Inject OBR Scoring systems
     TableModel.evaluateMethods.obr2017 = require('./sorters/obr2017');
+    TableModel.evaluateMethods.obr2018nacional = require('./sorters/obr2018nacional');
 
     // Set 'obr2017' as default sorting algorithm
     TableModel.attributes.evaluateMethod.defaultsTo = 'obr2017';

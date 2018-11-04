@@ -68,7 +68,8 @@ var app = angular.module('app.scorers', [])
     },
 
     victims_dead: {
-      'total': 0,
+      'before_alive': 0,
+      'after_alive': 0,
     },
 
     // victims_lower_live: {
@@ -128,9 +129,11 @@ var app = angular.module('app.scorers', [])
       var tentativa = model.victims.attempts - 1
       var nivel_alto = model.altura.final
       var pontos_base = nivel_alto ? 30 : 20
-      if (!salvou_todas_vivas) {
+
+      if (sub == 'before_alive') {
         pontos_base = 5
       }
+
       var pontos = val * Math.max(pontos_base - (5 * tentativa), 0)
       return pontos
     },

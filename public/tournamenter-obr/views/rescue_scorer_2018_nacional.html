@@ -127,7 +127,7 @@
           <span class="input-group-addon">{{sumSpecial(scorings.speedbump, [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25])}} pts</span>
         </div>
 
-        <h5>Intercessões</h5>
+        <h5>Interseções</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.intersection[k]"
@@ -350,17 +350,30 @@
           <span class="input-group-addon">{{scorings.victims_alive.total || 0}} pts</span>
         </div>
 
-        <h4>Vitmas Mortas Resgatadas</h4>
+        <h4>Vitmas Mortas Resgatadas (antes das vivas)</h4>
         <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="1">1</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="2">2</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="3">3</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="4">4</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="5">5</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="6">6</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="7">7</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="8">8</label>
-          <span class="input-group-addon">{{scorings.victims_dead.total || 0}} pts</span>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="1">1</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="2">2</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="3">3</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="4">4</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="5">5</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="6">6</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="7">7</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before_alive" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims_dead.before_alive || 0}} pts</span>
+        </div>
+
+        <h4>Vitmas Mortas Resgatadas (depois das vivas)</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="1">1</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="2">2</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="3">3</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="4">4</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="5">5</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="6">6</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="7">7</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.after_alive" btn-radio="8">8</label>
+          <span class="input-group-addon">{{scorings.victims_dead.after_alive || 0}} pts</span>
         </div>
 
         <!-- <h5>1ª Vítima</h5> -->
