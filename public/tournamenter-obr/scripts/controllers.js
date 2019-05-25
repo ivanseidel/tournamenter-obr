@@ -4,7 +4,7 @@
 	/*
 		Configurations
 	*/
-	var GlobalScorerName = 'RescueScorer2018Nacional';
+	var GlobalScorerName = 'RescueScorer2019Regional';
 	var SCORE_WITH_TIME = true;
 
 	angular.module('app.controllers', [])

@@ -15,8 +15,10 @@ module.exports = function () {
       if (i%2 != 0) continue;   
         sum += (scores[i]*1 || 0);    
 
-      if(minScore > scores[i]*1 && i <= 5) {    
-        minScore = scores[i]*1 || 0;                    
+      if(minScore > scores[i]*1) {    
+        if (i <= 5) {
+          minScore = scores[i]*1 || 0;                    
+        }
       }       
 
       if(maxScore < scores[i]*1) {      
