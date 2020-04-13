@@ -4,19 +4,50 @@
   "description": "Plugin da OBR Regional para o Tournamenter. Importa e exporta diretamente do Sistema olimpo.",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/http-server public/tournamenter-obr",
-    "assets": "bower install && bower-installer",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx http-server public",
+    "build": "webpack --config webpack.config.js",
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ivan Seidel <ivan@tendadigital.net>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ivanseidel/tournamenter-obr"
+  },
+  "license": "MIT",
   "dependencies": {
-    "http-server": "^0.7.1",
-    "lodash": "^4.14.0",
-    "request": "^2.81.0"
+    "angular": "~1.2.0",
+    "angular-animate": "~1.2.0",
+    "angular-bootstrap": "^0.12.2",
+    "angular-cookies": "~1.2.0",
+    "angular-resource": "~1.2.0",
+    "angular-route": "~1.2.0",
+    "angular-sanitize": "~1.2.0",
+    "async": "^2.2.0",
+    "bootstrap": "^4.4.1",
+    "bootstrap-slider": "^10.6.2",
+    "font-awesome": "^4.7.0",
+    "jquery": "~2.1.1",
+    "moment": "^2.18.1",
+    "popper.js": "^1.16.1"
   },
   "devDependencies": {
-    "bower": "^1.7.9",
-    "bower-installer": "latest"
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "autoprefixer": "^9.7.6",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^7.0.2",
+    "css-loader": "^3.5.2",
+    "cssnano": "^4.1.10",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.2.0",
+    "lodash": "^4.14.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-fetch": "^2.6.0",
+    "postcss-loader": "^3.0.0",
+    "sass": "^1.26.3",
+    "sass-loader": "^8.0.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }
