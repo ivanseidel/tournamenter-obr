@@ -102,7 +102,7 @@
 					if(!confirm('Are you sure you want to delete this?'))
 						return;
 				}
-				$scope.scoreData = _.deepClone(substitute || Scorer.model);
+				$scope.scoreData = JSON.parse(JSON.stringify(substitute || Scorer.model));
 				$scope.timer.reset();
 				$scope.team = null
 				$scope.compute();

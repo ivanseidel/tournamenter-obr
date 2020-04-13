@@ -1,4 +1,4 @@
-moment.locale('pt-BR');
+// moment.locale('pt-BR');
 
 var app = angular.module('app', [
   'ngRoute',

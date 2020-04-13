@@ -3,8 +3,6 @@ var TOURNAMENTER_URL = '';
 
 (function() {
 
-	_.mixin({ deepClone: function (p_object) { return JSON.parse(JSON.stringify(p_object)); } });
-
 	var app = angular.module('app', [
 		'ngRoute',
 		'ngAnimate',

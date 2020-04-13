@@ -2,7 +2,7 @@ const ObrConfigProps = ['url', 'sync', 'method', 'interval']
 
 angular.module('app.exportar', [])
 
-.controller('ExportarCtrl', function($scope, $interval, ObrConfig, $interval) {
+.controller('ExportarCtrl', function($scope, $interval, ObrConfig) {
   $scope.error = ''
   $scope.success = ''
   $scope.needsSave = false
