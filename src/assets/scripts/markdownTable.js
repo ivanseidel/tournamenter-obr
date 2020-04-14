@@ -6,50 +6,50 @@
 // module.exports = markdownTable;
 
 /* Expressions. */
-var EXPRESSION_DOT = /\./;
-var EXPRESSION_LAST_DOT = /\.[^.]*$/;
+const EXPRESSION_DOT = /\./;
+const EXPRESSION_LAST_DOT = /\.[^.]*$/;
 
 /* Allowed alignment values. */
-var LEFT = 'l';
-var RIGHT = 'r';
-var CENTER = 'c';
-var DOT = '.';
-var NULL = '';
+const LEFT = 'l';
+const RIGHT = 'r';
+const CENTER = 'c';
+const DOT = '.';
+const NULL = '';
 
-var ALLIGNMENT = [LEFT, RIGHT, CENTER, DOT, NULL];
-var MIN_CELL_SIZE = 3;
+const ALLIGNMENT = [LEFT, RIGHT, CENTER, DOT, NULL];
+const MIN_CELL_SIZE = 3;
 
 /* Characters. */
-var COLON = ':';
-var DASH = '-';
-var PIPE = '|';
-var SPACE = ' ';
-var NEW_LINE = '\n';
+const COLON = ':';
+const DASH = '-';
+const PIPE = '|';
+const SPACE = ' ';
+const NEW_LINE = '\n';
 
 /* Create a table from a matrix of strings. */
 function markdownTable(table, options) {
-  var settings = options || {};
-  var delimiter = settings.delimiter;
-  var start = settings.start;
-  var end = settings.end;
-  var alignment = settings.align;
-  var calculateStringLength = settings.stringLength || lengthNoop;
-  var cellCount = 0;
-  var rowIndex = -1;
-  var rowLength = table.length;
-  var sizes = [];
-  var align;
-  var rule;
-  var rows;
-  var row;
-  var cells;
-  var index;
-  var position;
-  var size;
-  var value;
-  var spacing;
-  var before;
-  var after;
+  const settings = options || {};
+  let delimiter = settings.delimiter;
+  let start = settings.start;
+  let end = settings.end;
+  let alignment = settings.align;
+  const calculateStringLength = settings.stringLength || lengthNoop;
+  let cellCount = 0;
+  let rowIndex = -1;
+  const rowLength = table.length;
+  let sizes = [];
+  let align;
+  let rule;
+  let rows;
+  let row;
+  let cells;
+  let index;
+  let position;
+  let size;
+  let value;
+  let spacing;
+  let before;
+  let after;
 
   alignment = alignment ? alignment.concat() : [];
 
@@ -125,7 +125,8 @@ function markdownTable(table, options) {
       if (alignment[index] === DOT) {
         position = dotindex(value);
 
-        size = sizes[index] +
+        size =
+          sizes[index] +
           (EXPRESSION_DOT.test(value) ? 0 : 1) -
           (calculateStringLength(value) - position);
 
@@ -231,7 +232,7 @@ function markdownTable(table, options) {
 }
 
 function stringify(value) {
-  return (value === null || value === undefined) ? '' : String(value);
+  return value === null || value === undefined ? '' : String(value);
 }
 
 /* Get the length of `value`. */
@@ -246,7 +247,7 @@ function pad(length, character) {
 
 /* Get the position of the last dot in `value`. */
 function dotindex(value) {
-  var match = EXPRESSION_LAST_DOT.exec(value);
+  const match = EXPRESSION_LAST_DOT.exec(value);
 
   return match ? match.index + 1 : value.length;
 }

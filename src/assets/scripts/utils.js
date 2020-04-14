@@ -1,7 +1,7 @@
 const countBy = (list, iteratee) => {
-  if (typeof iteratee != 'function') {
+  if (typeof iteratee !== 'function') {
     const iterateeRef = iteratee;
-    iteratee = (value) => value[iterateeRef];
+    iteratee = value => value[iterateeRef];
   }
 
   return list.reduce((accumulator, current, index) => {
@@ -16,8 +16,8 @@ const countBy = (list, iteratee) => {
 };
 
 const pick = (object, ...whitelist) => {
-  let obj = {};
-  
+  const obj = {};
+
   whitelist.flat(Infinity).map(whiteitem => {
     obj[whiteitem] = object[whiteitem];
   });
@@ -30,12 +30,12 @@ const without = (array, ...values) => {
 };
 
 const throttle = (func, timeFrame) => {
-  const lastTime = 0;
+  let lastTime = 0;
   return () => {
     const now = new Date();
     if (now - lastTime >= timeFrame) {
       func();
-      lastTime = now
+      lastTime = now;
     }
   };
 };

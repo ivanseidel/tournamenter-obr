@@ -2,6 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const PrettierPlugin = require("prettier-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -15,14 +16,25 @@ module.exports = {
   module: {
     rules: [
       {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        loader: 'eslint-loader',
+        options: {
+          failOnWarning: false,
+          failOnError: true,
+          fix: true,
+        }
+      },
+      {
         test: /\.js$/,
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env'],
-          }
-        }
+          },
+        },
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -94,7 +106,17 @@ module.exports = {
         useShortDoctype: true,
       },
       scriptLoading: 'defer',
-    })
+    }),
+    new PrettierPlugin({
+      tabWidth: 2, // Specify the number of spaces per indentation-level.
+      useTabs: false, // Indent lines with tabs instead of spaces.
+      semi: true, // Print semicolons at the ends of statements.
+      encoding: 'utf-8', // Which encoding scheme to use on files
+      extensions: [".js"],
+      singleQuote: true,
+      arrowParens: "avoid",
+      endOfLine: "auto" 
+    }),
   ],
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   resolve: {

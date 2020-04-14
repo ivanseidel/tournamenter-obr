@@ -1,0 +1,63 @@
+module.exports = {
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["angular"],
+  "rules": {
+    "getter-return":	1,
+    "no-async-promise-executor": 2,
+    "no-await-in-loop": 2,
+    "no-compare-neg-zero": 1,
+    "no-cond-assign":	2,
+    "no-constant-condition": 2,
+    "no-debugger": 1,
+    "no-dupe-args":	2,
+    "no-dupe-else-if": 1,
+    "no-dupe-keys":	2,
+    "no-empty":	1,
+    "no-extra-parens": 1,
+    "no-extra-semi": 1,
+    "no-import-assign":	2,
+    "no-inner-declarations": 1,
+    "no-prototype-builtins": 1,
+    "no-regex-spaces": 1,
+    "no-setter-return":	2,
+    "no-sparse-arrays":	1,
+    "no-template-curly-in-string": 2,
+    "no-unexpected-multiline": 1,
+    "no-unreachable":	2,
+    "no-unsafe-finally": 2,
+    "no-unsafe-negation":	1,
+    "use-isnan": 1,
+    "valid-typeof": 1,
+    "no-undef": 1,
+    "no-unused-vars": 1,
+    "class-methods-use-this": 1,
+    "curly": 1,
+    "eqeqeq": 1,
+    "no-else-return": 2,
+    "require-await": 1,
+    "global-require": 1,
+    "indent": ["error", 2],
+    "object-curly-spacing": ["warn", "always"],
+    "arrow-parens": ["warn", "as-needed"],
+    "no-var": 2,
+    "prefer-const": ["warn", {
+      "destructuring": "all",
+      "ignoreReadBeforeAssign": false,
+    }],
+    "prefer-rest-params": 1,
+    "prefer-spread": 1,
+    "quotes": ["warn", "single", { "avoidEscape": true }],
+  }
+};

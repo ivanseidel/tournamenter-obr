@@ -1,20 +1,21 @@
 // moment.locale('pt-BR');
 
-var app = angular.module('app', [
-  'ngRoute',
-  'ngAnimate',
-  'ngResource',
+const app = angular
+  .module('app', [
+    'ngRoute',
+    'ngAnimate',
+    'ngResource',
 
-  'ui.bootstrap',
+    'ui.bootstrap',
 
-  'app.api',
-  'Desafio',
-])
+    'app.api',
+    'Desafio',
+  ])
 
-.controller('AppCtrl', function ($scope, $timeout) {
-  $scope.loaded = false
+  .controller('AppCtrl', function ($scope, $timeout) {
+    $scope.loaded = false;
 
-  $timeout(function (){
-    $scope.loaded = true
-  }, 500)
-})
+    $timeout(function () {
+      $scope.loaded = true;
+    }, 500);
+  });
