@@ -1,35 +1,48 @@
-const pick = (obj, ...whitelist) => {
-  return {};
+const countBy = (list, iteratee) => {
+  if (typeof iteratee != 'function') {
+    const iterateeRef = iteratee;
+    iteratee = (value) => value[iterateeRef];
+  }
+
+  return list.reduce((accumulator, current, index) => {
+    index = iteratee(current);
+    if (accumulator.hasOwnProperty(index)) {
+      ++accumulator[index];
+    } else {
+      accumulator[index] = 1;
+    }
+    return accumulator;
+  }, {});
 };
-const throttle = () => {};
-const isNumber = () => {};
-const reduce = () => {};
-const values = () => {};
-const without = () => {};
-const sample = () => {};
-const chain = () => {};
-const slice = () => {};
-const sortBy = () => {};
-const last = () => {};
-const first = () => {};
-const difference = () => {};
-const isString = () => {};
-const countBy = () => {};
+
+const pick = (object, ...whitelist) => {
+  let obj = {};
+  
+  whitelist.flat(Infinity).map(whiteitem => {
+    obj[whiteitem] = object[whiteitem];
+  });
+
+  return obj;
+};
+
+const without = (array, ...values) => {
+  return array.filter(value => values.flat(Infinity).includes(value));
+};
+
+const throttle = (func, timeFrame) => {
+  const lastTime = 0;
+  return () => {
+    const now = new Date();
+    if (now - lastTime >= timeFrame) {
+      func();
+      lastTime = now
+    }
+  };
+};
 
 module.exports = {
-  pick,
-  throttle,
-  isNumber,
-  reduce,
-  values,
-  without,
-  sample,
-  chain,
-  slice,
-  sortBy,
-  last,
-  first,
-  difference,
-  isString,
   countBy,
+  pick,
+  without,
+  throttle,
 };

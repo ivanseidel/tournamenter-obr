@@ -1,152 +1,150 @@
+const { countBy } = require('./utils');
+
 angular.module('app.importar', [])
 
-.controller('ImportarCtrl', function($scope, Team, ExternalEventAPI, ExternalTeamAPI) {
-  $scope.error = ''
-  $scope.success = ''
-  $scope.teams = Team.all()
-  $scope.events = ExternalEventAPI.all()
-  $scope.importEvent = null
-  $scope.teamsToImport = null
+.controller('ImportarCtrl', ($scope, Team, ExternalEventAPI, ExternalTeamAPI) => {
+  $scope.error = '';
+  $scope.success = '';
+  $scope.teams = Team.all();
+  $scope.events = ExternalEventAPI.all();
+  $scope.importEvent = null;
+  $scope.teamsToImport = null;
 
-  $scope.$watch('importEvent', function () {
+  $scope.$watch('importEvent', () => {
     if (!$scope.importEvent) {
-      return
+      return;
     }
 
-    $scope.teamsToImport = ExternalTeamAPI.all({event: $scope.importEvent})
+    $scope.teamsToImport = ExternalTeamAPI.all({ event: $scope.importEvent });
   })
 
-  $scope.actions = null
-  $scope.progress = 0
-  $scope.canCommit = false
+  $scope.actions = null;
+  $scope.progress = 0;
+  $scope.canCommit = false;
 
-  $scope.diffTeams = function () {
-    $scope.error = ''
-    $scope.success = ''
-    $scope.actions = null
+  $scope.diffTeams = () => {
+    $scope.error = '';
+    $scope.success = '';
+    $scope.actions = null;
 
-    $scope.teams = Team.all(function (){
+    $scope.teams = Team.all(() => {
       // Generate commits
-      $scope.actions = getCommits($scope.teams, $scope.teamsToImport, $scope.allowDelete)
-      $scope.actionsStats = _.countBy($scope.actions, 'action')
+      $scope.actions = getCommits($scope.teams, $scope.teamsToImport, $scope.allowDelete);
+      $scope.actionsStats = countBy($scope.actions, 'action');
 
       // Show message
       if ($scope.actions.length === 0) {
-        $scope.success = 'Nenhuma diferença encontrada. Equipes já estão sincronizados'
+        $scope.success = 'Nenhuma diferença encontrada. Equipes já estão sincronizados';
       } else {
-        $scope.success = 'Diferenças encontradas. Verifique e execute as mudanças (passo 2)'
-        $scope.canCommit = true
+        $scope.success = 'Diferenças encontradas. Verifique e execute as mudanças (passo 2)';
+        $scope.canCommit = true;
       }
 
-    }, function (err) {
-      $scope.error = err
+    }, err => {
+      $scope.error = err;
     })
   }
 
-  $scope.executing = false
+  $scope.executing = false;
 
-  $scope.executeCommits = function (){
+  $scope.executeCommits = () => {
     if ($scope.executing)
-      return
+      return;
 
-    $scope.error = ''
-    $scope.success = ''
-    $scope.progress = 0
-    $scope.executing = true
-    $scope.canCommit = false
+    $scope.error = '';
+    $scope.success = '';
+    $scope.progress = 0;
+    $scope.executing = true;
+    $scope.canCommit = false;
 
-    async.forEachSeries($scope.actions, applyCommit, function (err) {
-      $scope.progress = 0
-      $scope.executing = false
+    async.forEachSeries($scope.actions, applyCommit, err => {
+      $scope.progress = 0;
+      $scope.executing = false;
       if (err) {
-        $scope.error = 'Falha ao executar commit: ' + err
+        $scope.error = `Falha ao executar commit: ${err}`;
       }
 
-      $scope.success = 'Importação finalizada com sucesso!'
+      $scope.success = 'Importação finalizada com sucesso!';
 
-      updateCommits()
+      updateCommits();
     })
   }
 
   function getCommits(teams, newTeams, allowDelete) {
-    var actions = []
+    let actions = [];
 
-    newTeams.forEach(function (newTeam){
-      var team = teams.find(function (t) {return newTeam.id == t.id})
+    newTeams.forEach(newTeam => {
+      var team = teams.find(t => newTeam.id == t.id);
 
       if (!team) {
         // Create
-        return actions.push({action: 'create', msg: newTeam.name, team: newTeam})
+        return actions.push({ action: 'create', msg: newTeam.name, team: newTeam });
       }
 
       if (isDifferent(newTeam, team)) {
         // Update
-        var msg = team.name + ' -> ' + newTeam.name
-        return actions.push({action: 'update', msg: msg, team: newTeam})
+        const msg = team.name + ' -> ' + newTeam.name;
+        return actions.push({action: 'update', msg, team: newTeam});
       }
-    })
+    });
 
     // Deletion? 
     if (allowDelete) {
-      teams.forEach(function (oldTeam) {
-        var team = newTeams.find(function (t) {return oldTeam.id == t.id})
+      teams.forEach(oldTeam => {
+        const team = newTeams.find(t => oldTeam.id == t.id);
 
         if (!team) {
           // Remove
-          return actions.push({action: 'remove', msg: oldTeam.name, team: oldTeam})
+          return actions.push({ action: 'remove', msg: oldTeam.name, team: oldTeam });
         }
       })
     }
 
-    return actions
+    return actions;
   }
 
   function applyCommit(commit, next) {
-    if (commit.action == 'create') {
-      Team.create(commit.team, onFinish, onError)
-    } else if (commit.action == 'update') {
-      Team.update(commit.team, onFinish, onError)
-    } else if (commit.action == 'remove') {
-      Team.remove(commit.team, onFinish, onError)
-    }
+    const { action, team } = commit;
+    const { id, name } = team;
 
     function onFinish(){
-      commit.status = 'success'
-      updateCommits()
-      setTimeout(function (){
+      commit.status = 'success';
+      updateCommits();
+      setTimeout(() => {
         next()
       }, 50);
     }
 
     function onError(){
-      commit.status = 'error'
-      updateCommits()
-      next('Falha ao executar commit: ' + 
-        commit.action + ' {id: ' + commit.team.id + ', name: ' + commit.team.name + '}')
+      commit.status = 'error';
+      updateCommits();
+      next(`Falha ao executar commit: ${action} { id: ${id}, name: ${name} }`);
     }
+
+    Team[action](team, onFinish, onError);
   }
 
   function isDifferent(a, b) {
     for (var k in a) {
-      if (!_.isString(a[k]) || !_.isNumber(a[k]))
+      if (typeof a[k] !== 'string' || typeof a[k] !== 'number')
         continue;
       
       if (a[k] != b[k]) {
-        console.log(a[k], b[k], 'differ')
-        return true
+        console.log(a[k], b[k], 'differ');
+        return true;
       }
     }
-    return false
+    return false;
   }
 
   function updateCommits() {
     // Update progress
-    var total = $scope.actions.length
-    var progress = _.countBy($scope.actions, 'status')['success'] || 0
-    $scope.progress = Math.round(progress / total * 100)
+    const total = $scope.actions.length;
+    const progress = countBy($scope.actions, 'status')['success'] || 0;
+    $scope.progress = Math.round(progress / total * 100);
 
     // Apply changes to scope if not in digest phase
     if(!$scope.$$phase)
       $scope.$apply();
   }
-})
+});

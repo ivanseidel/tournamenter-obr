@@ -1,4 +1,6 @@
-const ObrConfigProps = ['url', 'sync', 'method', 'interval']
+const { pick } = require('./utils');
+
+const ObrConfigProps = ['url', 'sync', 'method', 'interval'];
 
 angular.module('app.exportar', [])
 
@@ -22,7 +24,7 @@ angular.module('app.exportar', [])
     $scope.success = ''
 
     // var newConfig = angular.toJson($scope.syncConfig)
-    var config = _.pick($scope.syncConfig, ObrConfigProps)
+    var config = pick($scope.syncConfig, ObrConfigProps)
     ObrConfig.save(config, function (){
       $scope.needsSave = false
     }, function (err){

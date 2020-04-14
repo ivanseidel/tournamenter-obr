@@ -1,73 +1,77 @@
-var TAG = _TAG('SyncModule')
+const request = require('request');
 
-var request = require('request')
+const { pick } = require('./src/assets/scripts/utils');
 
-exports.default = {
+const TAG = _TAG('SyncModule');
+
+const default = {
   url: null, 
   sync: false,
   method: 'POST',
   interval: 600,
 }
 
+exports = {
+  default,
+}
+
 /*
  * Initializes deamon based on database configuration
  */
-exports.init = function (app) {
+exports.init = (app) => {
   // Generate 'obr-sync' config in database
   // app.models.Config.destroy({id: 'obr-sync'}, console.log)
-  app.models.Config.findOrCreate({id: 'obr-sync'}, _.defaults({
+  app.models.Config.findOrCreate({ id: 'obr-sync' }, {
+    ...default,
     id:'obr-sync',
-  }, exports.default), function (err, config){
+  }, (err, config) => {
     if (err) {
-      return console.log('Falha ao criar configuração da `obr-sync`!');
+      return console.error('Falha ao criar configuração da `obr-sync`!');
     }
 
-    console.log(TAG, 'init:', config.sync ? 'Ligado' : 'Desligado')
-    exports.updateDeamon(config)
-  })
+    console.log(TAG, 'init:', config.sync ? 'Ligado' : 'Desligado');
+    exports.updateDeamon(config);
+  });
 
-  app.models.Config.findOrCreate(_.defaults({
-    id:'obr-last-sync',
-  }, {}), function (err, config){
+  app.models.Config.findOrCreate({ id:'obr-last-sync' }, (err, config) => {
     if (err) {
-      return console.log('Falha ao criar configuração da `obr-last-sync`!');
+      return console.error('Falha ao criar configuração da `obr-last-sync`!');
     }
-  })
+  });
 }
 
 /*
  * Handles the route /obr-sync
  * Saves configs in the database, and update deamon to reflect new config
  */
-exports.updateConfig = function (req, res) {
+exports.updateConfig = (req, res) => {
 
   // Save to database
-  app.models.Config.findOne('obr-sync', function (err, model) {
-    var config = _.defaults(req.query, model, exports.default)
-    config = _.pick(config, _.keys(exports.default))
-    
+  app.models.Config.findOne('obr-sync', (err, model) => {
+    let config = pick({...default, ...model, ...req.query }, Object.keys(default)); 
+
     // Fix for boolean flags like 'sync'
-    var falses = ['false', '0', 'off', false]
-    config.sync = falses.includes(config.sync) ? false : true
+    const falses = ['false', '0', 'off', false];
+    config.sync = falses.includes(config.sync) ? false : true;
 
     // Convert time to number
-    config.interval = parseInt(config.interval)
+    config.interval = parseInt(config.interval);
     
     // Update deamon
-    exports.updateDeamon(config)
+    exports.updateDeamon(config);
 
     // Persist do db if 'now' is not set
     if ('now' in req.query) {
-      exports.sync(config, function (err, data) {
+      exports.sync(config, (err, data) => {
         if (err) {
-          return res.status(500).send(err)
+          return res.status(500).send(err);
         }
 
-        return res.send('now')
+        return res.send('now');
       })
     } else {
-      app.models.Config.update('obr-sync', config, function (err, model){
-        return res.send(_.pick(model[0], _.keys(exports.default)))
+      app.models.Config.update('obr-sync', config, (err, model) => {
+        return res.send(pick(model[0], Object.keys(default)));
       })
     }
   })
@@ -79,45 +83,47 @@ exports.updateConfig = function (req, res) {
 exports.statusMenu = {
   path: '/obr-config',
   name: '',
-  badge: 'Sync: Inicializando...'
+  badge: 'Sync: Inicializando...',
 }
 
-exports.updateBadge = function () {
-  var badge = 'Sincronização OBR: '
+exports.updateBadge = () => {
+  var badge = 'Sincronização OBR: <span style="color: ';
 
   if (!exports.config.sync) {
-    badge += '<span style="color: #DDD"> 😴️ Desligado</span>'
+    badge += '#DDD"> 😴️ Desligado';
   } else if (exports.error) {
-    badge += '<span style="color: #ff687d"> 👎 Falhou </span>'
+    badge += '#ff687d"> 👎 Falhou';
   } else {
-    badge += '<span style="color: #33EE30"> 👌 Ligado</span>'
+    badge += '#33EE30"> 👌 Ligado';
   }
 
-  exports.statusMenu.badge = badge
+  badge += '</span>';
+
+  exports.statusMenu.badge = badge;
 }
 
 /*
  * Returns the last successfull sync
  */
-exports.getLastSync = function getLastSync(req, res) {
-  app.models.Config.findOne('obr-last-sync', function (err, config) {
+exports.getLastSync = (req, res) => {
+  app.models.Config.findOne('obr-last-sync', (err, config) => {
     if (err) {
-      return res.status(500).send(err)
+      return res.status(500).send(err);
     }
 
-    var lastSync = config && config.value
-    res.send({timestamp: lastSync || null,  })
+    var lastSync = config && config.value;
+    res.send({ timestamp: lastSync || null });
   })
 }
 
 /*
  * Updates the timestamp of the last success on sync (config: obr-last-sync)
  */
-exports.didSync = function didSync() {
+exports.didSync = () => {
   app.models.Config.update('obr-last-sync', {
     value: Date.now()
-  }, function (err, model) {
-    console.log(TAG, 'didSync', err ? err : 'OK')
+  }, (err, model) => {
+    console.log(TAG, 'didSync', err || 'OK');
   })
 }
 
@@ -128,49 +134,49 @@ exports.interval = null
 /*
  * Updates the deamon responsible for triggering sync
  */
-exports.updateDeamon = function (config) {
-  exports.config = config
-  clearInterval(exports.interval)
-  exports.interval = null
+exports.updateDeamon = (config) => {
+  exports.config = config;
+  clearInterval(exports.interval);
+  exports.interval = null;
 
-  exports.updateBadge()
+  exports.updateBadge();
 
   if (!config.sync) {
-    return
+    return;
   }
   // Limit interval period
-  var period = exports.config.interval * 1000 || 0
-  period = Math.max(period,  1 * 60 * 1000) // 1 minute minimum
-  period = Math.min(period, 30 * 60 * 1000) // 30 minutes maximum
-  
-  // Update interval
-  exports.interval = setInterval(exports.sync, period)
-  
-  // Call on change
-  exports.sync()
+  var period = exports.config.interval * 1000 || 0;
+  period = Math.max(period,  1 * 60 * 1000); // 1 minute minimum
+  period = Math.min(period, 30 * 60 * 1000); // 30 minutes maximum
 
-  console.log(TAG, 'Deamon updated. ')
+  // Update interval
+  exports.interval = setInterval(exports.sync, period);
+
+  // Call on change
+  exports.sync();
+
+  console.log(TAG, 'Deamon updated. ');
 }
 
 /*
  * Fetches table data and sends as a post to the defined URL
  */
-exports.sync = function (config, next) {
-  config = config || exports.config
+exports.sync = (config, next) => {
+  config = config || exports.config;
 
   // Check tournamenter is compatible...
-  if (! ('ConvertTableToMatrix' in app.helpers) )
-    return next('A versão do TournamenterApp precisa estar acima de 1.7.0')
+  if (!('ConvertTableToMatrix' in app.helpers))
+    return next('A versão do TournamenterApp precisa estar acima de 1.7.0');
 
   // Sync
-  console.log(TAG, 'Sync data...')
+  console.log(TAG, 'Sync data...');
 
   // Get tables
-  app.controllers.Table._findAssociated(null, function (tables) {
+  app.controllers.Table._findAssociated(null, (tables) => {
 
-    var matrixTables = tables.map(ConvertTableToMatrix)
+    const matrixTables = tables.map(ConvertTableToMatrix);
 
-    var data = {
+    const data = {
       tables: matrixTables,
       blobs: tables,
     }
@@ -179,28 +185,31 @@ exports.sync = function (config, next) {
       url: config.url, 
       json: data,
       method: 'POST'
-    }, function (err, httpResponse, body) {
+    }, (err, httpResponse, body) => {
       if (err) {
-        console.log(TAG, 'Failed to sync: ' + err)
-        exports.error = true; exports.updateBadge();
-        return next && next((err || '').toString() || body)
+        console.error(TAG, 'Failed to sync: ' + err);
+        exports.error = true;
+        exports.updateBadge();
+        return next && next((err || '').toString() || body);
       }
 
-      let statusCode = httpResponse.statusCode
+      let { statusCode } = httpResponse;
+
       if (statusCode >= 400) {
         console.log(TAG, 'Failed to sync', statusCode)
         exports.error = true; exports.updateBadge();
-        return next && next('Falha na sincronização. Retorno: ' + statusCode + ': ' + body)
+        return next && next('Falha na sincronização. Retorno: ' + statusCode + ': ' + body);
       }
 
       // Update badge
-      exports.error = false; exports.updateBadge();
+      exports.error = false;
+      exports.updateBadge();
 
       // Update timestamp
-      exports.didSync()
+      exports.didSync();
 
       // Push to url as post
-      next && next(null, body)
+      next && next(null, body);
     })
   }, {
     isView: true,
@@ -211,37 +220,37 @@ exports.sync = function (config, next) {
  * Convert table to matrix
  */
 function ConvertTableToMatrix(table) {
-  if (!table)
-    return null;
+  if (!table) return null;
 
-  var scores = table.scores
-  var headers = table.headers
-  var scoreColumns = parseInt(table.columns)
-  var headerColumns = 3 // RANK, NAME and FINAL
+  const { scores, headers } = table
+  const { rank, team, scores, final } = headers;
+  const scoreColumns = parseInt(table.columns)
+  const headerColumns = 3 // RANK, NAME and FINAL
 
   // Generate rows
-  var rows = []
+  let rows = []
 
   // Push Header
-  var header = _.flatten([headers.rank, headers.team, headers.scores, headers.final])
-  console.log(header)
-  rows.push(header)
+  const header = [rank, team, scores, final].flat(Infinity);
+  console.log(header);
+  rows.push(header);
 
   // Push data
-  scores.forEach(function (line) {
-    var row = [line.rank, line.team ? line.team : null]
-    
+  scores.forEach((line) => {
+    const { rank, team, scores, final } = line;
+    var row = [rank, team || null];
+
     // Add scores (Makes sure the size is fixed)
-    _.times(scoreColumns, function (n) {
-      row.push(n in line.scores ? line.scores[n].value : '-')
-    })
+    Array.from({ length: scoreColumns }).map((v,n) => {
+      row.push(n in scores ? scores[n].value : '-');
+    });
 
     // Add final score
-    row.push(line.final)
+    row.push(final);
 
     // Add to rows
-    rows.push(row)
+    rows.push(row);
   })
 
-  return rows
+  return rows;
 }

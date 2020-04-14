@@ -1,3 +1,5 @@
+const { without } = require('./utils');
+
 /*
   Given the configurations, and an array of Teams, generates a timetable object like:
   {
@@ -19,57 +21,54 @@
   }
  */
 function generateTimetable(config, table) {
-  window.config = config
-  window.table = table
+  window.config = config;
+  window.table = table;
 
-  var result = {
+  const result = {
     errors: [],
     tables: [],
     finalRodadas: {},
-  }
+  };
 
   // Valida se tabela foi selecionada
   if (!table) {
-    result.errors.push('Nenhuma tabela foi selecionada.')
-    return result
+    result.errors.push('Nenhuma tabela foi selecionada.');
+    return result;
   }
 
   // Valida se possui equipes
   if (!table.scores || table.scores.length <= 0) {
-    result.errors.push('A tabela selecionada deve conter equipes')
-    return result
+    result.errors.push('A tabela selecionada deve conter equipes');
+    return result;
   }
 
   // Valida se todos os níveis de dificuldade estão em pelo menos 1 dos rounds
-  var faltando = nivelFaltando(config.uso)
+  const faltando = nivelFaltando(config.uso);
+
   if (faltando) {
-    result.errors.push(
-      'O nível ' + ['', 'Fácil', 'Médio', 'Difícil'][faltando] + 
-      ' não foi alocado para nenhuma rodada.' +
-      ' Todos os níveis devem ser alocados em pelo menos uma rodada.'
-    )
-    return result
+    result.errors.push(`O nível ${['', 'Fácil', 'Médio', 'Difícil'][faltando]} não foi alocado para nenhuma rodada. Todos os níveis devem ser alocados em pelo menos uma rodada.`);
+    return result;
   }
 
   // Gera equipes e salve em tabela (cache)
-  var k = 1
-  var teams = table.teams = table.teams || _.map(table.scores, function (team) {
+  const teams = table.teams = table.teams || table.scores.map(team => {
+    const { id, name } = team.team;
     return {
-      id: team.team && team.team.id || '?',
-      name: (team.team && team.team.name.replace(/^(1|2) - /gi, '') || '<Sem nome>'),
-    }
-  })
+      id: team.team && id || '?',
+      name: (team.team && name.replace(/^(1|2) - /gi, '') || '<Sem nome>'),
+    };
+  });
 
   // Clear niveis
-  teams.forEach(function (team) {
-    team.niveis = [null, null, null]
-    team.startOfSearch = 0
+  teams.forEach(team => {
+    team.niveis = [null, null, null];
+    team.startOfSearch = 0;
     // Equipe que precede
-    team.before = null
-  })
+    team.before = null;
+  });
 
   // Start basic allocation and distribution
-  var allocations = {
+  const allocations = {
     // Rodada 1
     1: {},
     // Rodada 2
@@ -79,92 +78,96 @@ function generateTimetable(config, table) {
   }
 
   // Aloca primariamente por nivel de cada rodada
-  for (var rodada = 1; rodada <= 3; rodada++) {
-    var toAllocate = teams.slice()
-    var arenaIndex = 0
-    var arenas = config.arenas.length
+  const { arenas, uso } = config;
+  const { length } = arenas;
 
-    // Inicializa allocations 
-    for (var arena = 0; arena < arenas; arena++) {
-      allocations[rodada][arena] = []
-    }
+  Array.from({ length: 2 }).map((v,rodada) => {
+    rodada++;
+    let toAllocate = teams.slice();
 
-    /*
-     * Transforma o map table da tabela de uso em 
-     * um array de níveis das arenas desta rodada.
-     * Remove nível `0`: "Arena vazia"
-     * Subtrai 1 de todos, de modo que:
-     * 'facil' = 0, 'medio' = 1, 'dificil' = 2
-     */
-    function subtract1(val) {return val - 1}
-    var niveisDaRodada = 
-      _.chain(config.uso[rodada])
-       .values()
-       .slice(0, arenas)
-       .without(0)
-       .map(subtract1)
-       .value()
+    // Inicializa allocations
+    Array.from({ length }).map((v, arenaIndex) => {
+      allocations[rodada][arenaIndex] = [];
+    });
 
     /*
-     * Para garantir que as colunas se movimentem integralmente, precisamos
-     * garantir que nenhuma coluna irá utilizar uma arena em que uma outra
-     * coluna precise prioritariamente. Ex:
-     * - Temos arenas 1, 2, 3 e 4.
-     *
-     * - Temos os níveis [Rodada 1]:
-     *                1, 2, 3 e 1
-     *
-     * - Temos os níveis [Rodada 2]:
-     *                1, 2, 3 e 2
-     *
-     * - Temos grupos A, B, C e D (colunas)
-     * = Rodada 1:    1:A   2:B   3:C   4:D
-     * = Rodada 2:
-     *    Passo 1:    1:?   2:A   3:?   4:?
-     *    Passo 2:    1:?   2:A   3:B   4:?
-     *    Passo 3:    1:?   2:A   3:B   4:C
-     *    Passo 4:    1:!   2:A   3:B   4:C
-     *    Haverá um problema em inserir o grupo, pois o grupo D já
-     *    participou em uma arena fácil, e apenas sobrou ela.
-     *
-     * Para resolver, precisamos dar prioridade às primeiras equipes 
-     * (equipes cabeças do grupo) com "menos" opções.
-     */
-    var firstTeams = toAllocate.splice(0, niveisDaRodada.length)
+      * Transforma o map table da tabela de uso em 
+      * um array de níveis das arenas desta rodada.
+      * Remove nível `0`: "Arena vazia"
+      * Subtrai 1 de todos, de modo que:
+      * 'facil' = 0, 'medio' = 1, 'dificil' = 2
+      */
+
+    const niveisDaRodada = without(uso[rodada].slice(0, length), 0).map(value => value--);
+
+    // var niveisDaRodada = 
+    //   _.chain(uso[rodada])
+    //    .values()
+    //    .slice(0, length)
+    //    .without(0)
+    //    .map(value => value--)
+    //    .value()
+
+    /*
+      * Para garantir que as colunas se movimentem integralmente, precisamos
+      * garantir que nenhuma coluna irá utilizar uma arena em que uma outra
+      * coluna precise prioritariamente. Ex:
+      * - Temos arenas 1, 2, 3 e 4.
+      *
+      * - Temos os níveis [Rodada 1]:
+      *                1, 2, 3 e 1
+      *
+      * - Temos os níveis [Rodada 2]:
+      *                1, 2, 3 e 2
+      *
+      * - Temos grupos A, B, C e D (colunas)
+      * = Rodada 1:    1:A   2:B   3:C   4:D
+      * = Rodada 2:
+      *    Passo 1:    1:?   2:A   3:?   4:?
+      *    Passo 2:    1:?   2:A   3:B   4:?
+      *    Passo 3:    1:?   2:A   3:B   4:C
+      *    Passo 4:    1:!   2:A   3:B   4:C
+      *    Haverá um problema em inserir o grupo, pois o grupo D já
+      *    participou em uma arena fácil, e apenas sobrou ela.
+      *
+      * Para resolver, precisamos dar prioridade às primeiras equipes 
+      * (equipes cabeças do grupo) com "menos" opções.
+      */
+    const firstTeams = toAllocate.splice(0, niveisDaRodada.length).concat().sort(
+      team => missingNiveis(team.niveis, niveisDaRodada).length);;
+
     // console.log(_.pluck(firstTeams, 'name'))
-    firstTeams = _.sortBy(firstTeams, function compare(team) {
-      var niveis = missingNiveis(team.niveis, niveisDaRodada)
+    // firstTeams = _.sortBy(firstTeams, function compare(team) {
+      // var niveis = missingNiveis(team.niveis, niveisDaRodada);
       // console.log(team.name, niveis)
-      return niveis.length
-    })
+      // return niveis.length;
+    // })
     // console.log(_.pluck(firstTeams, 'name'))
 
     // Coloca equipes de volta no array, desta vez organizadas
-    toAllocate = firstTeams.concat(toAllocate)
+    toAllocate = firstTeams.concat(toAllocate);
 
     // Carrega uma equipe
-    var team = null
+    let team = null;
     while (team = toAllocate.shift()) {
       // Dos níveis que a equipe ainda não participou, qual dos disponíveis pode participar?
-      var niveisDisponiveis = missingNiveis(team.niveis, niveisDaRodada)
+      const niveisDisponiveis = missingNiveis(team.niveis, niveisDaRodada);
       
       if (niveisDisponiveis.length <= 0) {
         // Nenhum nivel disponível para competir. Não pode prosseguir...
-        result.errors.push(
-          '#1 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
-          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.')
-        return result
+        result.errors.push(`#1 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe "${team.name}" em nenhuma das arenas da Rodada ${rodada}.`);
+        return result;
       }
 
       // Encontra melhor nível para atribuir equipe
       // Euristica: Arena rodando nível com menos equipes
-      var allocatedArena = null
-      var allocatedArenaTeams = Infinity
+      let allocatedArena = null;
+      let allocatedArenaTeams = Infinity;
 
-      for (var k = 0; k < arenas; k++) {
-        var arena = (k + team.startOfSearch) % arenas
+      Array.from({ length }).map((v, k) => {
+        const arena = (k + team.startOfSearch) % length;
         // var arena = sortedArenas[k] * 1
-        var nivelDaArena = config.uso[rodada][arena]
+        const nivelDaArena = uso[rodada][arena];
 
         // Arena não deve ser utilizada. Pule...
         if (nivelDaArena == 0)
@@ -172,131 +175,119 @@ function generateTimetable(config, table) {
 
         // Checa se o nível da arena está em niveisDisponiveis
         if (niveisDisponiveis.indexOf(nivelDaArena - 1) < 0)
-          continue
-        
+          continue;
+
         // Número de equipes alocadas na arena que estamos verificando
-        var equipes = allocations[rodada][arena].length
+        const equipes = allocations[rodada][arena].length;
 
         // Ultima equipe alocada para esta rodada na arena que estamos verificando
-        var ultimaEquipe = _.last(allocations[rodada][arena]) || null
+        const ultimaEquipe = allocations[rodada][arena].slice(-1) || null;
         
         // Verifica se a equipe anterior é a equipe de de fila indiana da equipe atual
         if (ultimaEquipe === team.before) {
-          allocatedArena = arena
-          break
+          allocatedArena = arena;
+          break;
         }
 
         // Uma das primeiras equipes sendo alocadas, escolhe a primeira arena
         if (ultimaEquipe === null && team.before === null){
-          allocatedArena = arena
-          break
+          allocatedArena = arena;
+          break;
         }
 
         // Verifica se é uma opção melhor (menos equipes)...
         if (equipes < allocatedArenaTeams) {
           // Salva opção
-          allocatedArena = arena
-          allocatedArenaTeams = equipes
+          allocatedArena = arena;
+          allocatedArenaTeams = equipes;
         }
-      }
+      });
 
       // Nenhuma arena pode ser alocada para a equipe. É erro nela!
       if (allocatedArena === null) {
         // Nenhum nivel disponível para competir. Não pode prosseguir...
-        result.errors.push(
-          '#2 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe ' +
-          '"' + team.name + '" em nenhuma das arenas da Rodada ' + rodada+ '.')
-        return result
+        result.errors.push(`#2 Não foi possivel alocar equipe. O algoritmo não encontrou uma arena para a equipe "${team.name}" em nenhuma das arenas da Rodada ${rodada}.`);
+        return result;
       }
 
       // Atribui arena à equipe no nivel especificado
-      var nivel = config.uso[rodada][allocatedArena] - 1
-      team.startOfSearch = allocatedArena
-      team.niveis[nivel] = allocatedArena
-      team.before = _.last(allocations[rodada][allocatedArena]) || null
-      allocations[rodada][allocatedArena].push(team)
+      const nivel = config.uso[rodada][allocatedArena] - 1;
+      team.startOfSearch = allocatedArena;
+      team.niveis[nivel] = allocatedArena;
+      team.before = allocations[rodada][allocatedArena].slice(-1) || null;
+      allocations[rodada][allocatedArena].push(team);
     }
-  }
+  });
 
-  console.log(' ')
-  console.log('======== Estatisticas ========')
-  for(var rodada = 1; rodada <= 3; rodada++){
-    console.log('======== Rodada', rodada, ' ========')
-    for(var k = 0; k < arenas; k++) {
-      var equipes = allocations[rodada][k] || []
-      console.log('Arena:', k, 'Equipes:', equipes.length)
-      
-    }
-  }
+  console.log(' ');
+  console.log('======== Estatisticas ========');
 
-  
+  Array.from({ length: 3 }).map((v, rodada) => {
+    console.log(`======== Rodada ${rodada+1} ========`);
+    Array.from({length}).map((v,k) => {
+      console.log(`Arena: ${k} Equipes: ${allocations[rodada][k].length || 0}`);
+    });
+  });
+
   // Nós temos neste momento a divisão das equipes por arena e rodada.
   // Basta Serializarmos as equipes e criar a tabela de cada Arena
   // E contabilizar o tempo total
-  var horarios = generateTimeForAllocations(config, allocations)
-  window.horarios = horarios
+  const horarios = generateTimeForAllocations(config, allocations);
+  window.horarios = horarios;
 
   // Salva horário de término de cada rodada
-  for (var rodada = 1; rodada <= 3; rodada++){
-    // Soma com uma duração, pois eles representam inicios
-    result.finalRodadas[rodada] = _.last(horarios[rodada]) + config.duration
-  }
+  result.finalRodadasErrors = {};
+  Array.from({ length: 3 }).map((v, rodada) => {
+    rodada++;
+    result.finalRodadas[rodada] = horarios[rodada].slice(-1) + config.duration;
 
-  // Verifica conflitos de horários
-  result.finalRodadasErrors = {}
-  for (var rodada = 2; rodada <= 3; rodada++){
-    if (result.finalRodadas[rodada-1] > _.first(horarios[rodada])){
-      result.errors.push('Conflito de horários. O horário inicial da Rodada ' + 
-        rodada + ' é anterior ao término da Rodada ' + (rodada - 1))
-      result.finalRodadasErrors[rodada] = true
+    // Verifica conflitos de horários
+    if (rodada > 1) {
+      if (result.finalRodadas[rodada-1] > horarios[rodada][0]) {
+        result.errors.push(`Conflito de horários. O horário inicial da Rodada ${rodada} é anterior ao término da Rodada ${rodada -1}`);  
+        result.finalRodadasErrors[rodada] = true;
+      }
     }
-  }
+  });
 
   // Gerar a tabela baseado em `allocations` e `horarios`
-  var tables = []
+  const tables = [];
 
-  for (var rodada = 1; rodada <= 3; rodada++) {
-    var allocation = allocations[rodada]
-    var table = []
+  Array.from({ length: 3 }).map((v, rodada) => {
+    rodada++;
+    const allocation = allocations[rodada];
+    const table = [];
 
     // Cria Header (Primeira coluna para horário)
-    table.push([''].concat(config.arenas))
-    
-    // Descobre quantidade de linhas
-    var rows = horarios[rodada].length
+    table.push([''].concat(config.arenas));
 
-    for (var row = 0; row < rows; row++) {
-      var horario = minuteToTime(horarios[rodada][row])
-      var line = [horario]
+    // Descobre quantidade de linhas
+    const rows = horarios[rodada].length;
+
+    Array.from({ length: rows }).map((v, row) => {
+      const horario = minuteToTime(horarios[rodada][row]);
+      const line = [horario];
 
       // Cria linhas de conteudos (para cada coluna)
-      for (var arena = 0; arena < config.arenas.length; arena++) {
-        if (allocation[arena] && allocation[arena][row]) {
-          line.push(allocation[arena][row].name)
-        }else {
-          line.push('-')
-        }
-      }
-      table.push(line)
-    }
-    tables.push(table)
-  }
-  result.tables = tables
+      Array.from({ length: length }).map((v, arena) => {
+        line.push(allocation[arena] && allocation[arena][row] ? allocation[arena][row].name : '-');
+      });
 
-  window.result = result
-  return result
+      table.push(line);
+    });
+
+    tables.push(table);
+  });
+
+  result.tables = tables;
+  window.result = result;
+  return result;
 }
 
 /*
-  Converte de minutos para horario no tipo "hh:mm"
+ * Converte de minutos para horario no tipo "hh:mm"
  */
-function minuteToTime(value) {
-  var h = Math.floor(value / 60)
-  var m = value % 60
-  var t = (h < 10 ? '0'+h : h) + ':' + (m < 10 ? '0'+m : m)
-  return t
-}
-
+const minuteToTime = value => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 
 /*
   Retorna a lista de níveis do qual uma equipe ainda precisa participar.
@@ -304,12 +295,13 @@ function minuteToTime(value) {
   E também uma lista de níveis que a rodada atual oferece (não mapeada)
  */
 function missingNiveis(teamNiveis, niveisDaRodada) {
-  var niveisFeitos = [
-    _.isNumber(teamNiveis[0]) ? 0 : null,
-    _.isNumber(teamNiveis[1]) ? 1 : null,
-    _.isNumber(teamNiveis[2]) ? 2 : null,
-  ]
-  return _.difference(niveisDaRodada, niveisFeitos)
+  const niveisFeitos = [];
+
+  Array.from({ length: 3 }).map((v,k) => {
+    niveisFeitos.push(typeof teamNiveis[k] === 'number' ? k : null);
+  });
+
+  return niveisDaRodada.filter(nivel => !niveisFeitos.includes(nivel));
 }
 
 /*
@@ -333,41 +325,39 @@ function missingNiveis(teamNiveis, niveisDaRodada) {
   }
  */
 function generateTimeForAllocations(config, allocations) {
-  var arenas = config.arenas.length
-  var intervalos = config.periodos
-  var tempoDeRound = config.duration
+  const intervalos = config.periodos;
+  const tempoDeRound = config.duration;
 
-  var horarios = {
+  const horarios = {
     1: [],
     2: [],
     3: [],
   }
 
-  for (var rodada = 1; rodada <= 3; rodada++) {
-    var allocation = allocations[rodada]
-    var tempoInicial = config.inicios[rodada - 1] // Inicios começa em 0, e não em 1
-    var tempoAtual = tempoInicial
+  Array.from({ length: 3 }).map((v, rodada) => {
+    rodada++;
+    const tempoInicial = config.inicios[rodada - 1]; // Inicios começa em 0, e não em 1
+    let tempoAtual = tempoInicial;
 
     // Encontra o maior numero de rounds de qualquer arena
-    var maxMatches = _.chain(allocations[rodada]).values().pluck('length').max().value()
+    const maxMatches = allocations[rodada].map((x) => x.length).sort((a, b) => b - a)[0];
+    // var maxMatches = _.chain(allocations[rodada]).values().pluck('length').max().value();
     // console.log('MaxRounds: ', maxMatches)
 
     // Faz um rodizio para cada horário nas esquipes das arenas
     // ex: arena0.equipe0, arena1.equipe0, arena2.equipe0, ...
     //     arena0.equipe1, arena1.equipe1, arena2.equipe1, ...
-    for (var match = 0; match < maxMatches; match++) {
+    Array.from({ length: maxMatches }).map((v, match) => {
       // Encontra próximo horário livre
-      tempoAtual = nextAvailableTime(tempoAtual, intervalos)
-
+      tempoAtual = nextAvailableTime(tempoAtual, intervalos);
       // Registra horário
-      horarios[rodada].push(tempoAtual)
-      
+      horarios[rodada].push(tempoAtual);
       // Incrementa próximo horário
-      tempoAtual += tempoDeRound
-    }
-  }
+      tempoAtual += tempoDeRound;
+    });
+  });
 
-  return horarios
+  return horarios;
 }
 
 /*
@@ -381,31 +371,27 @@ function generateTimeForAllocations(config, allocations) {
  */
 function nextAvailableTime(startTime, intervalos) {
   // Checa se está dentro de algum intervalo
-  for (var k in intervalos) {
-    var intervalo = intervalos[k]
+  intervalos.forEach(intervalo => {
     if (startTime >= intervalo[0] && startTime < intervalo[1]) {
-      startTime = intervalo[1]
+      startTime = intervalo[1];
     }
-  }
-  return startTime
+  });
+  return startTime;
 }
-
 
 /*
   Dado uma tabela de uso {<rodada>: {<arena>: <0|1|2|3>, ...}, ...}
   Retorna se possui pelo menos 1 de cada dificuldade nelas
  */
 function nivelFaltando(uso) {
-  var niveis = 
-    _.values(uso[1])
-     .concat(_.values(uso[2]))
-     .concat(_.values(uso[3]))
+  const niveis = [].concat(Object.values(uso[1]), Object.values(uso[2]), Object.values(uso[3]));
 
-  for (var k = 1; k <= 3; k++) {
+  Array.from({ length: 3 }).map((v,k) => {
+    k++;
     if (niveis.indexOf(k) >= 0)
       continue;
-    return k
-  }
+    return k;
+  });
 
-  return false
+  return false;
 }
