@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/ivanseidel/tournamenter-obr"
   },
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
     "angular": "~1.2.0",
     "angular-animate": "~1.2.0",
@@ -28,7 +28,8 @@
     "font-awesome": "^4.7.0",
     "jquery": "~2.1.1",
     "moment": "^2.18.1",
-    "popper.js": "^1.16.1"
+    "popper.js": "^1.16.1",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -43,11 +44,12 @@
     "eslint-loader": "^4.0.0",
     "eslint-plugin-angular": "^4.0.1",
     "file-loader": "^6.0.0",
+    "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.2.0",
     "mini-css-extract-plugin": "^0.9.0",
     "node-fetch": "^2.6.0",
     "postcss-loader": "^3.0.0",
-    "prettier": "^2.0.4",
+    "prettier": "^2.0.5",
     "prettier-webpack-plugin": "^1.2.0",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",

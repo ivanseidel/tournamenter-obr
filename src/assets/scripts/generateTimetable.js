@@ -1,4 +1,4 @@
-const { without } = require('./utils');
+import { without } from './utils';
 
 /*
   Given the configurations, and an array of Teams, generates a timetable object like:

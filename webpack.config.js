@@ -11,7 +11,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: '[name].js',
+    filename: 'assets/scripts/[name].js',
   },
   module: {
     rules: [
@@ -57,13 +57,44 @@ module.exports = {
         ]
       },
       {
+        test: /\.(html)$/i,
+        use: [
+          {
+            loader: 'html-loader',
+          }
+        ]
+      },
+      {
+        test: /\.(ejs)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'views',
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(pdf)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            }
+          }
+        ]
+      },
+      {
         test: /\.(png|jpe?g|gif|svg)$/,
         use: [
           {
             loader: "file-loader",
-
             options: {
-              outputPath: 'images',
+              name: '[name].[ext]',
+              outputPath: 'assets/images',
             }
           }
         ]
@@ -74,7 +105,8 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              outputPath: 'fonts',
+              name: '[name].[ext]',
+              outputPath: 'assets/fonts',
             }
           }
         ]
@@ -84,11 +116,11 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      moduleFilename: ({ name }) => `${name.replace('/js/', '/css/')}.css`
+      filename: "assets/styles/[name].css",
     }),
     new HtmlWebpackPlugin({
       title: 'Pontuador OBR',
-      template: 'src/views/index.ejs',
+      template: 'src/views/index.html',
       inject: 'body',
       // favicon: 'assets/images/icon.png',
       meta:	{
@@ -120,6 +152,6 @@ module.exports = {
   ],
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   resolve: {
-    extensions: ['.js', '.scss']
+    extensions: ['.js', '.scss', '.css', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.html', '.ejs']
   }
 };

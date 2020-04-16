@@ -6,7 +6,7 @@ const countBy = (list, iteratee) => {
 
   return list.reduce((accumulator, current, index) => {
     index = iteratee(current);
-    if (accumulator.hasOwnProperty(index)) {
+    if (Object.prototype.hasOwnProperty.call(accumulator, index)) {
       ++accumulator[index];
     } else {
       accumulator[index] = 1;
@@ -40,9 +40,4 @@ const throttle = (func, timeFrame) => {
   };
 };
 
-module.exports = {
-  countBy,
-  pick,
-  without,
-  throttle,
-};
+export { countBy, pick, without, throttle };

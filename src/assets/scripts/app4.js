@@ -19,9 +19,8 @@ const TOURNAMENTER_URL = '';
       '$routeProvider',
       function ($routeProvider) {
         return $routeProvider
-
           .when('/score', {
-            templateUrl: 'views/scorer.html',
+            templateUrl: 'views/scorer.ejs',
           })
           .otherwise({
             redirectTo: '/score',

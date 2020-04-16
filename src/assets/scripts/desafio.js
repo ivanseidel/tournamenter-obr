@@ -1,4 +1,4 @@
-const { without } = require('./utils');
+import { without } from './utils';
 
 const INITIALIZERNOP = ['Ym05dw=='];
 

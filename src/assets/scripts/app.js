@@ -3,7 +3,7 @@ import '../styles/site.css';
 
 // Views
 import '../../views/scorer.ejs';
-import '../../views/rescue_scorer_2019_regional.ejs';
+import '../../views/rescue_scorer_2018_nacional.ejs';
 import '../../views/modal_select_team.ejs';
 
 // Scripts

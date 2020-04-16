@@ -2,12 +2,12 @@
   Default view module
 */
 const path = require('path');
-const request = require('request')
+const request = require('request');
 
 const package = require('./package.json');
 const SyncModule = require('./SyncModule');
 
-const auth = app.helpers.isAuthenticated
+const auth = app.helpers.isAuthenticated;
 const hasUpdate = null;
 
 module.exports = {

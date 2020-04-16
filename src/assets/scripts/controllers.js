@@ -1,5 +1,5 @@
 // v1.01
-const { pick } = require('./utils');
+import { pick } from './utils';
 
 (function () {
   /*
@@ -157,10 +157,10 @@ const { pick } = require('./utils');
           }
 
           const modalInstance = $modal.open({
-            templateUrl: `views/modal_select_team.html?r=${Math.random()}`,
+            templateUrl: `views/modal_select_team.ejs?r=${Math.random()}`,
             controller: 'SaveScoreController',
             size: 'lg',
-            // windowTemplateUrl: '/views/window.html',
+            // windowTemplateUrl: '/views/window.ejs',
             // backdrop: false,
             resolve: {
               extra: () => {

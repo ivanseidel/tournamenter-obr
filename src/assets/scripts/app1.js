@@ -1,4 +1,4 @@
-const { throttle } = require('./utils');
+import { throttle } from './utils';
 
 // moment.locale('pt-BR');
 

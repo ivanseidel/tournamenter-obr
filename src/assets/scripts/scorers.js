@@ -52,7 +52,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2019_regional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2019_regional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       totalTime: 300,
@@ -227,7 +227,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2018_nacional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2018_nacional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       totalTime: 480,
@@ -320,7 +320,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2018_regional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2018_regional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       totalTime: 300,
@@ -449,7 +449,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2017_nacional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2017_nacional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       totalTime: 480,
@@ -526,7 +526,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2017_regional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2017_regional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       totalTime: 300,
@@ -604,7 +604,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2014.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2014.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       score: function (model) {
@@ -673,7 +673,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2016_regional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2016_regional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       score: function (model) {
@@ -764,7 +764,7 @@ const app = angular
     };
 
     return {
-      view: 'views/rescue_scorer_2016_regional.html?r=' + Math.random(),
+      view: 'views/rescue_scorer_2016_regional.ejs?r=' + Math.random(),
       model: model,
       scorings: scorings,
       score: function (model) {
@@ -851,7 +851,7 @@ const app = angular
     };
 
     return {
-      view: 'views/fll_scorer_world_class.html',
+      view: 'views/fll_scorer_world_class.ejs',
       model: model,
       scorings: scorings,
       score: function (model) {

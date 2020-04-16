@@ -1,4 +1,4 @@
-const { countBy } = require('./utils');
+import { countBy } from './utils';
 
 angular
   .module('app.importar', [])

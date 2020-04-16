@@ -1,4 +1,4 @@
-const { pick } = require('./utils');
+import { pick } from './utils';
 
 const ObrConfigProps = ['url', 'sync', 'method', 'interval'];
 
