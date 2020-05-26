@@ -1,3 +1,12 @@
+const flatArray = array => {
+  return array.reduce((flat, i) => {
+    if (Array.isArray(i)) {
+      return flat.concat(flatArray(i));
+    }
+    return flat.concat(i);
+  }, []);
+};
+
 const countBy = (list, iteratee) => {
   if (typeof iteratee !== 'function') {
     const iterateeRef = iteratee;
@@ -18,7 +27,7 @@ const countBy = (list, iteratee) => {
 const pick = (object, ...whitelist) => {
   const obj = {};
 
-  whitelist.flat(Infinity).map(whiteitem => {
+  flatArray(whitelist).map(whiteitem => {
     obj[whiteitem] = object[whiteitem];
   });
 
@@ -40,4 +49,4 @@ const throttle = (func, timeFrame) => {
   };
 };
 
-export { countBy, pick, without, throttle };
+export { flatArray, countBy, pick, without, throttle };

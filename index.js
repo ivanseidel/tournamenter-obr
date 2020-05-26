@@ -8,7 +8,7 @@ const package = require('./package.json');
 const SyncModule = require('./SyncModule');
 
 const auth = app.helpers.isAuthenticated;
-const hasUpdate = null;
+let hasUpdate = null;
 
 module.exports = {
   type: ['menu'],

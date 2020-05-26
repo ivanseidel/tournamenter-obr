@@ -1,6 +1,6 @@
 const request = require('request');
 
-const { pick } = require('./src/assets/scripts/utils');
+const { flatArray, pick } = require('./src/assets/scripts/utils');
 
 const TAG = _TAG('SyncModule');
 
@@ -231,7 +231,7 @@ function ConvertTableToMatrix(table) {
   let rows = []
 
   // Push Header
-  const header = [rank, team, scores, final].flat(Infinity);
+  const header = flatArray([rank, team, scores, final])
   console.log(header);
   rows.push(header);
 

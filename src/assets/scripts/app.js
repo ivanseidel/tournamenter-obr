@@ -8,10 +8,8 @@ import '../../views/modal_select_team.ejs';
 
 // Scripts
 import './api';
-import './app1';
-import './app2';
-import './app3';
-import './app4';
+import './generateRounds';
+import './router';
 import './controllers';
 import './desafio';
 import './exportar';
@@ -23,3 +21,4 @@ import './scorers';
 
 // Other
 import '../../ManualOBRTournamenter.pdf';
+import '../../views/manifest.json';

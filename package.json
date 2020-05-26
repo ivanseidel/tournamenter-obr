@@ -1,10 +1,12 @@
 {
   "name": "tournamenter-obr",
-  "version": "2019.2.1",
+  "version": "2020.1.0",
   "description": "Plugin da OBR Regional para o Tournamenter. Importa e exporta diretamente do Sistema olimpo.",
   "main": "index.js",
   "scripts": {
-    "start": "npx http-server public",
+    "server": "npx http-server public",
+    "start:dev": "npm run build && npm run server",
+    "start": "npm run build:prod && npm run server",
     "build": "webpack --config webpack.config.js",
     "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js"
   },

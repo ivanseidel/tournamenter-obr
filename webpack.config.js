@@ -77,7 +77,8 @@ module.exports = {
         ]
       },
       {
-        test: /\.(pdf)$/,
+        test: /\.(pdf|json)$/,
+        type: 'javascript/auto',
         use: [
           {
             loader: 'file-loader',
@@ -152,6 +153,6 @@ module.exports = {
   ],
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   resolve: {
-    extensions: ['.js', '.scss', '.css', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.html', '.ejs']
+    extensions: ['.js', '.scss', '.css', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.html', '.ejs', '.json']
   }
 };
