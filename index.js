@@ -1,15 +1,14 @@
 /*
   Default view module
 */
-var _ = require('lodash');
-var path = require('path');
-var request = require('request')
+const path = require('path');
+const request = require('request');
 
-var auth = app.helpers.isAuthenticated
-var package = require('./package.json')
-var SyncModule = require('./SyncModule')
+const package = require('./package.json');
+const SyncModule = require('./SyncModule');
 
-var hasUpdate = null
+const auth = app.helpers.isAuthenticated;
+let hasUpdate = null;
 
 module.exports = {
   type: ['menu'],
@@ -17,11 +16,8 @@ module.exports = {
   getAssets: function (app){
     return {
       css: [],
-
       js: [],
-
       jst: [],
-
       serve: [
         `${__dirname}/public`,
       ]
@@ -148,7 +144,7 @@ module.exports = {
 
     var relViewPath = path.relative(path.resolve(__dirname+'/../../views'), viewPath);
 
-    res.render(relViewPath, _.extend(locals, {
+    res.render(relViewPath, Object.assign(locals, {
       layout: path.join(__dirname, 'layout.ejs'),
     }));
   },
