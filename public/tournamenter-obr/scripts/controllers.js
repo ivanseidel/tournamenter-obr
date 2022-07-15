@@ -4,7 +4,7 @@
 	/*
 		Configurations
 	*/
-	var GlobalScorerName = 'RescueScorer2018Nacional';
+	var GlobalScorerName = 'RescueScorer2022Nacional';
 	var SCORE_WITH_TIME = true;
 
 	angular.module('app.controllers', [])
@@ -111,6 +111,7 @@
 
 			$scope.compute = function (){
 				console.log('Computing score');
+				console.log($scope.scoreData);
 				$scope.scorings = $scope.scorer.score($scope.scoreData);
 			};
 			$scope.newScore();

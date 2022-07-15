@@ -1,5 +1,209 @@
 var app = angular.module('app.scorers', [])
 
+.factory('RescueScorer2022Nacional', function (){
+  var model = {
+    rooms: {
+      'first': 0,
+      'secc': 0,
+    },
+    corridors: {
+      'ramp': 0,
+    },
+    gaps: {
+
+    },
+    squares1: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    squares2: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    squares3: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+    },
+    obstacles: {
+
+    },
+    speedbump: {
+
+    },
+    intersection: {
+
+    },
+    passage: {
+
+    },
+    becos: {
+
+    },
+    rampas: {
+
+    },
+    seesaw: {
+
+    },
+
+    saiu_salvamento: {
+      'final': 0,
+    },
+
+    altura: {
+      'final': 0,
+    },
+
+    victims: {
+      'total': 1,
+      'attempts': 1,
+    },
+
+    victims_alive: {
+      'total': 0,
+    },
+
+    victims_dead: {
+      'before_alive': 0,
+      'after_alive': 0,
+    },
+
+    kit: {
+      multiplier: 1
+    }
+
+    // victims_lower_live: {
+    //   '1a': 0,
+    // },
+
+    // victims_upper_dead: {
+    //   '1a': 0,
+    // },
+
+    // victims_upper_live: {
+    //   '1a': 0,
+    // },
+  };
+
+  var scorings ={
+    rooms: [0, 60, 40, 20, 0],
+    corridors: [0,30,20,10,0],
+    gaps: [0,10],
+
+    squares1: 5,
+    squares2: 3,
+    squares3: 1,
+
+    obstacles: [0,10],
+    speedbump: [0, 5],
+    intersection: [0,15],
+    passage: [0, 10],
+    seesaw: [0, 15],
+
+    becos: [0, 15],
+    rampas: [0, 5],
+
+    saiu_salvamento: [0, 20],
+    kit: {
+      multiplier: 1
+    },
+
+    altura: function(val, scorings, model) {
+      return 0
+    },
+
+    victims: function(sub, val, scorings, model) {
+      return 0
+    },
+
+    victims_alive: function(sub, val, scorings, model) {
+      var salvou_todas_vivas = model.victims.total <= model.victims_alive.total
+      var tentativa = model.victims.attempts - 1
+      var nivel_alto = model.altura.final
+      var pontos_base = nivel_alto ? 40 : 30
+      var pontos = val * Math.max(pontos_base - (5 * tentativa), 0)
+      // if (salvou_todas_vivas) {
+      //   return val * 
+      // }
+      return pontos
+    },
+
+    victims_dead: function(sub, val, scorings, model) {
+      var salvou_todas_vivas = model.victims.total <= model.victims_alive.total
+      var tentativa = model.victims.attempts - 1
+      var nivel_alto = model.altura.final
+      var pontos_base = nivel_alto ? 30 : 20
+
+      if (sub == 'before_alive') {
+        pontos_base = 5
+      }
+
+      var pontos = val * Math.max(pontos_base - (5 * tentativa), 0)
+      return pontos
+    },
+
+    kit: function (sub, val, scorings, model, scored) {
+      if (model.victims_alive.total > 0) {
+        return scored * (model.kit.multiplier - 1)
+      }
+      return 0
+    }
+
+    // victims: [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400],
+
+    // victims_lower_dead: [0, 15, 30, 45,  60,  75,  90, 105, 120],
+    // victims_lower_live: [0, 30, 60, 90, 120, 150, 180, 210, 240],
+
+    // victims_upper_dead: [0, 20, 40,  60,  80, 100, 120, 140, 160],
+    // victims_upper_live: [0, 40, 80, 120, 160, 200, 240, 280, 320],
+  }
+
+  return {
+    view: 'views/rescue_scorer_2022_nacional.html?r='+Math.random(),
+    model: model,
+    scorings: scorings,
+    totalTime: 480,
+    score: function (model){
+      var scored = {
+        total: 0,
+      };
+
+      for(var k in model){
+        scored[k] = {};
+        var group = model[k];
+
+        for(var i in group){
+          var mission = group[i];
+          if(mission === false) mission = 0;
+          if(mission === true) mission = 1;
+
+          var pointsGroup = scorings[k];
+          var points;
+          if (typeof pointsGroup == 'function') {
+            points = pointsGroup(i, mission, scorings, model, scored.total)
+          } else if(typeof pointsGroup == 'number'){
+            points = pointsGroup * mission;
+          } else {
+            points = scorings[k][mission];
+          }
+
+          scored[k][i] = points
+          scored.total += points || 0;
+        }
+      }
+
+
+      return scored
+    }
+  }
+})
+
 .factory('RescueScorer2019Regional', function (){
 
   var model = {
