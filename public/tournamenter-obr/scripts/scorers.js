@@ -16,6 +16,9 @@ var app = angular.module('app.scorers', [])
     obstacles: {
 
     },
+    seesaw: {
+
+    },
     speedbump: {
 
     },
@@ -51,11 +54,12 @@ var app = angular.module('app.scorers', [])
     corridors: [0,30,20,10,0],
     gaps: [0,10],
 
-    obstacles: [0,10],
+    obstacles: [0,15],
     speedbump: [0, 5],
-    intersection: [0,15],
+    intersection: [0,10],
     passage: [0, 10],
-    beco: [0, 15],
+    beco: [0, 10],
+    seesaw: [0, 15],
 
     saiu_salvamento: [0, 20],
 
@@ -153,12 +157,11 @@ var app = angular.module('app.scorers', [])
     corridors: [0,30,20,10,0],
     gaps: [0,10],
 
-    obstacles: [0,15],
+    obstacles: [0,10],
     speedbump: [0, 5],
-    intersection: [0,10],
+    intersection: [0,15],
     passage: [0, 10],
-    beco: [0, 10],
-    seesaw: [0, 15],
+    beco: [0, 15],
 
     saiu_salvamento: [0, 20],
 
