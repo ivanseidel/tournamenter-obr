@@ -73,6 +73,8 @@ var app = angular.module('app.scorers', [])
         total: 0,
       };
 
+      console.log("model", model)
+
       for(var k in model){
         scored[k] = {};
         var group = model[k];
@@ -156,6 +158,7 @@ var app = angular.module('app.scorers', [])
     intersection: [0,10],
     passage: [0, 10],
     beco: [0, 10],
+    seesaw: [0, 15],
 
     saiu_salvamento: [0, 20],
 

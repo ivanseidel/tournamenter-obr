@@ -110,6 +110,17 @@
           <span class="input-group-addon">{{sumSpecial(scorings.beco, ['A','B','C','D','E'])}} pts</span>
         </div>
 
+        <h5>Gangorra</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default"
+            ng-model="scoreData.seesaw[k]"
+            ng-repeat="k in ['A','B','C']"
+            btn-checkbox>
+              {{k}}
+          </label>
+          <span class="input-group-addon">{{sumSpecial(scorings.seesaw, ['A','B','C','D','E'])}} pts</span>
+        </div>
+
         <h5>Gap</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
