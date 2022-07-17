@@ -105,7 +105,7 @@ var app = angular.module('app.scorers', [])
           }
         }
       }
-      scored.total = scored.victmsScore * rescueKitMultipliers[model.rescueKit]
+      scored.total = scored.total - scored.victmsScore + scored.victmsScore * rescueKitMultipliers[model.rescueKit]
       return scored;
     }
   }
