@@ -246,6 +246,16 @@
           <span class="input-group-addon">{{scorings.victims_dead['3a'] || 0}} pts</span>
         </div>
 
+        <h5 style="margin-top: 32px;">Kit de Resgate</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.rescueKit"
+            btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.rescueKit"
+            btn-radio="1">No Robô</label>
+          <label class="btn btn-default" ng-model="scoreData.rescueKit"
+            btn-radio="2">No Caminho</label>
+        </div>
+
 
         <div style="margin-top: 44px;" class="btn btn-lg btn-block navbar-btn btn-danger" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
           <span class="glyphicon glyphicon-pause"></span> Parar Tempo

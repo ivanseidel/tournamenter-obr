@@ -46,10 +46,13 @@ var app = angular.module('app.scorers', [])
       '1a': 0,
       '2a': 0,
       '3a': 0,
+    },
+    rescueKit: { 
+
     }
   };
 
-  var scorings ={
+  var scorings = {
     rooms: [0, 60, 40, 20, 0],
     corridors: [0,30,20,10,0],
     gaps: [0,10],
@@ -65,7 +68,10 @@ var app = angular.module('app.scorers', [])
 
     victims: [0, 60, 40, 20],
     victims_dead: [0, 50, 30, 10],
+    rescueKit: [0, 0, 0]
   }
+
+  var rescueKitMultipliers = [1, 1.1, 1.2]
 
   return {
     view: 'views/rescue_scorer_2022_regional.html?r='+Math.random(),
@@ -100,7 +106,7 @@ var app = angular.module('app.scorers', [])
           scored.total += points || 0;
         }
       }
-
+      scored.total = scored.total * rescueKitMultipliers[model.rescueKit]
       return scored;
     }
   }
