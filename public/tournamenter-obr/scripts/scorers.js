@@ -1,5 +1,116 @@
 var app = angular.module('app.scorers', [])
 
+.factory('RescueScorer2022Regional', function (){
+
+  var model = {
+    rooms: {
+      'first': 0,
+      'secc': 0,
+    },
+    corridors: {
+      'ramp': 0,
+    },
+    gaps: {
+
+    },
+    obstacles: {
+
+    },
+    seesaw: {
+
+    },
+    speedbump: {
+
+    },
+    intersection: {
+
+    },
+    passage: {
+
+    },
+    beco: {
+
+    },
+
+    saiu_salvamento: {
+      'final': 0,
+    },
+
+    victims: {
+      '1a': 0,
+      '2a': 0,
+      '3a': 0,
+    },
+    challenge: 0,
+    victims_dead: {
+      '1a': 0,
+      '2a': 0,
+      '3a': 0,
+    },
+    rescueKit: 0
+  };
+
+  var scorings = {
+    rooms: [0, 60, 40, 20, 0],
+    corridors: [0,30,20,10,0],
+    gaps: [0,10],
+
+    obstacles: [0,15],
+    speedbump: [0, 5],
+    intersection: [0,10],
+    passage: [0, 10],
+    beco: [0, 10],
+    seesaw: [0, 15],
+    challenge: [0, 60],
+    saiu_salvamento: [0, 20],
+
+    victims: [0, 60, 40, 20],
+    victims_dead: [0, 50, 30, 10],
+    rescueKit: [0, 0, 0]
+  }
+
+  var rescueKitMultipliers = [1, 1.1, 1.2]
+
+  return {
+    view: 'views/rescue_scorer_2022_regional.html?r='+Math.random(),
+    model: model,
+    scorings: scorings,
+    totalTime: 300,
+    score: function (model){
+      var scored = {
+        total: 0,
+        victmsScore: 0
+      };
+      for(var k in model){
+        scored[k] = {};
+        var group = model[k];
+
+        for(var i in group){
+          var mission = group[i];
+          if(mission === false) mission = 0;
+          if(mission === true) mission = 1;
+
+          var pointsGroup = scorings[k];
+          var points;
+          if(typeof pointsGroup == 'number'){
+            points = pointsGroup * mission;
+          }else{
+            points = scorings[k][mission];
+          }
+
+          scored[k][i] = points;
+          scored.total += points || 0;
+          if(k === "victims" || k === "victims_dead"){
+            scored.victmsScore += points || 0;
+          }
+        }
+      }
+      scored.total = scored.total - scored.victmsScore + scored.victmsScore * rescueKitMultipliers[model.rescueKit]
+      return scored;
+    }
+  }
+})
+
 .factory('RescueScorer2019Regional', function (){
 
   var model = {
