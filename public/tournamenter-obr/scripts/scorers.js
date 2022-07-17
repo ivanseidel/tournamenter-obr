@@ -40,16 +40,14 @@ var app = angular.module('app.scorers', [])
       '1a': 0,
       '2a': 0,
       '3a': 0,
-      'desafio': 0,
     },
+    challenge: 0,
     victims_dead: {
       '1a': 0,
       '2a': 0,
       '3a': 0,
     },
-    rescueKit: { 
-
-    }
+    rescueKit: 0
   };
 
   var scorings = {
@@ -63,7 +61,7 @@ var app = angular.module('app.scorers', [])
     passage: [0, 10],
     beco: [0, 10],
     seesaw: [0, 15],
-
+    challenge: [0, 60],
     saiu_salvamento: [0, 20],
 
     victims: [0, 60, 40, 20],
@@ -81,10 +79,8 @@ var app = angular.module('app.scorers', [])
     score: function (model){
       var scored = {
         total: 0,
+        victmsScore: 0
       };
-
-      console.log("model", model)
-
       for(var k in model){
         scored[k] = {};
         var group = model[k];
@@ -102,11 +98,14 @@ var app = angular.module('app.scorers', [])
             points = scorings[k][mission];
           }
 
-          scored[k][i] = points
+          scored[k][i] = points;
           scored.total += points || 0;
+          if(k === "victims" || k === "victims_dead"){
+            scored.victmsScore += points || 0;
+          }
         }
       }
-      scored.total = scored.total * rescueKitMultipliers[model.rescueKit]
+      scored.total = scored.victmsScore * rescueKitMultipliers[model.rescueKit]
       return scored;
     }
   }
