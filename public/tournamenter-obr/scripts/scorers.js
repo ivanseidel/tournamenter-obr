@@ -41,7 +41,9 @@ var app = angular.module('app.scorers', [])
       '2a': 0,
       '3a': 0,
     },
-    challenge: {},
+    challenge: {
+      'first': 0
+    },
     victims_dead: {
       '1a': 0,
       '2a': 0,
