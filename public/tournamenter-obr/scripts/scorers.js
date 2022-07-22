@@ -81,8 +81,8 @@ var app = angular.module('app.scorers', [])
     score: function (model){
       var scored = {
         total: 0,
-        victmsScore: 0
       };
+      var totalVictmsSaved = 0;
       for(var k in model){
         scored[k] = {};
         var group = model[k];
@@ -102,12 +102,13 @@ var app = angular.module('app.scorers', [])
 
           scored[k][i] = points;
           scored.total += points || 0;
-          if(k === "victims" || k === "victims_dead"){
-            scored.victmsScore += points || 0;
+          if((k === "victims" || k === "victims_dead") && points > 0){
+              totalVictmsSaved += 1;
           }
         }
       }
-      scored.total = scored.total - scored.victmsScore + scored.victmsScore * rescueKitMultipliers[model.rescueKit]
+      var multiplier = Math.pow(rescueKitMultipliers[model.rescueKit], totalVictmsSaved)
+      scored.total = Math.round(scored.total * multiplier)
       return scored;
     }
   }
