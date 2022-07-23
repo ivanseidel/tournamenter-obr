@@ -35,7 +35,10 @@
       ng-init="k = 'first'">
 
       <div class="thumbnail">
-        <h5>Marcador 1</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/marcador.png" style="height: 32px; margin-right: 8px;" />
+          <h5>Marcador 1</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rooms['first']"
             btn-radio="0">Nop</label>
@@ -50,7 +53,11 @@
           <span class="input-group-addon">{{scorings.rooms['first'] || 0}} pts</span>
         </div>
 
-        <h5>Marcador 2</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/marcador.png" style="height: 32px; margin-right: 8px;" />
+          <h5>Marcador 2</h5>
+        </div>
+
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rooms['secc']"
             btn-radio="0">Nop</label>
@@ -65,7 +72,11 @@
           <span class="input-group-addon">{{scorings.rooms['secc'] || 0}} pts</span>
         </div>
 
-        <h5>Obstáculos</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/obstaculo.png" style="height: 32px; margin-right: 16px;" />
+          <h5>Obstáculos</h5>
+        </div>
+
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.obstacles[j]"
@@ -77,7 +88,11 @@
         </div>
 
 
-        <h5>Redutores</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/redutores.png" style="height: 48px; margin-right: 16px; margin-left: 10px; transform: rotate(90deg);" />
+          <h5>Redutores</h5>
+        </div>
+        
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.speedbump[j]"
@@ -88,7 +103,11 @@
           <span class="input-group-addon">{{sumSpecial(scorings.speedbump, ['A','B','C','D','E','F','G','H','I','J'])}} pts</span>
         </div>
 
-        <h5>Intersecções</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/interseccao.png" style="height: 24px; margin-right: 16px;" />
+          <h5>Intersecções</h5>
+        </div>
+        
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.intersection[k]"
@@ -98,8 +117,11 @@
           </label>
           <span class="input-group-addon">{{sumSpecial(scorings.intersection, ['A','B','C','D','E','F','G','H','I','J','K','L'])}} pts</span>
         </div>
-
-        <h5>Beco sem Saída</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/beco.png" style="height: 48px; margin-right: 16px; margin-left: 10px; transform: rotate(90deg);" />
+          <h5>Beco sem Saída</h5>
+        </div>
+        
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.beco[k]"
@@ -110,7 +132,10 @@
           <span class="input-group-addon">{{sumSpecial(scorings.beco, ['A','B','C','D','E'])}} pts</span>
         </div>
 
-        <h5>Gangorra</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/gangorra.png" style="height: 24px; margin-right: 8px;" />
+          <h5>Gangorra</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.seesaw[k]"
@@ -121,7 +146,11 @@
           <span class="input-group-addon">{{sumSpecial(scorings.seesaw, ['A','B','C'])}} pts</span>
         </div>
 
-        <h5>Gap</h5>
+        <div style="display: flex; align-items: center;">
+          <div style="background-color: black; height: 6px; width: 24px; margin-left: 12px;"></div>
+          <div style="background-color: black; height: 6px; width: 24px; margin-left: 12px; margin-right: 8px;"></div>
+          <h5>Gaps</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.gaps[k]"
@@ -132,7 +161,10 @@
           <span class="input-group-addon">{{sumSpecial(scorings.gaps, ['A','B','C','D','E','F'])}} pts</span>
         </div>
 
-        <h5>Passagem</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/passagem.png" style="height: 24px; margin-right: 8px;" />
+          <h5>Passagem</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
             ng-model="scoreData.passage[k]"
@@ -143,7 +175,7 @@
           <span class="input-group-addon">{{sumSpecial(scorings.passage, ['A'])}} pts</span>
         </div>
 
-        <h5>Desafio Surpresa</h5>
+        <h5>Desafio Surpresa <span style="font-weight: bold; font-size: 24px; margin-left: 8px">?</span></h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.challenge[first]" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.challenge[first]" btn-radio="1">Fez</label>
@@ -155,7 +187,10 @@
     <div class="col-md-6 col-sm-6">
 
       <div class="thumbnail">
-        <h4>Rampa</h4>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/rampa.png" style="height: 24px; margin-right: 16px;" />
+          <h4>Rampa</h4>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.corridors['ramp']" btn-radio="1">1ª</label>
@@ -165,7 +200,12 @@
           <span class="input-group-addon">{{scorings.corridors['ramp'] || 0}} pts</span>
         </div>
 
-        <h5>Gaps</h5>
+        <div style="display: flex; align-items: center;">
+          <div style="background-color: black; height: 6px; width: 24px; margin-left: 12px;"></div>
+          <div style="background-color: black; height: 6px; width: 24px; margin-left: 12px; margin-right: 8px;"></div>
+          <h5>Gaps</h5>
+        </div>
+
         <div class="btn-group btn-group-justified">
             <label class="btn btn-default"
             ng-model="scoreData.gaps[k]"
@@ -176,7 +216,10 @@
           <span class="input-group-addon">{{sumSpecial(scorings.gaps, ['RAMPA_A', 'RAMPA_B'])}} pts</span>
         </div>
 
-        <h5>Redutores</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/redutores.png" style="height: 48px; margin-right: 16px; margin-left: 10px; transform: rotate(90deg);" />
+          <h5>Redutores</h5>
+        </div>
         <div class="btn-group btn-group-justified">
             <label class="btn btn-default"
             ng-model="scoreData.speedbump[k]"
@@ -192,7 +235,10 @@
 
         <!-- <h4></h4> -->
 
-        <h5>Resgate: 1ª Vítima (Viva)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitima.png" style="height: 24px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 1ª Vítima (Viva)</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['1a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['1a']" btn-radio="1">1ª</label>
@@ -201,7 +247,10 @@
           <span class="input-group-addon">{{scorings.victims['1a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 2ª Vítima (Viva)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitima.png" style="height: 24px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 2ª Vítima (Viva)</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['2a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['2a']" btn-radio="1">1ª</label>
@@ -210,7 +259,10 @@
           <span class="input-group-addon">{{scorings.victims['2a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 3ª Vítima (Viva)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitima.png" style="height: 24px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 3ª Vítima (Viva)</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims['3a']" btn-radio="1">1ª</label>
@@ -219,7 +271,11 @@
           <span class="input-group-addon">{{scorings.victims['3a'] || 0}} pts</span>
         </div>
         
-        <h5 style="margin-top: 32px;">Resgate: 1ª Vítima (Morta)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitimaMorta.png" style="height: 22px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 1ª Vítima (Morta)</h5>
+        </div>
+
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims_dead['1a']" btn-radio="1">1ª</label>
@@ -228,7 +284,10 @@
           <span class="input-group-addon">{{scorings.victims_dead['1a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 2ª Vítima (Morta)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitimaMorta.png" style="height: 22px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 2ª Vítima (Morta)</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims_dead['2a']" btn-radio="1">1ª</label>
@@ -237,7 +296,10 @@
           <span class="input-group-addon">{{scorings.victims_dead['2a'] || 0}} pts</span>
         </div>
 
-        <h5>Resgate: 3ª Vítima (Morta)</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/vitimaMorta.png" style="height: 22px; margin-right: 16px; transform: rotate(90deg);" />
+          <h5>Resgate: 3ª Vítima (Morta)</h5>
+        </div>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.victims_dead['3a']" btn-radio="1">1ª</label>
@@ -246,14 +308,18 @@
           <span class="input-group-addon">{{scorings.victims_dead['3a'] || 0}} pts</span>
         </div>
 
-        <h5 style="margin-top: 32px;">Kit de Resgate de entregue</h5>
+        <div style="display: flex; align-items: center;">
+          <img src="/tournamenter-obr/images/rescueKit.png" style="height: 26px; margin-right: 8px;" />
+          <h5>Kit de Resgate entregue</h5>
+        </div>
+
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rescueKit"
-            btn-radio="0">Não Entregue</label>
+            btn-radio="0">Nop</label>
           <label class="btn btn-default" ng-model="scoreData.rescueKit"
-            btn-radio="1">Entregue (No Robô)</label>
+            btn-radio="1">Entregue (Robô)</label>
           <label class="btn btn-default" ng-model="scoreData.rescueKit"
-            btn-radio="2">Entregue (No Caminho)</label>
+            btn-radio="2">Entregue (Pista)</label>
         </div>
 
 
