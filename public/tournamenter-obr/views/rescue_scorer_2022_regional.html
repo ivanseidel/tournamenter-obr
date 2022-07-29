@@ -6,7 +6,7 @@
   }
   .btn-group-justified > .input-group-addon {
     width: 0.000001%;
-    min-width: 80px;
+    min-width: 50px;
   }
 </style>
 
@@ -109,14 +109,20 @@
         </div>
         
         <div class="btn-group btn-group-justified">
-          <label class="btn btn-default"
-            ng-model="scoreData.intersection[k]"
-            ng-repeat="k in ['A','B','C','D','E','F','G','H']"
-            btn-checkbox>
-              {{k}}
+          <label class="btn btn-default" ng-model="scoreData.intersection[k]"
+            ng-repeat="k in ['A','B','C','D','E','F','G','H', 'I',]" btn-checkbox>
+            {{k}}
           </label>
-          <span class="input-group-addon">{{sumSpecial(scorings.intersection, ['A','B','C','D','E','F','G','H','I','J','K','L'])}} pts</span>
         </div>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.intersection[k]" ng-repeat="k in ['J','K','L','M','N','O','P','Q']"
+            btn-checkbox>
+            {{k}}
+          </label>
+          <span class="input-group-addon">{{sumSpecial(scorings.intersection,
+            ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q'])}} pts</span>
+        </div>
+
         <div style="display: flex; align-items: center;">
           <img src="/tournamenter-obr/images/beco.png" style="height: 48px; margin-right: 16px; margin-left: 10px; transform: rotate(90deg);" />
           <h5>Beco sem Saída</h5>
