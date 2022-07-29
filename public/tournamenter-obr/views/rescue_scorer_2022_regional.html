@@ -101,13 +101,20 @@
         </div>
         
         <div class="btn-group btn-group-justified">
-          <label class="btn btn-default"
-            ng-model="scoreData.speedbump[j]"
-            ng-repeat="j in ['A','B','C','D','E','F','G','H']"
-            btn-checkbox>
-              {{j}}
-          </label>
-          <span class="input-group-addon">{{sumSpecial(scorings.speedbump, ['A','B','C','D','E','F','G','H','I','J'])}} pts</span>
+          <div class="btn-group btn-group-justified">
+            <label class="btn btn-default" ng-model="scoreData.speedbump[k]"
+              ng-repeat="k in ['A','B','C','D','E','F','G','H', 'I',]" btn-checkbox>
+              {{k}}
+            </label>
+          </div>
+          <div class="btn-group btn-group-justified">
+            <label class="btn btn-default" ng-model="scoreData.speedbump[k]" ng-repeat="k in ['J','K','L','M','N','O','P','Q']"
+              btn-checkbox>
+              {{k}}
+            </label>
+            <span class="input-group-addon">{{sumSpecial(scorings.speedbump,
+              ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q'])}} pts</span>
+          </div>
         </div>
 
         <div style="display: flex; align-items: center;">
