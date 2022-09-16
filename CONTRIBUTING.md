@@ -24,6 +24,25 @@ Portanto é necessário atualizar o plugin para cada nova edição da modalidade
 
 ### Testando localmente suas alterações
 
+Você pode testar suas alterações através de duas maneiras
+
+#### Instalando seu plugin através do seu fork
+
+É possível instalar um plugin do tournamenter direto de uma URL do GitHub, então uma vez que você faça pushes de seu código para seu fork, basta desinstalar o plugin da obr, e reinstalar direto da url de seu GitHub para testar suas alterações
+
+#### Alterando os arquivos instalados no seu computador
+
+Procure o diretório base onde o Tournamenter está instalado, no meu caso está no caminho: `/Users/user.name/Library/Application Support/Tournamenter/`, é possível observar o caminho base no Tournamenter APP, ao abrir um servidor e observar o endereço do banco de dados, então basta remover o `nomeServer.pb` que você terá a url base.
+
+Em posse da URL base navegue até: `extensions -> node_modules -> tournamenter-obr`, então basta modificar também os arquivos aqui dentro desta pasta, adcionando suas alterações de código
+
+### Alterações gerais/Melhorias
+
+1. [Faça um fork](https://github.com/ivanseidel/tournamenter-obr/fork) do repositório e em seguida clone em seu computador.
+2. Abra uma issue discutindo sua ideia e proposta de melhoria
+3. Realize suas melhorias no código do plugin
+4. Faça um push dos seus commits para seu fork e [abra um pull request](https://github.com/ivanseidel/tournamenter-obr/compare)
+
 
 ### Considerações
 
@@ -31,8 +50,6 @@ Portanto é necessário atualizar o plugin para cada nova edição da modalidade
 - Cada missão pontuável dentro do scorer possui seus respectivos pontos registrados na variável `scorings`, representadas por um array, na primeira posição deve ser manter a pontuação de não concluído *geralmente 0*, depois a pontuação de concluído de primeira ou única tentativa, e se a missão considerar qual tentativa de solução foi utilizada, as demais pontuações nas próximas posições.
 ex: se uma missão pontua 35 pontos se concluída em qualquer tentativa deve ser representada como [0, 35], mas se a missão perde 5 pontos a cada tentativa até a 3, e na 4 não pontua mais, deve registrar [0, 35, 30, 25, 0]
 
-
-1. Push to your fork and [submit a pull request](https://github.com/ReciHub/FunnyAlgorithms/compare)
 
 ## Recursos
 
