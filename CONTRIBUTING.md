@@ -47,8 +47,6 @@ Procure o diretório base onde o Tournamenter está instalado, no meu caso está
 
 Em posse da URL base navegue até: `extensions -> node_modules -> tournamenter-obr`, então basta modificar também os arquivos aqui dentro desta pasta, adcionando suas alterações de código
 
-
-
 ## Recursos
 
 - [Como contribuir com Open Source](https://opensource.guide/how-to-contribute/)
