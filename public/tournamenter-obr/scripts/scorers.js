@@ -65,7 +65,7 @@ var app = angular.module('app.scorers', [])
     },
 
     mode: {
-      'final': 0,
+      'final': 1,
     },
     rescue_kit: { 
       'delivered': 0,
@@ -180,20 +180,19 @@ var app = angular.module('app.scorers', [])
         rescue_kit_multipliers = [1, 1.2, 1.6];
       }
 
-      var alive_victcms_multiplier = Math.pow(victim_save_multiplier, model.victims_alive.total);
+      var alive_victcms_multiplier = Math.pow((victim_save_multiplier - model.victims.fails * victms_lost_points), model.victims_alive.total);
       if(model.victims_alive.total === 2 && model.victims_dead.total === 1){
-        alive_victcms_multiplier = alive_victcms_multiplier * victim_save_multiplier;
+        alive_victcms_multiplier = alive_victcms_multiplier * (victim_save_multiplier -  model.victims.fails * victms_lost_points);
       }
+      const rescueKitMultiplier = rescue_kit_multipliers[model.rescue_kit.delivered] - model.victims.fails * victms_lost_points
 
-      var lost_multipliers = model.victims.fails * victms_lost_points;
-
-      var multiplier = alive_victcms_multiplier * rescue_kit_multipliers[model.rescue_kit.delivered]  - lost_multipliers;
+      var multiplier = alive_victcms_multiplier * rescueKitMultiplier;
       if(multiplier < 1){
         multiplier = 1;
       }
 
-      model.multiplier.value = multiplier;
-      scored.total = Math.round(scored.total * multiplier);
+      model.multiplier.value = (Math.round(multiplier*1000)/1000);
+      scored.total = Math.round(scored.total * multiplier);``
       return scored;
     }
   }

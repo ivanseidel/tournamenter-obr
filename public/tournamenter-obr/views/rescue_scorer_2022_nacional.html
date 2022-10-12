@@ -3,7 +3,7 @@
   <div class="jumbotron">
       <h1>Aguardando...</h1>
       <p>Para começar a pontuar, inicie o cronômetro</p>
-      <p>Versão: Nacional 2022.1</p>
+      <p>Versão: Nacional 2022.2</p>
     </div>
   </div>
 </div>
@@ -18,7 +18,7 @@
         <h3>Ladrilhos</h3>
 
         <div ng-repeat="mark in [1, 2, 3, 4, 5, 6]">
-          <h5>{{mark}}º Marcador</h5>
+          <h4>{{mark}}º Marcador</h4>
           <div class="row">
 
             <div class="col-md-3 col-xs-4">
@@ -169,12 +169,11 @@
 
 
       <div class="thumbnail">
-        <h2>Vítmas resgatadas</h2>
+        <h2>Vítimas resgatadas</h2>
 
         <h4>Modo</h4>
         <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="0">N1</label>
-          <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="1">N2 - Fácil</label>
+          <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="1">N1/N2 - Fácil</label>
           <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="2">N2 - Difícil</label>
         </div>
 
@@ -210,7 +209,7 @@
           <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="1">1</label>
         </div>
 
-        <h5 style="margin-top: 16px;">Bônus de saída</h5>
+        <h4 style="margin-top: 16px;">Bônus de saída</h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.bonus_de_saida['final']"
             btn-radio="0">Não</label>
@@ -219,7 +218,7 @@
           <span class="input-group-addon">{{scorings.bonus_de_saida['final'] || 0}} pts</span>
         </div>
 
-        <h5>Kit de Resgate entregue</h5>
+        <h4>Kit de Resgate entregue</h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.rescue_kit.delivered"
             btn-radio="0">Nop</label>
