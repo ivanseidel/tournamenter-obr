@@ -7,6 +7,7 @@ var app = angular.module('app.scorers', [])
 
     },
     squares1: {
+      'initial': 0,
       '1': 0,
       '2': 0,
       '3': 0,
@@ -82,6 +83,7 @@ var app = angular.module('app.scorers', [])
 
     victims_dead: {
       'total': 0,
+      'before': 0,
     },
     multiplier: { 
       'value': 1,
