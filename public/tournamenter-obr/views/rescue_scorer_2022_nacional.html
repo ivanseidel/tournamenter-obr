@@ -17,6 +17,13 @@
       <div class="thumbnail">
         <h3>Ladrilhos</h3>
 
+        <h4 style="margin-top: 16px;">Ladrilho Inicial</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.squares1['initial']" btn-radio="0">Não</label>
+          <label class="btn btn-default" ng-model="scoreData.squares1['initial']" btn-radio="1">Sim</label>
+          <span class="input-group-addon">{{scorings.squares1['initial'] || 0}} pts</span>
+        </div>
+
         <div ng-repeat="mark in [1, 2, 3, 4, 5, 6]">
           <h4>{{mark}}º Marcador</h4>
           <div class="row">
@@ -203,7 +210,13 @@
           <label ng-show="scoreData.victims['total'] >= 2" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="2">2</label>
         </div>
 
-        <h4>Vítimas Mortas Resgatadas</h4>
+        <h4>Vítima Morta Salva ANTES da viva</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before" btn-radio="0">0</label>
+          <label class="btn btn-default" ng-model="scoreData.victims_dead.before" btn-radio="1">1</label>
+        </div>
+
+        <h4>Vítima Morta Salva DEPOIS da viva</h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="0">0</label>
           <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="1">1</label>
