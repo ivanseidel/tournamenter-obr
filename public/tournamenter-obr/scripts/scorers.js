@@ -1,4 +1,190 @@
 var app = angular.module('app.scorers', [])
+  
+  .factory('RescueScorer2023Regional', function (){
+
+  var model = {
+    gaps: {
+
+    },
+    squares1: {
+      'initial': 0,
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    squares2: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    squares3: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    fails: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    obstacles: {
+
+    },
+    speedbump: {
+
+    },
+    intersection: {
+
+    },
+    passage: {
+
+    },
+    seesaw: {
+
+    },
+    becos: {
+
+    },
+    rampas: {
+
+    },
+    mode: {
+      'final': 1,
+    },
+    rescue_kit: { 
+      'delivered': 0,
+    },
+
+    victims: {
+      'total': 5,
+      'fails': 0,
+    },
+
+    victims_alive: {
+      'total': 0,
+    },
+
+    victims_dead: {
+      'total': 0,
+    },
+    victims_switched: {
+      'total': 0,
+    },
+    multiplier: { 
+      'value': 1,
+    }
+  };
+
+  var scorings ={
+    gaps: [0,10],
+
+    squares1: 5,
+    squares2: 3,
+    squares3: 1,
+    fails: 0,
+
+    obstacles: [0,15],
+    speedbump: [0, 5],
+    intersection: [0,10],
+    passage: [0, 10],
+
+    becos: [0, 10],
+    rampas: [0, 10],
+    seesaw: [0, 15],
+
+    rescue_kit: function(){
+      return 0;
+    },
+
+    multiplier: function(val, scorings, model) {
+      return 0
+    },
+
+    mode: function(val, scorings, model) {
+      return 0
+    },
+
+    victims: function(sub, val, scorings, model) {
+      return 0
+    },
+
+    victims_alive: function(sub, val, scorings, model) {
+      return 0;
+    },
+
+    victims_dead: function(sub, val, scorings, model) {
+      return 0;
+    },
+    victims_switched: function(sub, val, scorings, model) {
+      return 0;
+    },
+  }
+
+  return {
+    view: 'views/rescue_scorer_2023_regional.html?r='+Math.random(),
+    model: model,
+    scorings: scorings,
+    totalTime: 300,
+    score: function (model){
+      var scored = {
+        total: 0,
+      };
+
+      for(var k in model){
+        scored[k] = {};
+        var group = model[k];
+
+        for(var i in group){
+          var mission = group[i];
+          if(mission === false) mission = 0;
+          if(mission === true) mission = 1;
+
+          var pointsGroup = scorings[k];
+          var points;
+          if (typeof pointsGroup == 'function') {
+            points = pointsGroup(i, mission, scorings, model)
+          } else if(typeof pointsGroup == 'number'){
+            points = pointsGroup * mission;
+          } else {
+            points = scorings[k][mission];
+          }
+
+          scored[k][i] = points
+          scored.total += points || 0;
+        }
+      }
+
+      var victim_save_multiplier = 1.3;
+      var switched_save_multiplier = 1.1; 
+      var rescue_kit_multipliers = [1, 1.1, 1.2, 1.3, 1.6];
+
+      var correct_victims_multiplier = Math.pow(victim_save_multiplier, (model.victims_alive.total + model.victims_dead.total));
+      var switched_victms_multiplier = Math.pow(switched_save_multiplier, model.victims_switched.total)
+      const rescueKitMultiplier = rescue_kit_multipliers[model.rescue_kit.delivered] 
+
+      var multiplier = correct_victims_multiplier * switched_victms_multiplier * rescueKitMultiplier;
+      if(multiplier < 1){
+        multiplier = 1;
+      }
+
+      model.multiplier.value = (Math.round(multiplier*1000)/1000);
+      scored.total = Math.round(scored.total * multiplier);``
+      return scored;
+    }
+  }
+})
 
 .factory('RescueScorer2022Nacional', function (){
 
@@ -83,7 +269,6 @@ var app = angular.module('app.scorers', [])
 
     victims_dead: {
       'total': 0,
-      'before': 0,
     },
     multiplier: { 
       'value': 1,
