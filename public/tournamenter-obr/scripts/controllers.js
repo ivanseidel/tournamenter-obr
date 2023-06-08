@@ -115,7 +115,6 @@
 			};
 			$scope.newScore();
 			$scope.$watch('scoreData', function (){
-				console.log('Mudou');
 				$scope.compute();
 			}, true);
 
