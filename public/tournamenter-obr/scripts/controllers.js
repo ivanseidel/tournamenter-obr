@@ -33,10 +33,12 @@
 				table: null,
 				round: null,
 				score: null,
+				completeMission: 0,
 				// Extras
 				time: extra.time,
 				total: extra.total,
 				doNotSave: extra.doNotSave,
+				maxTime: 300,
 			};
 
 			$scope.tables = Table.all(
@@ -182,6 +184,11 @@
 
 					// Saves if doNotSave flag is false
 					if(!doNotSave && selected && selected.score.id){
+
+						if(SCORE_WITH_TIME){
+							if(!selected.completeMission)
+								selected.time = Scorer.totalTime;
+						}
 
 						var number1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
 						var number2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);

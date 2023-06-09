@@ -107,11 +107,18 @@
 			</span>
 		</h3>
 
-
 		<div class="input-group input-group-lg">
 			<span class="input-group-addon">Tempo total:</span>
-			<input type="text" class="form-control" placeholder="Tempo" ng-model="selected.time">
+			<input ng-if="selected.completeMission" type="text" class="form-control" placeholder="Tempo" ng-model="selected.time">
+			<span class="form-control" ng-if="!selected.completeMission">300</span>
 		</div>
+
+		<div class="btn-group btn-group-justified" style="margin-top: 24px; margin-bottom: 24px;">
+			<label class="btn btn-default" ng-model="selected.completeMission"
+			  btn-radio="0">300 Seg</label>
+			<label class="btn btn-default" ng-model="selected.completeMission"
+			  btn-radio="1">Tempo do cronômetro</label>
+		  </div>
 
 
 		<div class="btn-group pull-right">
