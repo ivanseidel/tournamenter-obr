@@ -37,10 +37,6 @@ module.exports = {
           name: 'Pontuador',
         },
         {
-          path: '/obr-desafio',
-          name: 'Desafio Surpresa',
-        },
-        {
           path: '/obr-config',
           name: 'Configurar (Importar/Exportar)',
         },

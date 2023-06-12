@@ -12,32 +12,24 @@ var app = angular.module('app.scorers', [])
       '2': 0,
       '3': 0,
       '4': 0,
-      '5': 0,
-      '6': 0,
     },
     squares2: {
       '1': 0,
       '2': 0,
       '3': 0,
       '4': 0,
-      '5': 0,
-      '6': 0,
     },
     squares3: {
       '1': 0,
       '2': 0,
       '3': 0,
       '4': 0,
-      '5': 0,
-      '6': 0,
     },
     fails: {
       '1': 0,
       '2': 0,
       '3': 0,
       '4': 0,
-      '5': 0,
-      '6': 0,
     },
     obstacles: {
 
@@ -142,6 +134,18 @@ var app = angular.module('app.scorers', [])
         total: 0,
       };
 
+      Object.keys(model.squares2).map(key => {
+        if(model.squares1[key] > 0){
+          model.squares2[key] = 0;
+        }
+      })
+
+      Object.keys(model.squares3).map(key => {
+        if(model.squares1[key] > 0 || model.squares2[key] > 0){
+          model.squares3[key] = 0;
+        }
+      })
+      
       for(var k in model){
         scored[k] = {};
         var group = model[k];
