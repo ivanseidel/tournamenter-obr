@@ -28,7 +28,7 @@ angular.module('app.importar', [])
 
     $scope.teams = Team.all(function (){
       // Generate commits
-      $scope.actions = getCommits($scope.teams, $scope.teamsToImport.teams,  $scope.teamsToImport.name[3].slice(-1), $scope.importEventToken)
+      $scope.actions = getCommits($scope.teams, $scope.teamsToImport.teams,  $scope.teamsToImport.name[3].slice(-1), $scope.importEventToken, $scope.teamsToImport.id)
       $scope.actionsStats = _.countBy($scope.actions, 'action')
 
       // Show message
@@ -69,13 +69,13 @@ angular.module('app.importar', [])
     })
   }
 
-  function getCommits(teams, newTeams, level, token) {
+  function getCommits(teams, newTeams, level, token, stepId) {
     var actions = []
 
     newTeams.forEach(function (newTeam){
       var team = teams.find(function (t) {return newTeam.id == t.olimpoId})
 
-      const teamObj = {...newTeam, id: undefined, olimpoId: newTeam.id, token: token, name: `${level} - ${newTeam.name}` , country: `${newTeam.city} - ${newTeam.state}`}
+      const teamObj = {...newTeam, id: undefined, olimpoId: newTeam.id, stepId, token: token, name: `${level} - ${newTeam.name}` , country: `${newTeam.city} - ${newTeam.state}`}
       if (!team) {
         // Create
         return actions.push({action: 'create', msg: newTeam.name, team: teamObj })
