@@ -5,15 +5,16 @@ angular.module('app.importar', [])
   $scope.success = ''
   $scope.teams = Team.all()
   $scope.events = ExternalEventAPI.all()
-  $scope.importEvent = null
+  $scope.importEventToken = null
   $scope.teamsToImport = null
 
-  $scope.$watch('importEvent', function () {
-    if (!$scope.importEvent) {
+  $scope.$watch('importEventToken', function () {
+    if (!$scope.importEventToken) {
       return
     }
 
-    $scope.teamsToImport = ExternalTeamAPI.all({event: $scope.importEvent})
+    $scope.teamsToImport = ExternalTeamAPI.all({token: $scope.importEventToken})
+    $scope.teamsToImport.$promise.then(teams => console.log(teams))
   })
 
   $scope.actions = null
@@ -27,7 +28,9 @@ angular.module('app.importar', [])
 
     $scope.teams = Team.all(function (){
       // Generate commits
-      $scope.actions = getCommits($scope.teams, $scope.teamsToImport, $scope.allowDelete)
+      const lastDigitMatch = $scope.teamsToImport.name.join(' ').split('').reverse().join('').match(/(\d)/);
+      const lastDigit = lastDigitMatch ? lastDigitMatch[1] : "?";
+      $scope.actions = getCommits($scope.teams, $scope.teamsToImport.teams,  lastDigit, $scope.importEventToken, $scope.teamsToImport.id)
       $scope.actionsStats = _.countBy($scope.actions, 'action')
 
       // Show message
@@ -68,35 +71,24 @@ angular.module('app.importar', [])
     })
   }
 
-  function getCommits(teams, newTeams, allowDelete) {
+  function getCommits(teams, newTeams, level, token, stepId) {
     var actions = []
 
     newTeams.forEach(function (newTeam){
-      var team = teams.find(function (t) {return newTeam.id == t.id})
+      var team = teams.find(function (t) {return newTeam.id == t.olimpoId})
 
+      const teamObj = {...newTeam, id: undefined, olimpoId: newTeam.id, stepId, token: token, name: `${level} - ${newTeam.name}` , country: `${newTeam.city} - ${newTeam.state}`}
       if (!team) {
         // Create
-        return actions.push({action: 'create', msg: newTeam.name, team: newTeam})
+        return actions.push({action: 'create', msg: newTeam.name, team: teamObj })
       }
 
       if (isDifferent(newTeam, team)) {
         // Update
-        var msg = team.name + ' -> ' + newTeam.name
-        return actions.push({action: 'update', msg: msg, team: newTeam})
+        var msg = team.name + ' -> ' + `${level} - ${newTeam.name}`
+        return actions.push({action: 'update', msg: msg, team: teamObj})
       }
     })
-
-    // Deletion? 
-    if (allowDelete) {
-      teams.forEach(function (oldTeam) {
-        var team = newTeams.find(function (t) {return oldTeam.id == t.id})
-
-        if (!team) {
-          // Remove
-          return actions.push({action: 'remove', msg: oldTeam.name, team: oldTeam})
-        }
-      })
-    }
 
     return actions
   }

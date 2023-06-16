@@ -1,7 +1,7 @@
 var TOURNAMENTER_URL    = '';
-var EXTERNAL_API_BASE   = 'http://www.sistemaolimpo.org/webservice/tournamenter';
-var EXTERNAL_API_EVENTS = '/eventos.php';
-var EXTERNAL_API_TEAMS  = '/equipes.php';
+var EXTERNAL_API_BASE   = 'http://olimpo.robocup.org.br/api/events/steps';
+var EXTERNAL_API_EVENTS = '/score';
+var EXTERNAL_API_TEAMS  = '/participants';
 
 var app = angular.module('app.api', [])
 
@@ -18,10 +18,9 @@ var app = angular.module('app.api', [])
 
 .factory('ExternalTeamAPI', ['$resource', function ($resource) {
 
-  return $resource(EXTERNAL_API_BASE + EXTERNAL_API_TEAMS, {event: '@event'}, {
+  return $resource(EXTERNAL_API_BASE + EXTERNAL_API_TEAMS, {token: '@token'}, {
     all: {
       url: EXTERNAL_API_BASE + EXTERNAL_API_TEAMS,// + '/:event',
-      isArray: true,
     },
   });
 

@@ -30,7 +30,7 @@
   <div class="container hide" ng-class="{hide: !loaded}">
 
     <!-- Importar equipes -->
-    <div class="col-md-6" ng-controller="ImportarCtrl">
+    <div class="col-md-6" style="margin-top: 42px" ng-controller="ImportarCtrl">
       <h2>Importar Equipes</h2>
       <hr/>
       <p>
@@ -43,25 +43,11 @@
       <div class="alert alert-success ng-cloak" ng-show="success" role="alert">{{success}}</div>
 
       <label>
-        Evento para importar equipes:
+        Token do Evento para importar equipes:
       </label>
       <div class="form-group row">
-        <div class="col-md-6">
-          <select 
-            class="form-control"
-            ng-model="importEvent" 
-            ng-disabled="!events || executing">
-            <option 
-              ng-if="!events"
-              value="0">
-                Carregando...
-            </option>
-            <option
-              ng-repeat="event in events"
-              value="{{event.id}}">
-                {{event.name}}
-            </option>
-          </select>
+        <div class="col-md-6 col-lg-12">
+          <input class="form-control" type="text" ng-model="importEventToken">
         </div>
 
         <div class="col-md-6" style="margin-top: 8px;">
@@ -72,7 +58,7 @@
               {{teamsToImport.length}} Equipes
           </span>
           <span
-            ng-show="teamsToImport.$resolved && !teamsToImport.length" 
+            ng-show="teamsToImport.$resolved && !teamsToImport.teams.length" 
             class="label label-danger"
             style="font-size: 16px;">
               Falha ao Carregar
@@ -86,7 +72,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <!-- <div class="form-group">
         <div class="checkbox">
           <label>
             <input
@@ -94,13 +80,13 @@
               type="checkbox"> Remover equipes inexistentes no Sistema Olimpo
           </label>
         </div>
-      </div>
+      </div> -->
 
       <div class="form-group">
         <button 
           type="button"
           ng-click="diffTeams()"
-          ng-disabled="!importEvent || !teamsToImport || executing"
+          ng-disabled="!importEventToken || !teamsToImport || executing"
           class="btn btn-primary btn-sm btn-block">
             Verificar Diferenças (passo 1)
         </button>
@@ -215,7 +201,7 @@
           </div>
         </div>
 
-        <div class="form-group row" ng-show="syncConfig.sync">
+        <!-- <div class="form-group row" ng-show="syncConfig.sync">
           <label>
             URL de envio (Somente a organização nacional da OBR pode fornece-la)
           </label>
@@ -224,7 +210,7 @@
             class="form-control"
             ng-model="syncConfig.url"
             placeholder="URL de envio"/>
-        </div>
+        </div> -->
 
         <!-- <div class="form-group row" ng-show="syncConfig.sync">
           <label>
