@@ -28,7 +28,7 @@ angular.module('app.importar', [])
 
     $scope.teams = Team.all(function (){
       // Generate commits
-      const lastDigitMatch = $scope.teamsToImport.name.join(' ').split('').reverse().join('').match(/(\d)/);
+      const lastDigitMatch = $scope.teamsToImport && $scope.teamsToImport.name && $scope.teamsToImport.name.join(' ').split('').reverse().join('').match(/(\d)/);
       const lastDigit = lastDigitMatch ? lastDigitMatch[1] : "?";
       $scope.actions = getCommits($scope.teams, $scope.teamsToImport.teams,  lastDigit, $scope.importEventToken, $scope.teamsToImport.id)
       $scope.actionsStats = _.countBy($scope.actions, 'action')

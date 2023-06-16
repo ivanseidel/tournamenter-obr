@@ -170,7 +170,7 @@ exports.sync = function (config, next) {
   // Get tables
   app.controllers.Table._findAssociated(null, function (tables) {
 
-    var steps = tables.map(ConvertTableToMatrix)
+    var steps = tables.map(ConvertTableToMatrix).filter(step => step !== null)
 
     var data = {
       steps
@@ -211,7 +211,7 @@ exports.sync = function (config, next) {
  * Convert table to matrix
  */
 function ConvertTableToMatrix(table) {
-  if (!table)
+  if (!table || !table.scores || !table.scores[0] || !table.scores[0].team)
     return null;
 
   var scores = table.scores
