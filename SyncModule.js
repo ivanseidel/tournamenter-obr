@@ -2,7 +2,7 @@ var TAG = _TAG('SyncModule')
 
 var request = require('request')
 
-const OLIMPO_API_URL = "https://olimpo.robocup.org.br/api/events/steps/score"
+const OLIMPO_API_URL = "http://olimpo.robocup.org.br/api/events/steps/score"
 
 exports.default = {
   url: null, 
