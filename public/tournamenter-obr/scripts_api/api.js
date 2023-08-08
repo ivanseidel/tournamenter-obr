@@ -1,5 +1,5 @@
 var TOURNAMENTER_URL    = '';
-var EXTERNAL_API_BASE   = 'https://olimpo.robocup.org.br/api/events/steps';
+var EXTERNAL_API_BASE   = 'http://olimpo.robocup.org.br/api/events/steps';
 var EXTERNAL_API_EVENTS = '/score';
 var EXTERNAL_API_TEAMS  = '/participants';
 
