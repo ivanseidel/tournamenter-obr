@@ -2,7 +2,7 @@ var TAG = _TAG('SyncModule')
 
 var request = require('request')
 
-const OLIMPO_API_URL = "http://olimpo.robocup.org.br/api/events/steps/score"
+const OLIMPO_API_URL = "https://olimpo.robocup.org.br/api/events/steps/score"
 
 exports.default = {
   url: null, 
@@ -171,7 +171,7 @@ exports.sync = function (config, next) {
   app.controllers.Table._findAssociated(null, function (tables) {
 
     var steps = tables.map(ConvertTableToMatrix).filter(step => step !== null)
-
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
     var data = {
       steps
     }
