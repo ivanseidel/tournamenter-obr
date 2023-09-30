@@ -2,6 +2,8 @@ var TAG = _TAG('SyncModule')
 
 var request = require('request')
 
+const OLIMPO_API_URL = "https://olimpo.robocup.org.br/api/events/steps/score"
+
 exports.default = {
   url: null, 
   sync: false,
@@ -168,15 +170,13 @@ exports.sync = function (config, next) {
   // Get tables
   app.controllers.Table._findAssociated(null, function (tables) {
 
-    var matrixTables = tables.map(ConvertTableToMatrix)
-
+    var steps = tables.map(ConvertTableToMatrix).filter(step => step !== null)
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
     var data = {
-      tables: matrixTables,
-      blobs: tables,
+      steps
     }
-
     request({
-      url: config.url, 
+      url: OLIMPO_API_URL, 
       json: data,
       method: 'POST'
     }, function (err, httpResponse, body) {
@@ -211,37 +211,43 @@ exports.sync = function (config, next) {
  * Convert table to matrix
  */
 function ConvertTableToMatrix(table) {
-  if (!table)
+  if (!table || !table.scores || !table.scores[0] || !table.scores[0].team)
     return null;
 
   var scores = table.scores
   var headers = table.headers
   var scoreColumns = parseInt(table.columns)
-  var headerColumns = 3 // RANK, NAME and FINAL
-
-  // Generate rows
-  var rows = []
-
-  // Push Header
-  var header = _.flatten([headers.rank, headers.team, headers.scores, headers.final])
-  console.log(header)
-  rows.push(header)
-
-  // Push data
-  scores.forEach(function (line) {
-    var row = [line.rank, line.team ? line.team : null]
-    
-    // Add scores (Makes sure the size is fixed)
+  const stepId = scores[0].team.stepId;
+  const token = scores[0].team.token;
+  var header = _.flatten([headers.rank, headers.scores, headers.final])
+  const scoresData = scores.map((line) => {
+    const dataMap = {};
+    const headersMap = {};
+    headersMap[headers.rank] = line.rank;
     _.times(scoreColumns, function (n) {
-      row.push(n in line.scores ? line.scores[n].value : '-')
+      if(line.scores && line.scores[n]){
+        dataMap[headers.scores[n]] = line.scores[n].data;
+        headersMap[headers.scores[n]] = line.scores[n].value;
+      }
+      else{
+        dataMap[headers.scores[n]] = '';
+        headersMap[headers.scores[n]] = 0;
+      }
     })
-
-    // Add final score
-    row.push(line.final)
-
-    // Add to rows
-    rows.push(row)
+    headersMap[headers.final] = line.final;
+    return {
+      id: line.team.olimpoId,
+      dataMap,
+      headersMap
+    }
   })
 
-  return rows
+  const step = {
+    id: stepId, 
+    token: token,
+    headers: header,
+    scores: scoresData,
+  }
+
+  return step;
 }
