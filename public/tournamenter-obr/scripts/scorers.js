@@ -64,11 +64,12 @@ var app = angular.module('app.scorers', [])
       'final': 0,
     },
 
-    mode: {
-      'final': 1,
-    },
     rescue_kit: { 
       'delivered': 0,
+    },
+
+    desafio_surpresa: { 
+      'completed': 0,
     },
 
     victims: {
@@ -99,13 +100,17 @@ var app = angular.module('app.scorers', [])
     obstacles: [0,15],
     speedbump: [0, 5],
     intersection: [0,10],
-    passage: [0, 0],
+    passage: [0, 10],
 
     becos: [0, 10],
     rampas: [0, 5],
     seesaw: [0, 15],
 
     rescue_kit: function(){
+      return 0;
+    },
+
+    desafio_surpresa: function(){
       return 0;
     },
 
@@ -116,10 +121,6 @@ var app = angular.module('app.scorers', [])
     },
 
     multiplier: function(val, scorings, model) {
-      return 0
-    },
-
-    mode: function(val, scorings, model) {
       return 0
     },
 
@@ -170,23 +171,26 @@ var app = angular.module('app.scorers', [])
         }
       }
 
-      var victim_save_multiplier = 1.2; // for easy mode or N1
-      var victms_lost_points = 0.025;
-      var rescue_kit_multipliers = [1, 1.1, 1.3];
-
-      if(model.mode.final === 2){ //hard mode
-        victim_save_multiplier = 1.4;
-        victms_lost_points = 0.05;
-        rescue_kit_multipliers = [1, 1.2, 1.6];
-      }
+      var victim_save_multiplier = 1.3; // for easy mode or N1
+      var victms_lost_points = 0.05;
+      var rescue_kit_multipliers = [1, 1.1, 1.4];
+      var desafio_surpresa_multipliers = [1, 1.1];
 
       var alive_victcms_multiplier = Math.pow((victim_save_multiplier - model.victims.fails * victms_lost_points), model.victims_alive.total);
-      if(model.victims_alive.total === 2 && model.victims_dead.total === 1){
-        alive_victcms_multiplier = alive_victcms_multiplier * (victim_save_multiplier -  model.victims.fails * victms_lost_points);
+      if(alive_victcms_multiplier < 1){
+        alive_victcms_multiplier = 1;
       }
-      const rescueKitMultiplier = rescue_kit_multipliers[model.rescue_kit.delivered] - model.victims.fails * victms_lost_points
+      if(model.victims_alive.total === 2 && model.victims_dead.total === 1){
+        var dead_victms_multiplier = (victim_save_multiplier -  model.victims.fails * victms_lost_points);
+        if(dead_victms_multiplier < 1){
+          dead_victms_multiplier = 1;
+        }
+        alive_victcms_multiplier = alive_victcms_multiplier * dead_victms_multiplier;
+      }
+      const rescueKitMultiplier = rescue_kit_multipliers[model.rescue_kit.delivered]
+      const desafioSurpresaMultiplier = desafio_surpresa_multipliers[model.desafio_surpresa.completed]
 
-      var multiplier = alive_victcms_multiplier * rescueKitMultiplier;
+      var multiplier = alive_victcms_multiplier * rescueKitMultiplier * desafioSurpresaMultiplier;
       if(multiplier < 1){
         multiplier = 1;
       }

@@ -93,6 +93,17 @@
 
       <div class="thumbnail">
 
+        <h5>Passagem</h5>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default"
+            ng-model="scoreData.passage[k]"
+            ng-repeat="k in [11, 12, 13, 14]"
+            btn-checkbox>
+              {{$index + 1}}
+          </label>
+          <span class="input-group-addon">{{sumSpecial(scorings.passage, [11, 12, 13, 14])}} pts</span>
+        </div>
+
         <h5>Obstáculos</h5>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default"
@@ -178,12 +189,6 @@
       <div class="thumbnail">
         <h2>Vítimas resgatadas</h2>
 
-        <h4>Modo</h4>
-        <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="1">N1/N2 - Fácil</label>
-          <label class="btn btn-default" ng-model="scoreData.mode['final']" btn-radio="2">N2 - Difícil</label>
-        </div>
-
         <h4>Falhas de Progresso Contendo Sala de Salvamento</h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims.fails" btn-radio="0">0</label>
@@ -203,32 +208,17 @@
         <p>.</p>
 
 
-        <h4>Vítimas Vivas Resgatadas</h4>
+        <h4>Vítimas Vivas Resgatadas na área de resgate <span style="color: green;">VERDE</span></h4>
         <div class="btn-group btn-group-justified">
           <label ng-show="scoreData.victims['total'] >= 0" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="0">0</label>
           <label ng-show="scoreData.victims['total'] >= 1" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="1">1</label>
           <label ng-show="scoreData.victims['total'] >= 2" class="btn btn-default" ng-model="scoreData.victims_alive.total" btn-radio="2">2</label>
         </div>
 
-        <h4>Vítima Morta Salva ANTES da viva</h4>
-        <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.before" btn-radio="0">0</label>
-          <label class="btn btn-default" ng-model="scoreData.victims_dead.before" btn-radio="1">1</label>
-        </div>
-
-        <h4>Vítima Morta Salva DEPOIS da viva</h4>
+        <h4>Vítima Morta salva DEPOIS da viva na área de resgate <span style="color: red;">VERMELHA</span></h4>
         <div class="btn-group btn-group-justified">
           <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="0">0</label>
           <label class="btn btn-default" ng-model="scoreData.victims_dead.total" btn-radio="1">1</label>
-        </div>
-
-        <h4 style="margin-top: 16px;">Bônus de saída</h4>
-        <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.bonus_de_saida['final']"
-            btn-radio="0">Não</label>
-          <label class="btn btn-default" ng-model="scoreData.bonus_de_saida['final']"
-            btn-radio="1">Sim</label>
-          <span class="input-group-addon">{{scorings.bonus_de_saida['final'] || 0}} pts</span>
         </div>
 
         <h4>Kit de Resgate entregue</h4>
@@ -241,9 +231,25 @@
             btn-radio="2">Entregue (Trajeto)</label>
         </div>
 
+        <h4>Desafio Surpresa</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.desafio_surpresa.completed"
+            btn-radio="0">Nop</label>
+          <label class="btn btn-default" ng-model="scoreData.desafio_surpresa.completed"
+            btn-radio="1">Desafio resolvido</label>
+        </div>
+
+        <h4 style="margin-top: 16px;">Bônus de saída</h4>
+        <div class="btn-group btn-group-justified">
+          <label class="btn btn-default" ng-model="scoreData.bonus_de_saida['final']"
+            btn-radio="0">Não</label>
+          <label class="btn btn-default" ng-model="scoreData.bonus_de_saida['final']"
+            btn-radio="1">Sim</label>
+          <span class="input-group-addon">{{scorings.bonus_de_saida['final'] || 0}} pts</span>
+        </div>
+
         <h4>Multiplicador Obtido</h4>
         <span class="input-group-addon">{{scoreData.multiplier['value'] || 1}}x</span>
-
 
         <div style="margin-top: 28px" class="btn btn-lg btn-block navbar-btn btn-danger" ng-click="timer.stop();" ng-class="{disabled: timer.data.state == 'STOPPED'}">
           <span class="glyphicon glyphicon-pause"></span> Parar Tempo
