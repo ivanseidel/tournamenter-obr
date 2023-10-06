@@ -5,7 +5,7 @@ var app = angular.module('app.scorers', [])
     gaps: {
 
     },
-    squares1: {
+    squares: {
       'initial': 0,
       '1': 0,
       '2': 0,
@@ -14,23 +14,7 @@ var app = angular.module('app.scorers', [])
       '5': 0,
       '6': 0,
     },
-    squares2: {
-      '1': 0,
-      '2': 0,
-      '3': 0,
-      '4': 0,
-      '5': 0,
-      '6': 0,
-    },
-    squares3: {
-      '1': 0,
-      '2': 0,
-      '3': 0,
-      '4': 0,
-      '5': 0,
-      '6': 0,
-    },
-    fails: {
+    tentativa: {
       '1': 0,
       '2': 0,
       '3': 0,
@@ -91,11 +75,7 @@ var app = angular.module('app.scorers', [])
 
   var scorings ={
     gaps: [0,10],
-
-    squares1: 5,
-    squares2: 3,
-    squares3: 1,
-    fails: 0,
+    tentativa: 0,
 
     obstacles: [0,15],
     speedbump: [0, 5],
@@ -106,6 +86,17 @@ var app = angular.module('app.scorers', [])
     rampas: [0, 10],
     seesaw: [0, 15],
 
+    squares: function(sub, val, scorings, model){
+      const squarePoints = [0, 5, 3, 1]
+      if(sub === 'initial' ){
+        return squarePoints[val];
+      }
+      else{
+        const points = squarePoints[model.tentativa[sub]] * val
+        return points;
+      }
+    },
+
     rescue_kit: function(){
       return 0;
     },
@@ -115,7 +106,11 @@ var app = angular.module('app.scorers', [])
     },
 
     bonus_de_saida: function(sub, val, scorings, model) {
-      const total_lackOfProgress = Object.keys(model.fails).map((index) => parseInt(model.fails[index], 10)).reduce((prev, curr) => (prev + curr), 0)
+      const total_lackOfProgress = Object.keys(model.tentativa).map((index) => {
+        const tentativa = parseInt(model.tentativa[index], 10)
+        const falha = tentativa === 0 ? 0 : tentativa -1;
+        return falha;
+      }).reduce((prev, curr) => (prev + curr), 0)
       const bonus = (60 - 5*total_lackOfProgress) * val;
       return bonus > 0 ? bonus : 0;
     },

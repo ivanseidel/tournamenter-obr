@@ -19,9 +19,9 @@
 
         <h4 style="margin-top: 16px;">Ladrilho Inicial</h4>
         <div class="btn-group btn-group-justified">
-          <label class="btn btn-default" ng-model="scoreData.squares1['initial']" btn-radio="0">Não</label>
-          <label class="btn btn-default" ng-model="scoreData.squares1['initial']" btn-radio="1">Sim</label>
-          <span class="input-group-addon">{{scorings.squares1['initial'] || 0}} pts</span>
+          <label class="btn btn-default" ng-model="scoreData.squares['initial']" btn-radio="0">Não</label>
+          <label class="btn btn-default" ng-model="scoreData.squares['initial']" btn-radio="1">Sim</label>
+          <span class="input-group-addon">{{scorings.squares['initial'] || 0}} pts</span>
         </div>
 
         <div ng-repeat="mark in [1, 2, 3, 4, 5, 6]">
@@ -29,51 +29,23 @@
           <div class="row">
 
             <div class="col-md-3 col-xs-4">
-              <p>1ª Tentativa</p>
+              <p>Ladrilhos Obtidos</p>
               <div class="">
-                <select ng-model="scoreData.squares1[mark]">
+                <select ng-model="scoreData.squares[mark]">
                   <option value="0" selected="true">0</option>
                   <option
                     ng-repeat="k in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]"
                     value="{{k}}">{{k}}</option>
                 </select>
                 <!-- <div> -->
-                <span>{{scorings.squares1[mark]}} pts</span>
+                <span>{{scorings.squares[mark]}} pts</span>
               </div>
             </div>
 
             <div class="col-md-3 col-xs-4">
-              <p>2ª Tentativa</p>
+              <p>Tentativa</p>
               <div class="">
-                <select ng-model="scoreData.squares2[mark]">
-                  <option value="0" selected="true">0</option>
-                  <option
-                    ng-repeat="k in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]"
-                    value="{{k}}">{{k}}</option>
-                </select>
-                <!-- <div> -->
-                <span>{{scorings.squares2[mark]}} pts</span>
-              </div>
-            </div>
-
-            <div class="col-md-3 col-xs-4">
-              <p>3ª Tentativa</p>
-              <div class="">
-                <select ng-model="scoreData.squares3[mark]">
-                  <option value="0" selected="true">0</option>
-                  <option
-                    ng-repeat="k in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]"
-                    value="{{k}}">{{k}}</option>
-                </select>
-                <!-- <div> -->
-                <span>{{scorings.squares3[mark]}} pts</span>
-              </div>
-            </div>
-
-            <div class="col-md-3 col-xs-4">
-              <p>Falhas de Progresso</p>
-              <div class="">
-                <select ng-model="scoreData.fails[mark]">
+                <select ng-model="scoreData.tentativa[mark]">
                   <option value="0" selected="true">0</option>
                   <option
                     ng-repeat="k in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]"
