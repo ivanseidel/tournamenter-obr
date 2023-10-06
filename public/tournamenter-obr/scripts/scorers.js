@@ -103,7 +103,7 @@ var app = angular.module('app.scorers', [])
     passage: [0, 10],
 
     becos: [0, 10],
-    rampas: [0, 5],
+    rampas: [0, 10],
     seesaw: [0, 15],
 
     rescue_kit: function(){
