@@ -41,6 +41,10 @@ module.exports = {
           name: 'Configurar (Importar/Exportar)',
         },
         {
+          path: '/obr-desafio',
+          name: 'Desafio Surpresa',
+        },
+        {
           path: '/obr-rounds',
           name: 'Gerar Tabela de Horários',
         },

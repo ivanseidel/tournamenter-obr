@@ -101,6 +101,7 @@ angular.module('Desafio', [])
     Score.update(newChallenges, function (score){ 
       $scope.selectedScore.desafio1 = score.desafio1
       $scope.selectedScore.desafio2 = score.desafio2
+      $scope.selectedScore.desafio3 = score.desafio3
     }, function () {
       $scope.error = 'Falha ao gerar scores'
     })
