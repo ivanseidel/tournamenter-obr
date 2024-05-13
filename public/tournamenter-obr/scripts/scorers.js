@@ -132,6 +132,9 @@ var app = angular.module('app.scorers', [])
     victims_dead: function(sub, val, scorings, model) {
       return 0;
     },
+    victims_switched: function(sub, val, scorings, model) {
+      return 0;
+    },
   }
 
   return {
