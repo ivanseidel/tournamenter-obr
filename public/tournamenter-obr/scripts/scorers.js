@@ -64,8 +64,10 @@ var app = angular.module('app.scorers', [])
     victims_alive: {
       'total': 0,
     },
-
     victims_dead: {
+      'total': 0,
+    },
+    victims_switched: {
       'total': 0,
     },
     multiplier: { 
