@@ -141,7 +141,7 @@ var app = angular.module('app.scorers', [])
     view: 'views/rescue_scorer_2024_regional.html?r='+Math.random(),
     model: model,
     scorings: scorings,
-    totalTime: 480,
+    totalTime: 300,
     score: function (model){
       var scored = {
         total: 0,
@@ -1363,7 +1363,7 @@ var app = angular.module('app.scorers', [])
     obstacles: [0,10],
     speedbump: [0, 5],
     intersection: [0,15],
-    passage: [0, 10],
+    passage: [0, 0],
 
     becos: [0, 15],
 
