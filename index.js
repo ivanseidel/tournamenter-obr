@@ -41,6 +41,10 @@ module.exports = {
           name: 'Configurar (Importar/Exportar)',
         },
         {
+          path: '/obr-desafio',
+          name: 'Desafio Surpresa',
+        },
+        {
           path: '/obr-rounds',
           name: 'Gerar Tabela de Horários',
         },
@@ -66,9 +70,10 @@ module.exports = {
     // Inject OBR Scoring systems
     TableModel.evaluateMethods.obr2017 = require('./sorters/obr2017');
     TableModel.evaluateMethods.obr2018nacional = require('./sorters/obr2018nacional');
+    TableModel.evaluateMethods.obr2024 = require('./sorters/obr2024');
 
-    // Set 'obr2017' as default sorting algorithm
-    TableModel.attributes.evaluateMethod.defaultsTo = 'obr2017';
+    // Set 'obr2024' as default sorting algorithm
+    TableModel.attributes.evaluateMethod.defaultsTo = 'obr2024';
     
     // Set columns count to 6 as default, with names
     TableModel.attributes.columns.defaultsTo = 6;

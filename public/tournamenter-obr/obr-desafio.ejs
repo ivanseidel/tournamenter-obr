@@ -96,6 +96,14 @@
                     ng-class="score.desafio2 ? 'glyphicon-ok' : 'glyphicon-lock'"
                     class="glyphicon"></span>
                 </span>
+                <span
+                  style="margin-right: 8px"
+                  ng-class="score.desafio3 ? 'label-success' : 'label-warning'"
+                  class="label">
+                  <span
+                    ng-class="score.desafio3 ? 'glyphicon-ok' : 'glyphicon-lock'"
+                    class="glyphicon"></span>
+                </span>
 
                 <!-- <span class="glyphicon glyphicon-chevron-right"></span> -->
               </div>
@@ -116,7 +124,7 @@
         </div>
 
         <!-- Desafios -->
-        <div ng-repeat="id in [1, 2]">
+        <div ng-repeat="id in [2, 3]">
           <div class="alert alert-warning" ng-show="!selectedScore['desafio'+id]">
             <div class="pull-right">
               <button
