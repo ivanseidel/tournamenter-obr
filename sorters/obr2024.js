@@ -1,39 +1,17 @@
 module.exports = function () {
   return function (scores) {
-    var sum = 0;  
-    var timeSum = 0;  
-    var minScore = 9999;  
-    var maxScore = 0; 
-    var timeMax = 0; 
-    var shouldSubtract = 0;  
+    const castedScores = scores.map((score) => parseInt(score || 0, 10));
+    const pointsScores = castedScores.filter((_, index) => index % 2 === 0);
+    const timeScores = castedScores.filter((_, index) => index % 2 !== 0);
+    const sumPoints = pointsScores.reduce((acc, score) => acc + score, 0);
+    const minPointsScore = Math.min(...pointsScores);
+    const maxPointsScore = Math.max(...pointsScores);
+    const maxPointsIndex = pointsScores.indexOf(maxPointsScore);
 
-    for(var k in scores) {    
+    const sumWithoutMin = sumPoints - minPointsScore;
+    const sumTimes = timeScores.reduce((acc, score) => acc + score, 0);
+    const timeOfMaxPointRound = timeScores[maxPointsIndex];
 
-      var i = k*1;    
-      if (i>3) shouldSubtract = 1;    
-
-      if (i%2 != 0) continue;   
-        sum += (scores[i]*1 || 0);    
-
-      if(minScore > scores[i]*1) {    
-        if (i <= 5) {
-          minScore = scores[i]*1 || 0;                    
-        }
-      }       
-
-      if(maxScore < scores[i]*1) {      
-        maxScore = scores[i]*1;         
-        timeMax = scores[i + 1]*1;                    
-      }             
-
-      if(scores[i + 1]) {           
-        timeSum += scores[i + 1]*1;                     
-      } else {      
-        timeSum += 1000;    
-      }      
-    };        
-
-    sum -= minScore * shouldSubtract;         
-    return [sum, -timeSum, -timeMax, sum + minScore * shouldSubtract];
-  }
-}
+    return [sumWithoutMin, -sumTimes, -timeOfMaxPointRound, minPointsScore, pointsScores[0], pointsScores[1], pointsScores[2]];
+  };
+};
