@@ -80,7 +80,7 @@ var app = angular.module('app.scorers', [])
     tentativa: 0,
 
     obstacles: [0,20],
-    speedbump: [0, 5],
+    speedbump: [0, 10],
     intersection: [0,10],
     passage: [0, 0],
 
