@@ -78,7 +78,7 @@ var app = angular.module('app.scorers', [])
     tentativa: 0,
 
     obstacles: [0,20],
-    speedbump: [0, 5],
+    speedbump: [0, 10],
     intersection: [0,10],
     passage: [0, 0],
 
@@ -105,10 +105,11 @@ var app = angular.module('app.scorers', [])
       return 0;
     },
 
-    bonus_de_saida: function(sub, val, scorings, model) {
+     bonus_de_saida: function(sub, val, scorings, model) {
       const total_lackOfProgress = Object.keys(model.tentativa).map((index) => {
         const tentativa = parseInt(model.tentativa[index], 10)
-        const falha = tentativa === 0 ? 0 : tentativa -1;
+        const reduceOne = model.squares[index] < 1 && tentativa === 3 ? 0 : 1;
+        const falha = tentativa === 0 ? 0 : tentativa - reduceOne;
         return falha;
       }).reduce((prev, curr) => (prev + curr), 0)
       const bonus = (60 - 5*total_lackOfProgress) * val;
