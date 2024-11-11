@@ -4,7 +4,7 @@
 	/*
 		Configurations
 	*/
-	var GlobalScorerName = 'RescueScorer2024Regional';
+	var GlobalScorerName = 'RescueScorer2024Nacional';
 	var SCORE_WITH_TIME = true;
 
 	angular.module('app.controllers', [])
@@ -38,7 +38,7 @@
 				time: extra.time,
 				total: extra.total,
 				doNotSave: extra.doNotSave,
-				maxTime: 300,
+				maxTime: 480,
 			};
 
 			$scope.tables = Table.all(

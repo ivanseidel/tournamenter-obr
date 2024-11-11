@@ -1,4 +1,202 @@
 var app = angular.module('app.scorers', [])
+  
+.factory('RescueScorer2024Nacional', function (){
+  var model = {
+    gaps: {
+
+    },
+    squares: {
+      'initial': 0,
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    tentativa: {
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+    },
+    obstacles: {
+
+    },
+    speedbump: {
+
+    },
+    intersection: {
+
+    },
+    passage: {
+
+    },
+    seesaw: {
+
+    },
+    becos: {
+
+    },
+    rampas: {
+
+    },
+
+    bonus_de_saida: {
+      'final': 0,
+    },
+
+    rescue_kit: { 
+      'delivered': 0,
+    },
+
+    desafio_surpresa: { 
+      'completed': 0,
+    },
+
+    victims: {
+      'total': 3,
+      'fails': 0,
+    },
+
+    victims_alive: {
+      'total': 0,
+    },
+
+    victims_dead: {
+      'total': 0,
+    },
+    multiplier: { 
+      'value': 1,
+    }
+  };
+
+  var scorings ={
+    gaps: [0,10],
+    tentativa: 0,
+
+    obstacles: [0,20],
+    speedbump: [0, 10],
+    intersection: [0,10],
+    passage: [0, 0],
+
+    becos: [0, 10],
+    rampas: [0, 10],
+    seesaw: [0, 20],
+
+    squares: function(sub, val, scorings, model){
+      const squarePoints = [0, 5, 3, 1]
+      if(sub === 'initial' ){
+        return squarePoints[val];
+      }
+      else{
+        const points = squarePoints[model.tentativa[sub]] * val
+        return points;
+      }
+    },
+
+    rescue_kit: function(){
+      return 0;
+    },
+
+    desafio_surpresa: function(){
+      return 0;
+    },
+
+     bonus_de_saida: function(sub, val, scorings, model) {
+      const total_lackOfProgress = Object.keys(model.tentativa).map((index) => {
+        const tentativa = parseInt(model.tentativa[index], 10)
+        const reduceOne = model.squares[index] < 1 && tentativa === 3 ? 0 : 1;
+        const falha = tentativa === 0 ? 0 : tentativa - reduceOne;
+        return falha;
+      }).reduce((prev, curr) => (prev + curr), 0)
+      const bonus = (60 - 5*total_lackOfProgress) * val;
+      return bonus > 0 ? bonus : 0;
+    },
+
+    multiplier: function(val, scorings, model) {
+      return 0
+    },
+
+    victims: function(sub, val, scorings, model) {
+      return 0
+    },
+
+    victims_alive: function(sub, val, scorings, model) {
+      return 0;
+    },
+
+    victims_dead: function(sub, val, scorings, model) {
+      return 0;
+    },
+  }
+
+  return {
+    view: 'views/rescue_scorer_2024_nacional.html?r='+Math.random(),
+    model: model,
+    scorings: scorings,
+    totalTime: 480,
+    score: function (model){
+      var scored = {
+        total: 0,
+      };
+
+      for(var k in model){
+        scored[k] = {};
+        var group = model[k];
+
+        for(var i in group){
+          var mission = group[i];
+          if(mission === false) mission = 0;
+          if(mission === true) mission = 1;
+
+          var pointsGroup = scorings[k];
+          var points;
+          if (typeof pointsGroup == 'function') {
+            points = pointsGroup(i, mission, scorings, model)
+          } else if(typeof pointsGroup == 'number'){
+            points = pointsGroup * mission;
+          } else {
+            points = scorings[k][mission];
+          }
+
+          scored[k][i] = points
+          scored.total += points || 0;
+        }
+      }
+
+      var victim_save_multiplier = 1.3; // for easy mode or N1
+      var victms_lost_points = 0.05;
+      var rescue_kit_multipliers = [1, 1, 1];
+      var desafio_surpresa_multipliers = [1, 1.1];
+
+      var alive_victcms_multiplier = Math.pow((victim_save_multiplier - model.victims.fails * victms_lost_points), model.victims_alive.total);
+      if(alive_victcms_multiplier < 1){
+        alive_victcms_multiplier = 1;
+      }
+      if(model.victims_alive.total === 2 && model.victims_dead.total === 1){
+        var dead_victms_multiplier = (victim_save_multiplier -  model.victims.fails * victms_lost_points);
+        if(dead_victms_multiplier < 1){
+          dead_victms_multiplier = 1;
+        }
+        alive_victcms_multiplier = alive_victcms_multiplier * dead_victms_multiplier;
+      }
+      const rescueKitMultiplier = rescue_kit_multipliers[model.rescue_kit.delivered]
+      const desafioSurpresaMultiplier = desafio_surpresa_multipliers[model.desafio_surpresa.completed]
+
+      var multiplier = alive_victcms_multiplier * rescueKitMultiplier * desafioSurpresaMultiplier;
+      if(multiplier < 1){
+        multiplier = 1;
+      }
+
+      model.multiplier.value = (Math.round(multiplier*1000)/1000);
+      scored.total = Math.round(scored.total * multiplier);``
+      return scored;
+    }
+  }
+})  
 
 .factory('RescueScorer2024Regional', function (){
   var model = {
