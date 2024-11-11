@@ -38,7 +38,7 @@
 				time: extra.time,
 				total: extra.total,
 				doNotSave: extra.doNotSave,
-				maxTime: 300,
+				maxTime: 480,
 			};
 
 			$scope.tables = Table.all(
