@@ -170,7 +170,7 @@ var app = angular.module('app.scorers', [])
       var victim_save_multiplier = 1.3; // for easy mode or N1
       var victms_lost_points = 0.05;
       var rescue_kit_multipliers = [1, 1, 1];
-      var desafio_surpresa_multipliers = [1, 1.1];
+      var desafio_surpresa_multipliers = [1, 1.5];
 
       var alive_victcms_multiplier = Math.pow((victim_save_multiplier - model.victims.fails * victms_lost_points), model.victims_alive.total);
       if(alive_victcms_multiplier < 1){
