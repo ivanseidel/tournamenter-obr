@@ -1,5 +1,5 @@
 module.exports = function (){
-    const castedScores = scores.map((score) => Number(score || 0, 10));
+    const castedScores = scores.map((score) => Number(score || 0));
     const max = castedScores[1] > castedScores[2] ? castedScores[1] : castedScores[2];
     const score = castedScores[0]+max;
     const sum_palco = castedScores[1] + castedScores[2];
