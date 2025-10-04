@@ -1,0 +1,53 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: |
+          npm ci || npm install
+
+      - name: Build (if present)
+        run: |
+          if npm run | grep -q "build"; then
+            npm run build
+          else
+            echo "No build script, skipping"
+          fi
+
+      - name: Configure npm auth
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "NPM_TOKEN not set. Skipping publish.";
+            exit 1;
+          fi
+          npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+
+      - name: Publish package
+        run: |
+          # Prevent accidental publish of private packages
+          if [ "$(node -e "console.log(require('./package.json').private || '')")" = "true" ]; then
+            echo "package.json has \"private: true\"; aborting publish.";
+            exit 1;
+          fi
+          npm publish --access public
