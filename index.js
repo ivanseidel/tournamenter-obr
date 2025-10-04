@@ -71,7 +71,8 @@ module.exports = {
     TableModel.evaluateMethods.obr2017 = require('./sorters/obr2017');
     TableModel.evaluateMethods.obr2018nacional = require('./sorters/obr2018nacional');
     TableModel.evaluateMethods.obr2024 = require('./sorters/obr2024');
-     TableModel.evaluateMethods.obr2025 = require('./sorters/obr2025');
+    TableModel.evaluateMethods.obr2025 = require('./sorters/obr2025');
+    TableModel.evaluateMethods.artistica2025 = require('./sorters/artistica2025');
 
     // Set 'obr2025' as default sorting algorithm
     TableModel.attributes.evaluateMethod.defaultsTo = 'obr2025';
