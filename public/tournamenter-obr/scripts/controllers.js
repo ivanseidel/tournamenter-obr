@@ -4,12 +4,12 @@
 	/*
 		Configurations
 	*/
-	var GlobalScorerName = 'RescueScorer2025Nacional';
+	var GlobalScorerName = 'RescueScorer2026Regional';
 	var SCORE_WITH_TIME = true;
 
 	const MAX_TIME_REGIONAL = 300; // seconds, 5 minutes
 	const MAX_TIME_NACIONAL = 480; // seconds, 8 minutes
-	const CURRENT_MAX_TIME = MAX_TIME_NACIONAL;
+	const CURRENT_MAX_TIME = /Regional$/.test(GlobalScorerName) ? MAX_TIME_REGIONAL : MAX_TIME_NACIONAL;
 
 	angular.module('app.controllers', [])
 
