@@ -3,6 +3,14 @@
   "version": "2026.1.1",
   "description": "Plugin da OBR Regional para o Tournamenter. Importa e exporta diretamente do Sistema olimpo.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivanseidel/tournamenter-obr.git"
+  },
+  "homepage": "https://github.com/ivanseidel/tournamenter-obr#readme",
+  "bugs": {
+    "url": "https://github.com/ivanseidel/tournamenter-obr/issues"
+  },
   "scripts": {
     "start": "./node_modules/.bin/http-server public/tournamenter-obr",
     "assets": "bower install && bower-installer",
