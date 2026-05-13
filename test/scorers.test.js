@@ -4,6 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+const artistica2026 = require('../sorters/artistica2026');
+
 function loadScorers() {
   const factories = {};
   const moduleApi = {
@@ -73,4 +75,20 @@ test('computes a minimal mixed regional 2026 score correctly', () => {
   assert.equal(result.obstacles['11'], 20);
   assert.equal(model.multiplier.value, 1.95);
   assert.equal(result.total, 68);
+});
+
+test('sorts artistica 2026 scores with weighted score and tiebreakers', () => {
+  const sort = artistica2026();
+
+  const result = sort([80, 12, 70, 90, 3]);
+
+  assert.deepEqual(result, [98, 160, -3]);
+});
+
+test('sorts artistica 2026 empty values as zero', () => {
+  const sort = artistica2026();
+
+  const result = sort([undefined, '', null, 50, '']);
+
+  assert.deepEqual(result, [30, 50, -0]);
 });
