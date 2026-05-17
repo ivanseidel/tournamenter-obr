@@ -482,7 +482,7 @@ var app = angular.module('app.scorers', [])
         return squarePoints[val];
       }
       else{
-        const points = squarePoints[model.tentativa[sub]] * val
+        const points = (squarePoints[model.tentativa[sub]] || 0) * val
         return points;
       }
     },
@@ -499,7 +499,8 @@ var app = angular.module('app.scorers', [])
       const total_lackOfProgress = Object.keys(model.tentativa).map((index) => {
         const tentativa = parseInt(model.tentativa[index], 10)
         const reduceOne = model.squares[index] < 1 && tentativa === 3 ? 0 : 1;
-        const falha = tentativa === 0 ? 0 : tentativa -reduceOne;
+        const shouldCountAllAttempts = model.squares[index] > 0 && tentativa > 3;
+        const falha = tentativa === 0 ? 0 : tentativa - (shouldCountAllAttempts ? 0 : reduceOne);
         return falha;
       }).reduce((prev, curr) => (prev + curr), 0)
       const bonus = (60 - 5*total_lackOfProgress) * val;
