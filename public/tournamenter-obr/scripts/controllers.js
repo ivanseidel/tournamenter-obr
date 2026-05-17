@@ -7,10 +7,6 @@
 	var GlobalScorerName = 'RescueScorer2026Regional';
 	var SCORE_WITH_TIME = true;
 
-	const MAX_TIME_REGIONAL = 300; // seconds, 5 minutes
-	const MAX_TIME_NACIONAL = 480; // seconds, 8 minutes
-	const CURRENT_MAX_TIME = /Regional$/.test(GlobalScorerName) ? MAX_TIME_REGIONAL : MAX_TIME_NACIONAL;
-
 	angular.module('app.controllers', [])
 
 	.controller('AppCtrl', [
@@ -42,7 +38,7 @@
 				time: extra.time,
 				total: extra.total,
 				doNotSave: extra.doNotSave,
-				maxTime: CURRENT_MAX_TIME,
+				maxTime: extra.maxTime,
 			};
 
 			$scope.tables = Table.all(
@@ -152,6 +148,7 @@
 							return {
 								total: $scope.scorings.total,
 								time: finalTime,
+								maxTime: Scorer.totalTime,
 								doNotSave: doNotSave,
 							}
 						}

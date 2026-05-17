@@ -45,6 +45,14 @@ test('registers the regional 2026 scorer with the expected base config', () => {
   assert.equal(scorer.totalTime, 300);
 });
 
+test('save score modal displays the scorer max time instead of a hardcoded value', () => {
+  const modalPath = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views', 'modal_select_team.html');
+  const source = fs.readFileSync(modalPath, 'utf8');
+
+  assert.match(source, /\{\{selected\.maxTime\}\}/);
+  assert.doesNotMatch(source, /480 Seg/);
+});
+
 test('returns zero score and neutral multiplier for an untouched model', () => {
   const scorers = loadScorers();
   const scorer = scorers.RescueScorer2026Regional;
@@ -75,6 +83,29 @@ test('computes a minimal mixed regional 2026 score correctly', () => {
   assert.equal(result.obstacles['11'], 20);
   assert.equal(model.multiplier.value, 1.95);
   assert.equal(result.total, 68);
+});
+
+test('regional 2026 route markers allow extra attempts without tile points', () => {
+  const scorers = loadScorers();
+  const scorer = scorers.RescueScorer2026Regional;
+  const model = cloneModel(scorer.model);
+
+  model.squares['1'] = 2;
+  model.tentativa['1'] = 4;
+  model.bonus_de_saida.final = 1;
+
+  const result = scorer.score(model);
+
+  assert.equal(result.squares['1'], 0);
+  assert.equal(result.bonus_de_saida.final, 40);
+  assert.equal(result.total, 40);
+});
+
+test('regional 2026 scorer view allows up to nine route marker attempts', () => {
+  const viewPath = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views', 'rescue_scorer_2026_regional.html');
+  const source = fs.readFileSync(viewPath, 'utf8');
+
+  assert.match(source, /\[0,1,2,3,4,5,6,7,8,9\]/);
 });
 
 test('sorts artistica 2026 scores with weighted score and tiebreakers', () => {
