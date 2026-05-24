@@ -60,7 +60,7 @@ export function ChallengePage() {
     const teamNivel = teamName[0] === '1' ? 1 : teamName[0] === '2' ? 2 : null;
     if (!teamNivel) {
       setError(
-        'Não foi possível identificar o nível a partir do nome da equipe. \nUse o formato "1 - equipe" ou "2 - equipe" para indicar o nível 1 ou 2.',
+        'Não foi possível identificar o nível a partir do nome da equipe.\nUse o formato "1 - equipe" ou "2 - equipe" para indicar o nível 1 ou 2.',
       );
       return;
     }

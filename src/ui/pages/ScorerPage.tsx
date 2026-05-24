@@ -87,7 +87,7 @@ export function ScorerPage() {
   }
 
   function resetScore(confirmReset: boolean) {
-    if (confirmReset && !window.confirm('Are you sure you want to delete this?')) {
+    if (confirmReset && !window.confirm('Tem certeza de que deseja zerar esta pontuação?')) {
       return;
     }
     setScoreData(cloneModel(scorer.model));
@@ -116,6 +116,7 @@ export function ScorerPage() {
             <button
               type="button"
               className={`btn navbar-btn btn-success ${timer.running ? 'disabled' : ''}`}
+              disabled={timer.running}
               onClick={() => setRunningIf(timer, true)}
             >
               <span className="glyphicon glyphicon-play" />{' '}
@@ -124,6 +125,7 @@ export function ScorerPage() {
             <button
               type="button"
               className={`btn navbar-btn btn-info ${!timer.running ? 'disabled' : ''}`}
+              disabled={!timer.running}
               onClick={() => timer.setRunning(false)}
             >
               <span className="glyphicon glyphicon-pause" />{' '}
@@ -134,6 +136,7 @@ export function ScorerPage() {
               className={`btn navbar-btn btn-warning ${
                 timer.running || timer.value === 0 ? 'disabled' : ''
               }`}
+              disabled={timer.running || timer.value === 0}
               onClick={() => timer.setValue(0)}
             >
               <span className="glyphicon glyphicon-stop" /> <span className="hidden-xs">Zerar</span>
@@ -141,12 +144,18 @@ export function ScorerPage() {
           </div>
 
           <div className="btn-group navbar-btn pull-right">
-            <button type="button" className="btn btn-default disabled" style={{ minWidth: 50 }}>
+            <button
+              type="button"
+              className="btn btn-default disabled"
+              style={{ minWidth: 50 }}
+              disabled
+            >
               <strong>{computed.scored.total}</strong>
             </button>
             <button
               type="button"
               className={`btn btn-danger ${timer.running ? 'disabled' : ''}`}
+              disabled={timer.running}
               onClick={() => resetScore(true)}
             >
               Zerar
@@ -154,6 +163,7 @@ export function ScorerPage() {
             <button
               type="button"
               className={`btn btn-success ${timer.running ? 'disabled' : ''}`}
+              disabled={timer.running}
               onClick={() => setModalMode('save')}
             >
               Salvar
@@ -161,6 +171,7 @@ export function ScorerPage() {
             <button
               type="button"
               className={`btn btn-success ${timer.running ? 'disabled' : ''}`}
+              disabled={timer.running}
               onClick={() => setModalMode('load')}
             >
               Carregar
@@ -751,7 +762,7 @@ function ScoreModal({ mode, scoreData, total, time, onClose, onLoad }: ScoreModa
                 </button>
               ) : null}
               <button type="button" className="btn btn-warning" onClick={onClose}>
-                Cancel
+                Cancelar
               </button>
             </div>
           </div>

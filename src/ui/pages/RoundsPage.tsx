@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { parseTime, tableToCsv } from '../../domain/rounds';
 import { fetchTables } from '../../lib/api';
 import type { TimetableResult } from '../../types';
 import { ErrorAlert, LoadingAlert } from '../components/LegacyPanel';
@@ -11,15 +12,6 @@ type RoundsConfig = {
   inicios: Array<number | false>;
   duration: number;
 };
-
-function parseTime(value: string) {
-  const parts = value.split(':');
-  if (parts.length !== 2) return false;
-  const hour = Number(parts[0]);
-  const minute = Number(parts[1]);
-  if (Number.isNaN(hour) || Number.isNaN(minute)) return false;
-  return hour * 60 + minute;
-}
 
 function parsePeriod(value: string): [number, number] | false {
   if (!value) return false;
@@ -92,9 +84,7 @@ export function RoundsPage() {
   }
 
   function downloadCSV(table: string[][], nivel: string, rodada: number) {
-    const csv = window.exportToCsv
-      ? window.exportToCsv(table)
-      : table.map((row) => row.join(',')).join('\n');
+    const csv = tableToCsv(table);
     const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
