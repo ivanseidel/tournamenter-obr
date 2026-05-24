@@ -1,4 +1,11 @@
 const fs = require('node:fs');
+const util = require('node:util');
+
+if (typeof util.isRegExp !== 'function') {
+  util.isRegExp = function isRegExp(value) {
+    return value instanceof RegExp;
+  };
+}
 
 const writeFileSync = fs.writeFileSync;
 
