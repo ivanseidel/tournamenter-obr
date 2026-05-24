@@ -19,7 +19,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint src src-node test-modern test-e2e",
     "format": "prettier --check src src-node test-modern test-e2e docs CONTEXT.md eslint.config.js vite.config.ts vitest.config.ts playwright.config.ts tsconfig.json tsconfig.node.json .github/workflows/ci.yml .prettierrc.json",
-    "test": "node --test && vitest run",
+    "test": "node --test test/*.test.js && vitest run",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "verify": "npm run format && npm run lint && npm run type-check && npm test && npm run build && npm run test:e2e"
