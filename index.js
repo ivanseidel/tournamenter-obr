@@ -8,6 +8,17 @@ var request = require('request')
 var auth = app.helpers.isAuthenticated
 var package = require('./package.json')
 var SyncModule = require('./SyncModule')
+var ModernRuntime = null
+
+try {
+  ModernRuntime = require('./dist-node/plugin-runtime')
+} catch (e) {
+  ModernRuntime = {
+    modernUiRoutes: ['/', '/tournamenter-obr', '/obr-config', '/obr-desafio', '/obr-rounds'],
+    supportedScorers: ['RescueScorer2026Regional', 'RescueScorer2025Regional', 'RescueScorer2025Nacional'],
+    activeScorer: 'RescueScorer2026Regional',
+  }
+}
 
 var hasUpdate = null
 
@@ -119,6 +130,7 @@ module.exports = {
 
     // Init SyncModule
     SyncModule.init(app)
+    console.log('Tournamenter OBR modern runtime:', ModernRuntime.activeScorer)
 
     // Check uptades on this package
     request({

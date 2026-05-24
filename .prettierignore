@@ -1,0 +1,5 @@
+node_modules
+public/tournamenter-obr/assets
+public/tournamenter-obr/components
+package-lock.json
+dist-node

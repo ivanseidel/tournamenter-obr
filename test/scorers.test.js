@@ -4,6 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+const obr2025 = require('../sorters/obr2025');
+const artistica2025 = require('../sorters/artistica2025');
 const artistica2026 = require('../sorters/artistica2026');
 
 function loadScorers() {
@@ -106,6 +108,22 @@ test('regional 2026 scorer view allows up to nine route marker attempts', () => 
   const source = fs.readFileSync(viewPath, 'utf8');
 
   assert.match(source, /\[0,1,2,3,4,5,6,7,8,9\]/);
+});
+
+test('sorts OBR 2025 rescue scores by best two rounds and time tiebreakers', () => {
+  const sort = obr2025();
+
+  const result = sort([100, 10, 80, 20, 50, 30]);
+
+  assert.deepEqual(result, [180, -60, -10, 50, 100, 80, 50]);
+});
+
+test('sorts artistica 2025 scores with best stage and presentation time', () => {
+  const sort = artistica2025();
+
+  const result = sort([50, 20, 30, 4]);
+
+  assert.deepEqual(result, [80, 50, -4]);
 });
 
 test('sorts artistica 2026 scores with weighted score and tiebreakers', () => {

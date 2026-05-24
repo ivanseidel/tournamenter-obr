@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'codex/**'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ivanseidel/Tournamenter
+          path: Tournamenter
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-audit --no-fund
+        working-directory: Tournamenter
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify
+        env:
+          TOURNAMENTER_ROOT: ${{ github.workspace }}/Tournamenter
+      - name: Verify generated artifacts are committed
+        run: |
+          git diff --exit-code -- public/tournamenter-obr/assets dist-node package-lock.json
+          test -z "$(git status --short -- public/tournamenter-obr/assets dist-node package-lock.json)"

@@ -1,6 +1,6 @@
 {
   "name": "tournamenter-obr",
-  "version": "2026.1.5",
+  "version": "2026.1.6-modernization.0",
   "description": "Plugin da OBR Regional para o Tournamenter. Importa e exporta diretamente do Sistema olimpo.",
   "main": "index.js",
   "repository": {
@@ -14,17 +14,46 @@
   "scripts": {
     "start": "./node_modules/.bin/http-server public/tournamenter-obr",
     "assets": "bower install && bower-installer",
-    "test": "node --test"
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build && tsc -p tsconfig.node.json",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src src-node test-modern test-e2e",
+    "format": "prettier --check src src-node test-modern test-e2e docs CONTEXT.md eslint.config.js vite.config.ts vitest.config.ts playwright.config.ts tsconfig.json tsconfig.node.json .github/workflows/ci.yml .prettierrc.json",
+    "test": "node --test test/*.test.js && vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "verify": "npm run format && npm run lint && npm run type-check && npm test && npm run build && npm run test:e2e"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-query": "^5.60.0",
     "http-server": "^0.7.1",
     "lodash": "^4.14.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "request": "^2.81.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.49.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "bower": "^1.7.9",
-    "bower-installer": "latest"
+    "bower-installer": "latest",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.4.0",
+    "jsdom": "^25.0.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vite": "^6.3.0",
+    "vitest": "^3.2.4"
   }
 }
