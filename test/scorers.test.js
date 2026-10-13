@@ -36,6 +36,58 @@ function cloneModel(model) {
   return JSON.parse(JSON.stringify(model));
 }
 
+test('national 2026 scorer preserves the national 2025 rescue rules', () => {
+  const scorers = loadScorers();
+  const previous = scorers.RescueScorer2025Nacional;
+  const current = scorers.RescueScorer2026Nacional;
+
+  assert.ok(current);
+  assert.match(current.view, /^views\/rescue_scorer_2026_nacional\.html\?r=/);
+  assert.equal(current.totalTime, 480);
+  assert.deepEqual(cloneModel(current.model), cloneModel(previous.model));
+
+  const mixed = cloneModel(previous.model);
+  mixed.squares.initial = 1;
+  mixed.squares['1'] = 4;
+  mixed.tentativa['1'] = 2;
+  mixed.obstacles['11'] = true;
+  mixed.seesaw['11'] = true;
+  mixed.bonus_de_saida.final = 1;
+  mixed.victims_alive.total = 2;
+  mixed.victims_dead.total = 1;
+  mixed.victims.fails = 1;
+  mixed.desafio_surpresa.completed = 1;
+
+  for (const fixture of [previous.model, mixed]) {
+    const oldModel = cloneModel(fixture);
+    const newModel = cloneModel(fixture);
+    assert.deepEqual(cloneModel(current.score(newModel)), cloneModel(previous.score(oldModel)));
+    assert.equal(newModel.multiplier.value, oldModel.multiplier.value);
+  }
+});
+
+test('the scoring controller activates the national 2026 rescue scorer', () => {
+  const controllers = {};
+  const moduleApi = {
+    controller(name, controller) {
+      controllers[name] = controller;
+      return moduleApi;
+    },
+  };
+  const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'tournamenter-obr', 'scripts', 'controllers.js'), 'utf8');
+  vm.runInNewContext(source, { angular: { module: () => moduleApi } });
+
+  assert.equal(controllers.RescueScorer[1], 'RescueScorer2026Nacional');
+});
+
+test('national 2026 rescue view preserves the national 2025 interface', () => {
+  const views = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views');
+  const previous = fs.readFileSync(path.join(views, 'rescue_scorer_2025_nacional.html'), 'utf8');
+  const current = fs.readFileSync(path.join(views, 'rescue_scorer_2026_nacional.html'), 'utf8');
+
+  assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2'));
+});
+
 test('registers the regional 2026 scorer with the expected base config', () => {
   const scorers = loadScorers();
   const scorer = scorers.RescueScorer2026Regional;
