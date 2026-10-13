@@ -8,7 +8,7 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.0`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.1`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 Para a artística nacional, selecione a fórmula `artistica2026nacional` na tabela

@@ -85,7 +85,7 @@ test('national 2026 rescue view preserves the national 2025 interface', () => {
   const previous = fs.readFileSync(path.join(views, 'rescue_scorer_2025_nacional.html'), 'utf8');
   const current = fs.readFileSync(path.join(views, 'rescue_scorer_2026_nacional.html'), 'utf8');
 
-  assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2'));
+  assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2.1'));
 });
 
 test('registers the regional 2026 scorer with the expected base config', () => {
