@@ -8,21 +8,25 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.0`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.1`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 Para a artística nacional, selecione a fórmula `artistica2026nacional` na tabela
-do Tournamenter e configure seis colunas nesta ordem:
+do Tournamenter e configure sete colunas nesta ordem:
 
 1. Vídeo de demonstração técnica (15%)
 2. Pôster técnico (15%)
 3. Entrevista técnica (30%)
-4. Apresentação no palco (40%)
-5. Ponto extra de prática sustentável (até 10 pontos)
-6. Ponto extra de apresentação no Stand (até 5 pontos)
+4. Apresentação no palco 1
+5. Apresentação no palco 2
+6. Ponto extra de prática sustentável (até 10 pontos)
+7. Ponto extra de apresentação no Stand (até 5 pontos)
+
+Preencha as notas originais, sem aplicar os pesos. A maior nota entre as duas
+apresentações no palco recebe o peso de 40%.
 
 Pontuação total = (Vídeo × 0,15) + (Pôster × 0,15) + (Entrevista × 0,3) +
-(Apresentação × 0,4) + Sustentabilidade + Stand.
+(Maior apresentação × 0,4) + Sustentabilidade + Stand.
 
 Os extras são somados diretamente, limitados a 0–10 e 0–5 pontos,
 respectivamente. Valores vazios contam como zero. Com as quatro avaliações em
