@@ -192,7 +192,8 @@ var app = angular.module('app.scorers', [])
       }
 
       model.multiplier.value = (Math.round(multiplier*1000)/1000);
-      scored.total = Math.round(scored.total * multiplier);
+      // Remove floating-point noise before rounding up the national round score.
+      scored.total = Math.ceil(Number((scored.total * multiplier).toFixed(10)));
       return scored;
     }
   }

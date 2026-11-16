@@ -36,7 +36,7 @@ function cloneModel(model) {
   return JSON.parse(JSON.stringify(model));
 }
 
-test('national 2026 scorer preserves the national 2025 rescue rules', () => {
+test('national 2026 scorer preserves national 2025 score components except total rounding', () => {
   const scorers = loadScorers();
   const previous = scorers.RescueScorer2025Nacional;
   const current = scorers.RescueScorer2026Nacional;
@@ -61,9 +61,28 @@ test('national 2026 scorer preserves the national 2025 rescue rules', () => {
   for (const fixture of [previous.model, mixed]) {
     const oldModel = cloneModel(fixture);
     const newModel = cloneModel(fixture);
-    assert.deepEqual(cloneModel(current.score(newModel)), cloneModel(previous.score(oldModel)));
+    const newScore = cloneModel(current.score(newModel));
+    const oldScore = cloneModel(previous.score(oldModel));
+    const { total: newTotal, ...newComponents } = newScore;
+    const { total: oldTotal, ...oldComponents } = oldScore;
+    assert.deepEqual(newComponents, oldComponents);
+    assert.ok(newTotal === oldTotal || newTotal === oldTotal + 1);
     assert.equal(newModel.multiplier.value, oldModel.multiplier.value);
   }
+});
+
+test('national 2026 rounds up fractional scores without increasing exact integers', () => {
+  const scorer = loadScorers().RescueScorer2026Nacional;
+
+  const fractional = cloneModel(scorer.model);
+  fractional.squares.initial = 1;
+  fractional.victims_alive.total = 2;
+  assert.equal(scorer.score(fractional).total, 9); // 5 × 1.3² = 8.45
+
+  const integral = cloneModel(fractional);
+  integral.tentativa['1'] = 1;
+  integral.squares['1'] = 19;
+  assert.equal(scorer.score(integral).total, 169); // 100 × 1.3² = 169
 });
 
 test('the scoring controller activates the national 2026 rescue scorer', () => {
@@ -85,7 +104,7 @@ test('national 2026 rescue view preserves the national 2025 interface', () => {
   const previous = fs.readFileSync(path.join(views, 'rescue_scorer_2025_nacional.html'), 'utf8');
   const current = fs.readFileSync(path.join(views, 'rescue_scorer_2026_nacional.html'), 'utf8');
 
-  assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2.1'));
+  assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2.2'));
 });
 
 test('registers the regional 2026 scorer with the expected base config', () => {
