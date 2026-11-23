@@ -41,12 +41,12 @@
 
       <div ng-if="!draft && !saved" class="art-sheet">
         <p ng-if="busy" role="status">Carregando…</p>
-        <p ng-if="tables && !tables.length && !busy">Nenhuma tabela desbloqueada de Artística Nacional com oito colunas disponível.</p>
+        <p ng-if="tables && !tables.length && !busy">Nenhuma tabela de Artística Nacional com oito colunas disponível.</p>
         <div ng-if="tables.length" class="art-selectors">
           <div>
             <label for="art-table">Tabela</label>
             <select id="art-table" class="form-control" ng-model="selection.table" ng-change="selectTable()"
-              ng-options="table as table.name for table in tables" ng-disabled="busy">
+              ng-options="table as (table.name + (table.locked ? ' · bloqueada' : '')) for table in tables" ng-disabled="busy">
               <option value="">Selecione uma tabela</option>
             </select>
           </div>
@@ -59,12 +59,23 @@
             </select>
           </div>
           <button class="btn btn-primary" type="button" ng-click="openSheet()"
-            ng-disabled="busy || !selection.team || (volunteer && alreadySubmitted())">Abrir ficha</button>
+            ng-disabled="busy || !selection.team || selection.table.locked || (volunteer && alreadySubmitted())">Abrir ficha</button>
         </div>
         <p ng-if="selection.table && !selection.table.scores.length">Nenhuma equipe cadastrada nesta tabela.</p>
+        <p ng-if="selection.table.locked">Tabela bloqueada para edição. Selecione uma equipe para baixar suas avaliações.</p>
         <p ng-if="volunteer && alreadySubmitted()">Esta equipe já tem nota nesta coluna. Correções são feitas pela coordenação.</p>
         <button ng-if="!busy && !tables.length" class="btn btn-default" ng-click="loadTables()">Atualizar tabelas</button>
       </div>
+
+      <section ng-if="!volunteer && selection.team.submittedColumns.length" class="art-sheet art-reports">
+        <h3>Avaliação em PDF</h3>
+        <p>O PDF usa as notas e justificativas já salvas. O PDF da equipe reúne todas as fichas registradas nesta tabela.</p>
+        <div class="art-downloads">
+          <a ng-if="alreadySubmitted()" class="btn btn-default" target="_blank" rel="noopener"
+            ng-href="{{reportUrl(column.id)}}">Baixar PDF da ficha</a>
+          <a class="btn btn-default" target="_blank" rel="noopener" ng-href="{{reportUrl('equipe')}}">Baixar PDF da equipe</a>
+        </div>
+      </section>
 
       <form ng-if="draft" class="art-sheet" name="sheet" ng-submit="save()" novalidate>
         <fieldset ng-disabled="busy">

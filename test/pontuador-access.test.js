@@ -68,6 +68,8 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
       status(code) { result.status = code; return this; },
       set(key, value) { result.headers[key] = value; return this; },
       json(data) { resolve({ ...result, data }); return this; },
+      attachment(name) { result.filename = name; return this; },
+      send(data) { resolve({ ...result, data }); return this; },
       redirect(location) { resolve({ ...result, status: 302, location }); },
       sendFile(file) { resolve({ ...result, file }); },
     };
@@ -102,7 +104,7 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
     });
     return { release, started };
   }
-  return { request, configure, signIn, file, rows, access, config, pauseNextUpdate, advance: (ms) => { clock += ms; } };
+  return { request, configure, signIn, file, rows, tables, access, config, pauseNextUpdate, advance: (ms) => { clock += ms; } };
 }
 
 test('the old scorer link asks guests to sign in and preserves the role of existing sessions', async (t) => {
@@ -298,7 +300,7 @@ test('artistic judges use the rescue session, see only names and submission stat
   assert.equal((await f.request(list)).status, 401);
   assert.equal((await f.request('get ' + artisticAdmin + '/tabelas', { cookie })).status, 403);
   assert.deepEqual((await f.request(list, { cookie })).data, [{
-    id: '2', name: 'Artística', scores: [{ id: 'a', team: { name: 'Equipe A' }, submittedColumns: ['entrevista'] }],
+    id: '2', name: 'Artística', locked: false, scores: [{ id: 'a', team: { name: 'Equipe A' }, submittedColumns: ['entrevista'] }],
   }]);
   const form = (method, column, options) => f.request(method + ' ' + artisticVolunteer + artisticForm, {
     cookie, params: { tableId: '2', column }, ...options,
@@ -315,6 +317,43 @@ test('artistic judges use the rescue session, see only names and submission stat
   assert.equal((await form('get', 'stand')).status, 409);
   await f.configure({ disable: true });
   assert.equal((await form('get', 'video')).status, 401);
+});
+
+test('only coordination can download saved artistic PDFs, including from locked tables', async (t) => {
+  const f = await fixture(t);
+  const table = f.tables.find((item) => item.id === '2');
+  table.locked = 'yes';
+  const row = f.rows[0];
+  row.tableId = table.id;
+  row.scores = { 0: { value: 0, data: completedForm('video', {}) }, 3: { value: 4 } };
+  const original = structuredClone(row);
+  const route = 'get ' + artisticAdmin + '/relatorios/:tableId/:id/:column';
+  const params = { tableId: table.id, id: row.id, column: 'video' };
+  await f.configure({ password: firstPassword });
+  const { cookie } = await f.signIn();
+  assert.equal((await f.request(route, { params })).status, 403);
+  assert.equal((await f.request(route, { cookie, params })).status, 403);
+  assert.deepEqual((await f.request('get ' + artisticVolunteer + '/tabelas', { cookie })).data, []);
+  const list = await f.request('get ' + artisticAdmin + '/tabelas', { admin: true });
+  assert.equal(list.data[0].locked, true);
+  assert.deepEqual(list.data[0].scores[0].submittedColumns, ['video', 'entrevista']);
+  assert.equal((await f.request('put ' + artisticAdmin + artisticForm, { admin: true, params })).status, 409);
+
+  const download = (overrides) => f.request(route, { admin: true, params: { ...params, ...overrides } });
+  for (const column of ['video', 'entrevista', 'equipe']) {
+    const res = await download({ column });
+    assert.equal(res.status, 200);
+    assert.equal(res.headers['Cache-Control'], 'no-store');
+    assert.equal(res.filename, 'avaliacao-Equipe-A-' + column + '.pdf');
+    assert.equal(res.data.toString('ascii', 0, 5), '%PDF-');
+  }
+  assert.deepEqual(row, original);
+  assert.equal((await download({ tableId: '1' })).status, 409);
+  assert.equal((await download({ id: 'desconhecida' })).status, 404);
+  assert.equal((await download({ column: 'poster' })).status, 404);
+  assert.equal((await download({ column: 'invalida' })).status, 400);
+  row.scores = {};
+  assert.equal((await download({ column: 'equipe' })).status, 404);
 });
 
 test('artistic corrections check both interview cells and commit the validated consensus with its bonus atomically', async (t) => {

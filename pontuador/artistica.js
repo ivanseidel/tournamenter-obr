@@ -1,6 +1,7 @@
 const { createHash } = require('crypto');
 const path = require('path');
 const artistic = require('../public/tournamenter-obr/scripts/artistica');
+const renderReport = require('./artistica-pdf');
 const { withScoreWrite } = require('./score-writes');
 const { filled } = require('./submission');
 
@@ -11,9 +12,9 @@ const deductionIndex = 7;
 const deductionSource = 'obr-artistica-deducoes-v1';
 const deductionColumns = artistic.columns.filter((column) => column.stage || column.id === 'entrevista');
 
-function eligible(table) {
+function artisticTable(table) {
   return table && table.evaluateMethod === 'artistica2026nacional' &&
-    Number(table.columns) >= 8 && table.locked !== 'yes';
+    Number(table.columns) >= 8;
 }
 
 function indexes(column) {
@@ -28,6 +29,17 @@ function snapshot(row, column) {
   // Only concurrent changes to this form (including the interview bonus) invalidate it.
   const revision = createHash('sha256').update(JSON.stringify([row.tableId, row.teamId, row.id, column.id, cells])).digest('hex');
   return { cells, revision };
+}
+
+function reportSheet(scores, column) {
+  const main = scores[column.index];
+  const extra = column.bonusIndex === undefined ? null : scores[column.bonusIndex];
+  const value = main && main.value != null && main.value !== '' ? main.value : null;
+  const bonus = extra && extra.value != null && extra.value !== '' ? extra.value : null;
+  if (value === null && bonus === null) return null;
+  // The interview stores the same detailed sheet alongside its sustainability bonus.
+  const draft = artistic.restore(column.id, main && main.data) || artistic.restore(column.id, extra && extra.data);
+  return { column, draft, value, bonus };
 }
 
 function updateDeductions(scores) {
@@ -69,13 +81,44 @@ function install(app, { auth, noCache, handle, jsonOnly, requireVolunteer, check
     return render(req, res);
   });
 
+  const conflict = (res) => res.status(409).json({
+    error: 'Avaliação indisponível ou alterada. Atualize a ficha antes de continuar.',
+  });
+  async function loadTeam(req, res, allowLocked) {
+    const { tableId, id } = req.params;
+    const table = await Table.findOne(tableId);
+    if (!artisticTable(table) || (!allowLocked && table.locked === 'yes')) {
+      conflict(res);
+      return;
+    }
+    const row = await Scores.findOne(id);
+    const team = row && String(row.tableId) === String(table.id) && row.teamId && await Team.findOne(row.teamId);
+    if (!team) {
+      res.status(404).json({ error: 'Equipe não encontrada nesta tabela.' });
+      return;
+    }
+    return { table, row, team };
+  }
+
+  server.get('/obr-artistica-api/relatorios/:tableId/:id/:column', noCache, auth, handle(async (req, res) => {
+    const id = req.params.column;
+    const columns = id === 'equipe' ? artistic.columns : artistic.columns.filter((column) => column.id === id);
+    if (!columns.length) return res.status(400).json({ error: 'Coluna artística inválida.' });
+    const record = await loadTeam(req, res, true);
+    if (!record) return;
+    const { table, row, team } = record;
+    const sheets = columns.map((column) => reportSheet(row.scores || {}, column)).filter(Boolean);
+    if (!sheets.length) return res.status(404).json({ error: 'Nenhuma avaliação registrada para este PDF.' });
+    const pdf = await renderReport({ table: table.name, team: team.name, sheets });
+    const teamName = (team.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-').slice(0, 80).replace(/^-|-$/g, '') || 'equipe';
+    return res.attachment('avaliacao-' + teamName + '-' + id + '.pdf').send(pdf);
+  }));
+
   function routes(base, guard, volunteer) {
     const active = (req, res) => !volunteer || checkState(req, res);
-    const conflict = (res) => res.status(409).json({
-      error: 'Avaliação indisponível ou alterada. Atualize a ficha antes de continuar.',
-    });
     server.get(base + '/tabelas', noCache, guard, handle(async (req, res) => {
-      const tables = (await Table.find()).filter(eligible);
+      const tables = (await Table.find()).filter((table) => artisticTable(table) && (!volunteer || table.locked !== 'yes'));
       const rows = tables.length ? await Scores.find({ tableId: tables.map((table) => table.id) }) : [];
       const teamIds = Array.from(new Set(rows.map((row) => row.teamId).filter(Boolean)));
       const teams = teamIds.length ? await Team.find({ id: teamIds }) : [];
@@ -84,6 +127,7 @@ function install(app, { auth, noCache, handle, jsonOnly, requireVolunteer, check
       return res.json(tables.map((table) => ({
         id: table.id,
         name: table.name,
+        locked: table.locked === 'yes',
         scores: rows.filter((row) => String(row.tableId) === String(table.id) && names.has(String(row.teamId)))
           .map((row) => ({
             id: row.id,
@@ -96,23 +140,14 @@ function install(app, { auth, noCache, handle, jsonOnly, requireVolunteer, check
 
     const formRoute = base + '/sumulas/:tableId/:id/:column';
     async function open(req, res) {
-      const { tableId, id } = req.params;
       const column = artistic.columns.find((item) => item.id === req.params.column);
       if (!column) {
         res.status(400).json({ error: 'Coluna artística inválida.' });
         return;
       }
-      const table = await Table.findOne(tableId);
-      if (!eligible(table)) {
-        conflict(res);
-        return;
-      }
-      const row = await Scores.findOne(id);
-      if (!row || String(row.tableId) !== String(table.id) || !row.teamId || !await Team.findOne(row.teamId)) {
-        res.status(404).json({ error: 'Equipe não encontrada nesta tabela.' });
-        return;
-      }
-      if (!active(req, res)) return;
+      const record = await loadTeam(req, res, false);
+      if (!record || !active(req, res)) return;
+      const row = record.row;
       const current = snapshot(row, column);
       if (volunteer && current.cells.length) {
         conflict(res);
