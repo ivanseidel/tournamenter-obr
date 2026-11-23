@@ -13,7 +13,17 @@ class Table {
 
   calculate() { return 'legacy'; }
 }
-register({ _model: Table });
+const attributes = { evaluateMethod: {}, columns: {}, headerScore: {} };
+register({ _model: Table, attributes });
+
+test('registration configures the new table defaults on the active collection', () => {
+  assert.equal(attributes.evaluateMethod.defaultsTo, 'resgate2026nacional');
+  assert.equal(attributes.columns.defaultsTo, 10);
+  assert.deepEqual(attributes.headerScore.defaultsTo.split(', '), [
+    'Pontos R1', 'Tempo R1', 'Pontos R2', 'Tempo R2', 'Pontos R3', 'Tempo R3',
+    'Desafio Técnico', 'Pôster', 'Relatório', 'Pontos da Final',
+  ]);
+});
 
 const rank = (...teams) => new Table(teams.map(([name, scores]) => makeRow(name, scores))).calculate();
 const byId = (rows, id) => rows.find((row) => row.teamId === id);

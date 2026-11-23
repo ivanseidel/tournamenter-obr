@@ -77,16 +77,8 @@ module.exports = {
     TableModel.evaluateMethods.artistica2026nacional = require('./sorters/artistica2026nacional');
     require('./sorters/resgate2026nacional').register(app.models.Table);
 
-    // Set 'obr2025' as default sorting algorithm
-    TableModel.attributes.evaluateMethod.defaultsTo = 'obr2025';
-    
-    // Set columns count to 6 as default, with names
-    TableModel.attributes.columns.defaultsTo = 6;
-    TableModel.attributes.headerScore.defaultsTo = 
-     'Round 1, Tempo 1, Round 2, Tempo 2, Round 3, Tempo 3';
-
-    // Set default to Portugese on columns
-    TableModel.attributes.headerTeam.defaultsTo = 'Equipe';
+    // Use Portuguese for new tables. Existing tables retain their settings.
+    app.models.Table.attributes.headerTeam.defaultsTo = 'Equipe';
 
     // Update Default Tournamenter Logo
     app.config.appLogo = path.join(__dirname, '/public/tournamenter-obr/obr.png')

@@ -1,4 +1,8 @@
 const methodName = 'resgate2026nacional';
+const scoreHeaders = [
+  'Pontos R1', 'Tempo R1', 'Pontos R2', 'Tempo R2', 'Pontos R3', 'Tempo R3',
+  'Desafio Técnico', 'Pôster', 'Relatório', 'Pontos da Final',
+];
 const preliminaryColumns = 9;
 const finalColumn = 9;
 const finalistCount = 10;
@@ -86,6 +90,11 @@ function calculate(table) {
 
 function register(tableCollection) {
   // The plugin initializes after Waterline has built the model instances.
+  const attributes = tableCollection.attributes;
+  attributes.evaluateMethod.defaultsTo = methodName;
+  attributes.columns.defaultsTo = scoreHeaders.length;
+  attributes.headerScore.defaultsTo = scoreHeaders.join(', ');
+
   const prototype = tableCollection._model.prototype;
   const legacyCalculate = prototype.calculate;
   prototype.calculate = function (table) {

@@ -13,8 +13,10 @@ base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segund
 
 ### Classificação de Resgate (N1 e N2)
 
-Crie **uma tabela por nível**, selecione a fórmula `resgate2026nacional` e
-configure **10 colunas**. Use esta ordem em cada tabela:
+Crie **uma tabela por nível**. As novas tabelas já vêm com a fórmula
+`resgate2026nacional` e as **10 colunas** abaixo. As tabelas existentes não
+são alteradas. Para outras modalidades, escolha a fórmula e as colunas
+correspondentes na configuração da tabela.
 
 ```
 Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final
