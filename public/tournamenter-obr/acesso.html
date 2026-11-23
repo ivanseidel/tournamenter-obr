@@ -11,6 +11,11 @@
     <h1>Acesso ao Pontuador OBR</h1>
     <p>Use a senha de voluntários fornecida pela coordenação.</p>
     <form id="obr-volunteer-login" method="post">
+      <label for="obr-volunteer-modality">Modalidade</label>
+      <select id="obr-volunteer-modality" class="form-control">
+        <option value="resgate">Resgate</option>
+        <option value="artistica">Artística</option>
+      </select>
       <label for="obr-volunteer-password">Senha do pontuador</label>
       <input id="obr-volunteer-password" class="form-control" type="password" autocomplete="current-password" required maxlength="256">
       <button type="submit" class="btn btn-primary">Entrar</button>

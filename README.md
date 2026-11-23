@@ -83,6 +83,28 @@ empatadas na tabela; uma rodada extra, prevista no
 deve ser organizada separadamente. A fórmula
 `artistica2026` continua disponível para as tabelas da etapa regional.
 
+### Pontuador Artística
+
+Abra **Plugin OBR → Pontuador Artística**, escolha a coluna e selecione a
+tabela e a equipe. As seis fichas reproduzem os critérios de Vídeo, Pôster,
+Entrevista, Apresentação 1, Apresentação 2 e Stand. Registre a nota inteira
+de consenso dos juízes em cada campo. A célula guarda o total em `value` e
+os valores de cada critério, suas justificativas e a justificativa geral em
+`data`. As justificativas são opcionais.
+
+Na entrevista, a ficha grava a nota técnica e o bônus de sustentabilidade de
+até 10 pontos em suas respectivas colunas. Nas apresentações, registre as
+quantidades de intervenções, reinícios e blocos de 10 segundos excedentes
+atribuíveis à equipe. Cada ocorrência desconta três pontos. Deduções acima
+do subtotal podem resultar em nota negativa. Marque a opção de duração
+inferior a 1 min 30 s para registrar nota zero. O stand vale
+cinco pontos pela participação e apresentação.
+
+A coluna Dedução acumula os pontos descontados na entrevista e nas duas
+apresentações para o desempate. A coordenação pode manter um total manual
+nessa coluna. Se uma nota antiga foi lançada diretamente na tabela e sua
+dedução é desconhecida, confira o total de desempate ao corrigir a ficha.
+
 ## Acesso ao pontuador para voluntários
 
 1. Configure a senha administrativa do Tournamenter (`PASSWORD`) e mantenha-a
@@ -93,9 +115,11 @@ deve ser organizada separadamente. A fórmula
    e a senha do pontuador com os voluntários. Nos tablets, use um navegador
    sem sessão administrativa. Use HTTPS em redes compartilhadas ou não confiáveis.
 
-A sessão de voluntários dura até 12 horas e permite apenas consultar nomes
-de equipes e rodadas disponíveis de tabelas de Resgate desbloqueadas, além de
-registrar a primeira súmula de cada rodada. A final continua restrita a
+A sessão de voluntários dura até 12 horas e atende às duas modalidades.
+Na tela de acesso, selecione **Resgate** ou **Artística**. O endereço
+`/tournamenter-obr/acesso?modalidade=artistica` já seleciona Artística.
+Voluntários podem consultar as equipes das tabelas desbloqueadas e registrar
+a primeira súmula por rodada de Resgate ou por coluna da Artística. A final de Resgate continua restrita a
 finalistas. Voluntários não podem carregar súmulas anteriores, corrigir notas,
 acessar a administração nem alterar tabelas. A coordenação continua usando
 o acesso administrativo para correções. Se uma correção na tabela for

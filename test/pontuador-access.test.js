@@ -7,6 +7,7 @@ const { createAccess } = require('../pontuador/access');
 const { install } = require('../pontuador/routes');
 const { installAdminScoreWrites } = require('../pontuador/score-writes');
 const { roundScore } = require('../pontuador/submission');
+const artistic = require('../public/tournamenter-obr/scripts/artistica');
 
 const base = '/tournamenter-obr/voluntario-api';
 const admin = '/obr-pontuador-config';
@@ -61,12 +62,16 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
 
   const request = (route, options = {}) => new Promise((resolve, reject) => {
     const result = { status: 200, headers: {} };
+    const routePath = route.split(' ')[1];
     const res = {
       status(code) { result.status = code; return this; },
       set(key, value) { result.headers[key] = value; return this; },
       json(data) { resolve({ ...result, data }); return this; },
+      redirect(url) { resolve({ status: 302, url }); },
+      sendFile(file) { resolve({ ...result, file }); },
     };
     const req = {
+      path: routePath, route: { path: routePath },
       body: options.body || {}, params: { tableId: '1', id: 'a', ...options.params },
       query: options.query || {},
       param: (name, fallback) => options.query?.[name] ?? fallback,
@@ -226,4 +231,136 @@ test('an old table snapshot cannot erase a volunteer submission', async (t) => {
   assert.equal(f.rows[0].scores[4].value, 14);
   const metadata = await f.request('put /scores/:id', { admin: true, body: { teamId: 't' } });
   assert.deepEqual(metadata.data, { metadata: { teamId: 't' } });
+});
+
+const artisticAdmin = '/obr-artistica-api';
+const artisticVolunteer = base + '/artistica';
+const artisticForm = '/sumulas/:tableId/:id/:column';
+
+function completedForm(id, points) {
+  const draft = artistic.createDraft(id);
+  const column = artistic.columns.find((item) => item.id === id);
+  for (const criterion of column.criteria) {
+    const entry = draft.criteria[criterion.id];
+    entry.points = points[criterion.id] || 0;
+    entry.justification = 'Consenso sobre ' + criterion.id;
+  }
+  draft.justification = 'Avaliação concluída pelos juízes.';
+  return draft;
+}
+
+test('artistic judges use the rescue session, see only names and submission status, and can create each sheet once', async (t) => {
+  const f = await fixture(t);
+  const row = f.rows[0];
+  row.tableId = '2';
+  row.scores = { 3: { value: 0, data: { private: true } } };
+  await f.configure({ password: firstPassword });
+  const { cookie } = await f.signIn();
+  const list = 'get ' + artisticVolunteer + '/tabelas';
+  const volunteerPage = '/tournamenter-obr/voluntario-artistica';
+  const login = await f.request('get ' + volunteerPage);
+  assert.equal(login.url, '/tournamenter-obr/acesso?modalidade=artistica');
+  assert.equal((await f.request('get /tournamenter-obr/acesso', { cookie, query: { modalidade: 'artistica' } })).url, volunteerPage);
+  const pageFile = path.join(__dirname, '../pontuador/artistica.html');
+  assert.equal((await f.request('get ' + volunteerPage, { cookie })).file, pageFile);
+  assert.equal((await f.request('get /obr-artistica', { cookie })).status, 403);
+  assert.equal((await f.request('get /obr-artistica', { admin: true })).file, pageFile);
+  assert.equal((await f.request(list)).status, 401);
+  assert.equal((await f.request('get ' + artisticAdmin + '/tabelas', { cookie })).status, 403);
+  assert.deepEqual((await f.request(list, { cookie })).data, [{
+    id: '2', name: 'Artística', scores: [{ id: 'a', team: { name: 'Equipe A' }, submittedColumns: ['entrevista'] }],
+  }]);
+  const form = (method, column, options) => f.request(method + ' ' + artisticVolunteer + artisticForm, {
+    cookie, params: { tableId: '2', column }, ...options,
+  });
+  assert.equal((await form('get', 'entrevista')).status, 409);
+  const { data: empty } = await form('get', 'stand');
+  assert.deepEqual(empty.cells, []);
+  const body = { revision: empty.revision, data: completedForm('stand', { participacao: 5 }), value: 500 };
+  assert.equal((await form('put', 'stand', { header: false, body })).status, 403);
+  const results = await Promise.all([form('put', 'stand', { body }), form('put', 'stand', { body })]);
+  assert.deepEqual(results.map((r) => r.status).sort(), [200, 409]);
+  assert.deepEqual(row.scores[2], { value: 5, data: body.data });
+  assert.deepEqual(row.scores[3], { value: 0, data: { private: true } });
+  assert.equal((await form('get', 'stand')).status, 409);
+  await f.configure({ disable: true });
+  assert.equal((await form('get', 'video')).status, 401);
+});
+
+test('artistic corrections check both interview cells and commit the validated consensus with its bonus atomically', async (t) => {
+  const f = await fixture(t);
+  const row = f.rows[0];
+  row.tableId = '2';
+  row.scores = { 0: { value: 70 }, 3: { value: 3 } };
+  const form = (method, column, options) => f.request(method + ' ' + artisticAdmin + artisticForm, {
+    admin: true, params: { tableId: '2', column }, ...options,
+  });
+  assert.equal((await form('get', 'entrevista', { params: { tableId: '1', column: 'entrevista' } })).status, 409);
+  assert.equal((await form('get', 'deducao')).status, 400);
+  assert.equal((await form('get', 'video', { params: { tableId: '2', id: 'missing', column: 'video' } })).status, 404);
+  const { data: initial } = await form('get', 'entrevista');
+  assert.equal(initial.cells[0].value, 3);
+  const data = completedForm('entrevista', { software: 10, sustentabilidade: 8 });
+  const altered = structuredClone(data);
+  altered.criteria.software.points = 30;
+  const save = (revision, draft) => form('put', 'entrevista', { body: { revision, data: draft, value: 999 } });
+  assert.equal((await save(initial.revision, altered)).status, 400);
+  assert.equal(row.scores[4], undefined);
+  row.scores[3].value = 2;
+  assert.equal((await save(initial.revision, data)).status, 409);
+  const { data: fresh } = await form('get', 'entrevista');
+  const result = await save(fresh.revision, data);
+  assert.equal(result.status, 200);
+  assert.deepEqual(row.scores[4], { value: 10, data });
+  assert.deepEqual(row.scores[3], { value: 8, data });
+  assert.deepEqual(row.scores[0], { value: 70 });
+  assert.deepEqual((await form('get', 'entrevista')).data, result.data);
+  assert.equal((await save(fresh.revision, data)).status, 409);
+});
+
+async function saveArtisticForm(f, column, points) {
+  const route = artisticAdmin + artisticForm;
+  const options = { admin: true, params: { tableId: '2', column } };
+  const opened = await f.request('get ' + route, options);
+  assert.equal(opened.status, 200);
+  const body = { revision: opened.data.revision, data: completedForm(column, points) };
+  const saved = await f.request('put ' + route, { ...options, body });
+  assert.equal(saved.status, 200);
+}
+
+test('national ranking receives the sum of interview and both stage deductions after concurrent entries and corrections', async (t) => {
+  const f = await fixture(t);
+  f.rows[0].tableId = '2';
+  f.rows[0].scores = {};
+  await Promise.all([
+    saveArtisticForm(f, 'entrevista', { software: 12, deducao: 2, sustentabilidade: 3 }),
+    saveArtisticForm(f, 'apresentacao1', { impactoVisual: 20, reinicios: 1 }),
+    saveArtisticForm(f, 'apresentacao2', { impactoVisual: 15, intervencoes: 2 }),
+  ]);
+  const ranking = require('../sorters/artistica2026nacional')();
+  const ranked = () => ranking(Array.from({ length: 8 }, (_, i) => f.rows[0].scores[i]?.value));
+  assert.deepEqual(ranked(), [12.8, 26, -11]);
+  await saveArtisticForm(f, 'apresentacao1', { impactoVisual: 20, reinicios: 2 });
+  const [score, stages, tieBreak] = ranked();
+  assert.ok(Math.abs(score - 11.6) < 1e-10);
+  assert.deepEqual([stages, tieBreak], [23, -14]);
+  assert.deepEqual(f.rows[0].scores[7].data.deductions, { entrevista: 2, apresentacao1: 6, apresentacao2: 6 });
+});
+
+test('manual tie-break totals and unknown deductions from legacy sheets are preserved', async (t) => {
+  const f = await fixture(t);
+  const row = f.rows[0];
+  row.tableId = '2';
+  row.scores = { 5: { value: 65 } };
+  await saveArtisticForm(f, 'entrevista', { software: 10, deducao: 2 });
+  assert.equal(row.scores[7], undefined);
+  row.scores[7] = { value: 0 };
+  await saveArtisticForm(f, 'apresentacao1', { impactoVisual: 20, reinicios: 1 });
+  assert.deepEqual(row.scores[7], { value: 0 });
+  delete row.scores[7];
+  await saveArtisticForm(f, 'apresentacao2', { impactoVisual: 20, reinicios: 1 });
+  assert.equal(row.scores[7].value, 8);
+  row.scores[7].value = 1; // Tournamenter may keep the scoring metadata on a manual edit.
+  await saveArtisticForm(f, 'apresentacao1', { impactoVisual: 20, reinicios: 2 });
+  assert.equal(row.scores[7].value, 1);
 });

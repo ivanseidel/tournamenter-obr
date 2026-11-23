@@ -29,6 +29,7 @@
 
 	.controller('AppCtrl', [
 		'$scope', '$location', function($scope, $location) {
+			$scope.artisticUrl = volunteer ? '/tournamenter-obr/voluntario-artistica' : '/obr-artistica';
 
 			$scope.go = function ( path ) {
 				$location.path( path );
