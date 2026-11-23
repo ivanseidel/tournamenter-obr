@@ -1,5 +1,7 @@
 // v1.01
 var TOURNAMENTER_URL = '';
+var OBR_VOLUNTEER = location.pathname === '/tournamenter-obr/voluntario';
+var OBR_VOLUNTEER_API = '/tournamenter-obr/voluntario-api';
 
 (function() {
 
@@ -36,7 +38,7 @@ var TOURNAMENTER_URL = '';
 
 		return $resource(TOURNAMENTER_URL + '/tables/:id', {id: '@id'}, {
 			all: {
-				url: TOURNAMENTER_URL + '/tables',
+				url: OBR_VOLUNTEER ? OBR_VOLUNTEER_API + '/tabelas' : TOURNAMENTER_URL + '/tables',
 				isArray: true,
 			},
 		});
@@ -48,6 +50,11 @@ var TOURNAMENTER_URL = '';
 		return $resource(TOURNAMENTER_URL + '/scores/:id', {id: '@id', number: '@number'}, {
 			saveScore: {
 				url: TOURNAMENTER_URL + '/scores/:id/:number',
+			},
+			submitVolunteer: {
+				method: 'POST',
+				url: OBR_VOLUNTEER_API + '/sumulas/:tableId/:id',
+				headers: { 'X-OBR-Pontuador': '1' },
 			},
 			saveFinal: {
 				method: 'POST',

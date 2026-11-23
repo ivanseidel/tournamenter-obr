@@ -12,6 +12,21 @@
 }
 </style>
 
+<section class="container" id="acesso-ao-pontuador">
+  <h2>Acesso ao pontuador</h2>
+  <p>Defina uma senha separada para o <a href="/tournamenter-obr/acesso">pontuador dos voluntários</a>.
+    Alterar ou revogar a senha encerra as sessões de todos os voluntários.</p>
+  <form id="obr-volunteer-admin" method="post">
+    <label for="obr-volunteer-admin-password">Nova senha do pontuador</label>
+    <input class="form-control" id="obr-volunteer-admin-password" type="password"
+      autocomplete="new-password" minlength="12" maxlength="256" required>
+    <button type="submit" class="btn btn-primary" disabled>Definir ou trocar senha</button>
+    <button type="button" id="obr-volunteer-revoke" class="btn btn-danger" disabled>Revogar acesso</button>
+    <p id="obr-volunteer-status" role="status">Consultando o acesso…</p>
+  </form>
+</section>
+<script src="/tournamenter-obr/scripts/acesso.js"></script>
+
 <div data-ng-app="app" id="app-root" data-ng-controller="AppCtrl">
 
   <!-- <nav class="navbar navbar-default navbar-fixed-top" role="navigation">

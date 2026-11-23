@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acesso ao Pontuador OBR</title>
+  <link rel="stylesheet" href="components/bootstrap/bootstrap.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Acesso ao Pontuador OBR</h1>
+    <p>Use a senha de voluntários fornecida pela coordenação.</p>
+    <form id="obr-volunteer-login" method="post">
+      <label for="obr-volunteer-password">Senha do pontuador</label>
+      <input id="obr-volunteer-password" class="form-control" type="password" autocomplete="current-password" required maxlength="256">
+      <button type="submit" class="btn btn-primary">Entrar</button>
+      <p id="obr-volunteer-feedback" role="status"></p>
+    </form>
+  </main>
+  <script src="scripts/acesso.js"></script>
+</body>
+</html>

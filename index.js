@@ -9,6 +9,7 @@ var auth = app.helpers.isAuthenticated
 var package = require('./package.json')
 var SyncModule = require('./SyncModule')
 var saveResgateFinal = require('./save-resgate-final')
+var pontuadorAccess = require('./pontuador/routes')
 
 var hasUpdate = null
 
@@ -92,6 +93,7 @@ module.exports = {
     app.server.all('/obr-sync',       auth, SyncModule.updateConfig)
     app.server.all('/obr-last-sync',  auth, SyncModule.getLastSync)
     app.server.post('/obr-resgate-final/:tableId/:id', auth, saveResgateFinal(app.models))
+    pontuadorAccess.install(app, auth)
 
     // Render Configuration screen
     app.server.get('/obr-config',     auth, function (req, res) {

@@ -55,14 +55,15 @@
 					<button type="button" class="btn btn-success" ng-click="selectScoredTeam();" ng-class="{disabled: timer.data.state == 'RUNNING'}">Salvar<span class="hidden-xs"></span></button>
 				</div>
 
-				<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{disabled: timer.data.state == 'RUNNING'}">
+				<button ng-if="!volunteer" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{disabled: timer.data.state == 'RUNNING'}">
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>
-				<ul class="dropdown-menu">
+				<ul ng-if="!volunteer" class="dropdown-menu">
 					<li>
 						<a
 							style="cursor: pointer;"
+							ng-if="!volunteer"
 							ng-click="selectScoredTeam(true)"
 							ng-class="{disabled: timer.data.state == 'RUNNING'}">
 							Carregar
