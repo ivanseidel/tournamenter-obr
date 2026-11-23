@@ -8,8 +8,44 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.2`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.3`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
+
+### Classificação de Resgate (N1 e N2)
+
+Crie **uma tabela por nível**, selecione a fórmula `resgate2026nacional` e
+configure **10 colunas**. Use esta ordem em cada tabela:
+
+```
+Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final
+```
+
+O pontuador preenche os pontos e tempos das preliminares. Lance manualmente
+as notas brutas do Desafio Técnico, do Pôster (0 a 36) e do Relatório (0 a 96).
+Use zero quando for a nota atribuída e deixe em branco enquanto estiver
+pendente. Preencha as nove primeiras colunas de todas as equipes antes de
+usar a classificação para definir a final.
+
+A nota de arena é a soma das duas melhores preliminares e do Desafio Técnico.
+A nota de classificação soma 80% da nota de arena da equipe, 10% da nota
+proporcional de Pôster e 10% da nota proporcional de Relatório. Cada uma dessas
+duas avaliações é convertida da sua escala bruta para a maior nota de arena
+da própria tabela. Consulte as [páginas 61 e 67 do manual](https://obr.robocup.org.br/wp-content/uploads/2026/10/OBR2026_NACIONAL_MANUAL-DE-REGRAS-E-INSTRUCOES_RESGATE.pdf#page=61)
+para a fórmula e a ordem dos desempates. O algoritmo anterior `obr2025`
+continua disponível e não foi alterado.
+
+O pontuador oferece a opção **Final** apenas para as equipes classificadas
+entre as 10 melhores do nível, depois de completas as preliminares. Na
+final, salva só os pontos na décima coluna; eles são somados à nota de
+classificação, sem recalcular o descarte nem a normalização. Em caso de empate
+persistente no corte, o sistema não escolhe arbitrariamente quem fica com
+a vaga: a organização deve resolver a classificação dessas equipes antes
+de fechar o resultado. Empates após a soma da final também são mantidos
+para decisão da organização, pois o manual não explicita um critério
+específico para eles. Confira as notas preliminares antes de lançar a final:
+alterações nas preliminares recalculam a classificação.
+
+### Classificação de Robótica Artística
 
 Para a artística nacional, selecione a fórmula `artistica2026nacional` na tabela
 do Tournamenter e configure oito colunas nesta ordem:
