@@ -49,6 +49,10 @@ var TOURNAMENTER_URL = '';
 			saveScore: {
 				url: TOURNAMENTER_URL + '/scores/:id/:number',
 			},
+			saveFinal: {
+				method: 'POST',
+				url: TOURNAMENTER_URL + '/obr-resgate-final/:tableId/:id',
+			},
 			get: {
 				url: TOURNAMENTER_URL + '/scores/:id',
 			}

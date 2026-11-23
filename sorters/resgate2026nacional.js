@@ -8,7 +8,8 @@ const finalColumn = 9;
 const finalistCount = 10;
 const scoreScale = 2880;
 
-function readNumber(row, index, max = Infinity) {
+function readNumber(row, columns, index, max = Infinity) {
+  if (index >= columns) return null;
   const value = row.scores && row.scores[index] && row.scores[index].value;
   if ((typeof value !== 'number' && typeof value !== 'string') ||
       (typeof value === 'string' && !value.trim())) return null;
@@ -16,12 +17,12 @@ function readNumber(row, index, max = Infinity) {
   return Number.isFinite(number) && number >= 0 && number <= max ? number : null;
 }
 
-function readTeam(row) {
+function readTeam(row, columns) {
   const scores = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) =>
-    readNumber(row, index, ({ 1: 480, 3: 480, 5: 480, 7: 36, 8: 96 })[index]));
+    readNumber(row, columns, index, ({ 1: 480, 3: 480, 5: 480, 7: 36, 8: 96 })[index]));
   const [r1, t1, r2, t2, r3, t3, challenge, poster, report] = scores;
-  const points = [r1 ?? 0, r2 ?? 0, r3 ?? 0];
-  const times = [t1 ?? 480, t2 ?? 480, t3 ?? 480];
+  const points = [r1 || 0, r2 || 0, r3 || 0];
+  const times = [t1, t2, t3].map((time) => time === null ? 480 : time);
   const discarded = Math.min(...points);
   const maxRound = Math.max(...points);
   const fastestTopRound = Math.min(...times.filter((_, index) => points[index] === maxRound));
@@ -29,11 +30,11 @@ function readTeam(row) {
   return {
     row,
     complete: scores.slice(0, preliminaryColumns).every((value) => value !== null),
-    arena: points.reduce((sum, value) => sum + value, 0) - discarded + (challenge ?? 0),
-    poster: poster ?? 0,
-    report: report ?? 0,
+    arena: points.reduce((sum, value) => sum + value, 0) - discarded + (challenge || 0),
+    poster: poster || 0,
+    report: report || 0,
     tieBreak: [-times.reduce((sum, value) => sum + value, 0), -fastestTopRound, discarded, ...points],
-    finalPoints: readNumber(row, finalColumn),
+    finalPoints: readNumber(row, columns, finalColumn),
   };
 }
 
@@ -45,7 +46,8 @@ function compareKeys(left, right) {
 }
 
 function calculate(table) {
-  const teams = (table.scores || []).map(readTeam);
+  // Tournamenter sets columns to the view's limit when calculating public standings.
+  const teams = (table.scores || []).map((row) => readTeam(row, table.columns));
   const maxArena = teams.reduce((max, team) => Math.max(max, team.arena), 0);
 
   for (const team of teams) {
@@ -66,7 +68,7 @@ function calculate(table) {
     team.qualifies = preliminariesComplete && index < finalistCount &&
       (!boundaryTie || compareKeys(team.preliminaryKeys, qualifyingCutoff.preliminaryKeys) !== 0);
     team.row.resgateFinalista = team.qualifies;
-    team.total = team.preliminary + (team.qualifies ? (team.finalPoints ?? 0) * scoreScale : 0);
+    team.total = team.preliminary + (team.qualifies ? (team.finalPoints || 0) * scoreScale : 0);
   });
 
   // Rank by the original preliminary criteria until a finalist has a final
@@ -104,4 +106,4 @@ function register(tableCollection) {
   };
 }
 
-module.exports = { register };
+module.exports = { methodName, finalColumn, register };

@@ -8,6 +8,7 @@ var request = require('request')
 var auth = app.helpers.isAuthenticated
 var package = require('./package.json')
 var SyncModule = require('./SyncModule')
+var saveResgateFinal = require('./save-resgate-final')
 
 var hasUpdate = null
 
@@ -90,6 +91,7 @@ module.exports = {
     // Add route to change configs/get
     app.server.all('/obr-sync',       auth, SyncModule.updateConfig)
     app.server.all('/obr-last-sync',  auth, SyncModule.getLastSync)
+    app.server.post('/obr-resgate-final/:tableId/:id', auth, saveResgateFinal(app.models))
 
     // Render Configuration screen
     app.server.get('/obr-config',     auth, function (req, res) {

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function harness(table, data = {}, load = false) {
+function harness(table, data = {}, load = false, finalError) {
   const controllers = {};
   const angularModule = {
     controller(name, handler) { controllers[name] = handler; return this; },
@@ -40,6 +40,15 @@ function harness(table, data = {}, load = false) {
       data[number] = { value };
       done();
     },
+    saveFinal(params, payload, done, fail) {
+      assert.equal(params.tableId, table.id);
+      assert.equal(params.id, finalist.id);
+      assert.equal(payload.updatedAt, finalist.updatedAt);
+      if (finalError) return fail(finalError);
+      writes.push([9, payload.value]);
+      data[9] = { value: payload.value, data: payload.data };
+      done();
+    },
     get({ id }, done) { done({ id, scores: data }); },
   };
   controllers.RescueScorer.at(-1)(scorerScope, Scorer, timer, $modal, Score);
@@ -48,9 +57,9 @@ function harness(table, data = {}, load = false) {
   return { ...modal, writes, alerts, scorerScope };
 }
 
-const finalist = { id: 'a', resgateFinalista: true, scores: {} };
+const finalist = { id: 'a', updatedAt: '2026-01-01T00:00:00.000Z', resgateFinalista: true, scores: {} };
 const other = { id: 'b', resgateFinalista: false, scores: {} };
-const table = { columns: 10, evaluateMethod: 'resgate2026nacional', scores: [finalist, other] };
+const table = { id: 'table', columns: 10, evaluateMethod: 'resgate2026nacional', scores: [finalist, other] };
 
 test('national final is separate from R3, saves only column 10, and verifies its readback', () => {
   const { scope, writes, alerts } = harness(table);
@@ -64,6 +73,21 @@ test('national final is separate from R3, saves only column 10, and verifies its
   scope.ok();
   assert.deepEqual(writes, [[9, 42]]);
   assert.deepEqual(alerts, ['OK! Salvo com sucesso.']);
+});
+
+test('national final shows a conflict instead of success when a team loses its spot', () => {
+  const { scope, writes, alerts } = harness(table, {}, false, {
+    status: 409,
+    data: { error: 'A equipe não está classificada para a final.' },
+  });
+  scope.selectRound(3);
+  scope.selectScore(finalist);
+  scope.ok();
+
+  assert.deepEqual(writes, []);
+  assert.deepEqual(alerts, [
+    'A equipe não está classificada para a final. Abra o pontuador novamente para atualizar a seleção.',
+  ]);
 });
 
 test('national final loads the stored score sheet from column 10', () => {

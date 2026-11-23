@@ -226,6 +226,23 @@
 						var number1 = scoreColumn(selected);
 						var number2 = number1 + 1;
 
+						if (isNationalFinal(selected)) {
+							Score.saveFinal({
+								tableId: selected.table.id,
+								id: selected.score.id,
+							}, {
+								data: $scope.scoreData,
+								value: selected.total,
+								updatedAt: selected.score.updatedAt,
+							}, checkScore, function (response) {
+								if (response.status === 409 && response.data && response.data.error) {
+									return window.alert(response.data.error + ' Abra o pontuador novamente para atualizar a seleção.');
+								}
+								window.alert('FALHA AO SALVAR #1. REFAÇA A OPERAÇÃO.');
+							});
+							return;
+						}
+
 						// Save Data
 						Score.saveScore({
 							number: number1,

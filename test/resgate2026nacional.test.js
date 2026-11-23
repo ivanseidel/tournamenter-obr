@@ -41,6 +41,11 @@ test('desempate uses all three times including the discarded round', () => {
   assert.deepEqual(rows.map((row) => row.teamId), ['Y', 'X']);
 });
 
+test('zero time is accepted in the preliminary tie-break', () => {
+  const rows = rank(['X', base], ['Y', [110, 0, ...base.slice(2)]]);
+  assert.deepEqual(rows.map((row) => row.teamId), ['Y', 'X']);
+});
+
 test('among equal top scores, the fastest round breaks the tie even if it is not the first', () => {
   const rows = rank(
     ['X', [100, 100, 100, 50, 40, 100, 0, 0, 0]],
@@ -75,6 +80,28 @@ test('only ten preliminary finalists receive final points, without changing aren
   assert.equal(rows[0].teamId, '10');
   assert.equal(rows[0].final, 245.6);
   assert.equal(byId(rows, '11').final, 144);
+});
+
+test('standings exclude final points when the effective column count hides the final', () => {
+  const table = new Table([makeRow('A', base), makeRow('B', [100, ...base.slice(1), 20])]);
+  table.columns = 9;
+  const rows = table.calculate();
+  assert.deepEqual(rows.map((row) => [row.teamId, row.rank, row.final]), [
+    ['A', 1, 160], ['B', 2, 152],
+  ]);
+
+  table.columns = 10;
+  assert.deepEqual(table.calculate().map((row) => [row.teamId, row.rank, row.final]), [
+    ['B', 1, 172], ['A', 2, 160],
+  ]);
+});
+
+test('standings exclude hidden preliminary columns from scores and qualification', () => {
+  const table = new Table([makeRow('A', [...base.slice(0, 7), 36, 96, 100])]);
+  table.columns = 7;
+  const [team] = table.calculate();
+  assert.equal(team.final, 160);
+  assert.equal(team.resgateFinalista, false);
 });
 
 test('cutoff tie does not select one of the tied teams arbitrarily', () => {
