@@ -1,13 +1,42 @@
-const { randomBytes, scrypt, timingSafeEqual } = require('crypto');
+const { createHash, pbkdf2, randomBytes, scrypt, timingSafeEqual } = require('crypto');
 const { promisify } = require('util');
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
-const derive = promisify(scrypt);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
+const stat = promisify(fs.stat);
+const rename = promisify(fs.rename);
+const unlink = promisify(fs.unlink);
+const derive = promisify(pbkdf2);
+const deriveLegacyHash = typeof scrypt === 'function' ? promisify(scrypt) : null;
+const iterations = 600000;
+const passwordAlgorithm = 'pbkdf2-sha256-' + iterations;
 const prefix = '/tournamenter-obr';
-const cookieName = 'obr_pontuador';
 const sessionMs = 12 * 60 * 60 * 1000;
 const attemptsMs = 60 * 1000;
+const maxFailures = 10;
+const maxConcurrentChecks = 4;
+
+async function makeDirectory(folder) {
+  try {
+    await mkdir(folder, 0o700);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      await makeDirectory(path.dirname(folder));
+      return makeDirectory(folder);
+    }
+    if (error.code !== 'EEXIST' || !(await stat(folder)).isDirectory()) throw error;
+  }
+}
+
+function passwordHash(password, credential) {
+  if (credential.algorithm === passwordAlgorithm) {
+    return derive(password, Buffer.from(credential.salt, 'hex'), iterations, 32, 'sha256');
+  }
+  return deriveLegacyHash(password, credential.salt, 64);
+}
 
 function credentialFile(config) {
   const folder = path.resolve(config.connection.filePath);
@@ -20,15 +49,22 @@ function credentialFile(config) {
 }
 
 function createAccess(config, { file = credentialFile(config), now = Date.now } = {}) {
+  // Browser cookies are shared by all ports on a hostname.
+  const instance = createHash('sha256').update(path.resolve(file) + '\0' + (config.port || '')).digest('hex').slice(0, 16);
+  const cookieName = 'obr_pontuador_' + instance;
+  const cookiePattern = new RegExp('(?:^|;\\s*)' + cookieName + '=([0-9a-f]{64})(?:;|$)');
   const sessions = new Map();
+  const attempts = new Map();
   let credential = null;
-  let attempts = 0;
-  let resetAt = 0;
+  let pruneAt = 0;
+  let activeChecks = 0;
   let change = Promise.resolve();
   const loaded = (async () => {
     try {
-      const stored = JSON.parse(await fs.readFile(file, 'utf8'));
-      if (!/^[0-9a-f]{32}$/.test(stored.salt) || !/^[0-9a-f]{128}$/.test(stored.hash)) {
+      const stored = JSON.parse(await readFile(file, 'utf8'));
+      const supportedHash = stored.algorithm === passwordAlgorithm && /^[0-9a-f]{64}$/.test(stored.hash);
+      const legacyHash = stored.algorithm === undefined && /^[0-9a-f]{128}$/.test(stored.hash);
+      if (!/^[0-9a-f]{32}$/.test(stored.salt) || (!supportedHash && !legacyHash)) {
         throw new Error('Metadados de credencial do pontuador inválidos.');
       }
       credential = stored;
@@ -40,8 +76,12 @@ function createAccess(config, { file = credentialFile(config), now = Date.now } 
   loaded.catch(() => {});
 
   function token(req) {
-    const match = /(?:^|;\s*)obr_pontuador=([0-9a-f]{64})(?:;|$)/.exec(req.headers.cookie || '');
+    const match = cookiePattern.exec(req.headers.cookie || '');
     return match && match[1];
+  }
+
+  function enabled() {
+    return Boolean(config.password && credential && (credential.algorithm === passwordAlgorithm || deriveLegacyHash));
   }
 
   function valid(req) {
@@ -59,7 +99,7 @@ function createAccess(config, { file = credentialFile(config), now = Date.now } 
 
   async function status() {
     await loaded;
-    return { enabled: Boolean(config.password && credential), adminConfigured: Boolean(config.password) };
+    return { enabled: enabled(), adminConfigured: Boolean(config.password) };
   }
 
   function changePassword(password) {
@@ -69,23 +109,23 @@ function createAccess(config, { file = credentialFile(config), now = Date.now } 
       if (password !== null && (typeof password !== 'string' || password.trim().length < 12 ||
           Buffer.byteLength(password) > 256 || password === config.password)) return false;
       if (password === null) {
-        await fs.unlink(file).catch((error) => { if (error.code !== 'ENOENT') throw error; });
+        await unlink(file).catch((error) => { if (error.code !== 'ENOENT') throw error; });
         credential = null;
       } else {
-        const salt = randomBytes(16).toString('hex');
-        const hash = (await derive(password, salt, 64)).toString('hex');
-        const next = { salt, hash };
+        const next = { algorithm: passwordAlgorithm, salt: randomBytes(16).toString('hex') };
+        next.hash = (await passwordHash(password, next)).toString('hex');
         const tmp = file + '.' + randomBytes(8).toString('hex') + '.tmp';
-        await fs.mkdir(path.dirname(file), { recursive: true, mode: 0o700 });
+        await makeDirectory(path.dirname(file));
         try {
-          await fs.writeFile(tmp, JSON.stringify(next), { flag: 'wx', mode: 0o600 });
-          await fs.rename(tmp, file);
+          await writeFile(tmp, JSON.stringify(next), { flag: 'wx', mode: 0o600 });
+          await rename(tmp, file);
         } finally {
-          await fs.unlink(tmp).catch(() => {});
+          await unlink(tmp).catch(() => {});
         }
         credential = next;
       }
       sessions.clear();
+      attempts.clear();
       return true;
     });
     change = work.catch(() => {});
@@ -96,22 +136,42 @@ function createAccess(config, { file = credentialFile(config), now = Date.now } 
     await loaded;
     const current = credential;
     const password = req.body && req.body.password;
-    if (!config.password || !current) return res.status(403).json({ error: 'O acesso de voluntários não está ativo.' });
+    if (!enabled()) return res.status(403).json({ error: 'O acesso de voluntários não está ativo.' });
     if (typeof password !== 'string' || Buffer.byteLength(password) > 256) {
       return res.status(400).json({ error: 'Senha inválida.' });
     }
     const start = now();
-    if (start >= resetAt) {
-      attempts = 0;
-      resetAt = start + attemptsMs;
+    if (start >= pruneAt) {
+      for (const [origin, bucket] of attempts) if (bucket.resetAt <= start) attempts.delete(origin);
+      pruneAt = start + attemptsMs;
     }
-    if (attempts >= 40) {
-      return res.set('Retry-After', String(Math.ceil((resetAt - start) / 1000)))
+    const origin = req.ip || 'unknown';
+    let bucket = attempts.get(origin);
+    if (bucket && bucket.resetAt > start && bucket.failures >= maxFailures) {
+      return res.set('Retry-After', String(Math.ceil((bucket.resetAt - start) / 1000)))
         .status(429).json({ error: 'Muitas tentativas. Aguarde um minuto.' });
     }
-    attempts += 1;
-    const supplied = await derive(password, current.salt, 64);
-    if (current !== credential || !timingSafeEqual(supplied, Buffer.from(current.hash, 'hex'))) {
+    if (activeChecks >= maxConcurrentChecks) {
+      return res.set('Retry-After', '1').status(503).json({ error: 'Pontuador ocupado. Tente novamente.' });
+    }
+    if (!bucket || bucket.resetAt <= start) {
+      bucket = { failures: 0, pending: 0, resetAt: start + attemptsMs };
+      attempts.set(origin, bucket);
+    }
+    activeChecks += 1;
+    bucket.pending += 1;
+    try {
+      const supplied = await passwordHash(password, current);
+      if (current === credential && !timingSafeEqual(supplied, Buffer.from(current.hash, 'hex'))) {
+        bucket.failures += 1;
+        return res.status(401).json({ error: 'Senha inválida.' });
+      }
+    } finally {
+      activeChecks -= 1;
+      bucket.pending -= 1;
+      if (!bucket.pending && !bucket.failures && attempts.get(origin) === bucket) attempts.delete(origin);
+    }
+    if (current !== credential || !config.password) {
       return res.status(401).json({ error: 'Senha inválida.' });
     }
     for (const [key, expires] of sessions) if (expires <= now()) sessions.delete(key);

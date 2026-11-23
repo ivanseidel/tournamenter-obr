@@ -10,13 +10,15 @@ var package = require('./package.json')
 var SyncModule = require('./SyncModule')
 var saveResgateFinal = require('./save-resgate-final')
 var pontuadorAccess = require('./pontuador/routes')
+var installAdminScoreWrites = require('./pontuador/score-writes').installAdminScoreWrites
 
 var hasUpdate = null
 
 module.exports = {
   type: ['menu'],
 
-  getAssets: function (app){
+  getAssets: function (host = app){
+    installAdminScoreWrites(host);
     return {
       css: [],
 

@@ -5,6 +5,7 @@ const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { createAccess } = require('../pontuador/access');
 const { install } = require('../pontuador/routes');
+const { installAdminScoreWrites } = require('../pontuador/score-writes');
 const { roundScore } = require('../pontuador/submission');
 
 const base = '/tournamenter-obr/voluntario-api';
@@ -20,7 +21,7 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
   const access = createAccess(config, { file, now: () => clock });
   const routes = new Map();
   const server = {};
-  for (const method of ['get', 'post']) {
+  for (const method of ['get', 'post', 'put']) {
     server[method] = (url, ...handlers) => routes.set(method + ' ' + url, handlers);
   }
   const tables = [{ id: '1', columns: 6, evaluateMethod: 'obr2025', name: 'N1', token: 'never read' },
@@ -29,21 +30,33 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
   const rows = [{ id: 'a', tableId: '1', teamId: 't', scores: { 4: { value: 25, data: { private: true } } },
     updatedAt: new Date() }];
   const teams = [{ id: 't', name: 'Equipe A', hidden: 'private' }];
+  let pauseUpdate;
+  const snapshot = (rows) => structuredClone(rows);
   const Models = {
     Table: { find: async () => tables, findOne: async (id) => tables.find((table) => table.id === id) },
     Team: { find: async () => teams, findOne: async (id) => teams.find((team) => team.id === id) },
     Scores: {
-      find: async ({ tableId }) => rows.filter((row) => [].concat(tableId).includes(row.tableId)),
-      update: async (criteria, { scores }) => {
+      find: async ({ tableId }) => snapshot(rows.filter((row) => [].concat(tableId).includes(row.tableId))),
+      findOne: async (id) => snapshot(rows.find((row) => row.id === id)),
+      update: async (criteria, fields) => {
+        if (pauseUpdate) {
+          const pause = pauseUpdate;
+          pauseUpdate = undefined;
+          await pause();
+        }
         assert.equal(criteria.id, 'a');
         const row = rows[0];
-        if (row.updatedAt !== criteria.updatedAt || row.tableId !== criteria.tableId) return [];
-        Object.assign(row, { scores, updatedAt: new Date() });
-        return [row];
+        if (+row.updatedAt !== +criteria.updatedAt || (criteria.tableId && row.tableId !== criteria.tableId)) return [];
+        Object.assign(row, fields, { updatedAt: new Date(+row.updatedAt + 1) });
+        return [snapshot(row)];
       },
     },
   };
   const adminAuth = (req, res, next) => req.admin ? next() : res.status(403).json({});
+  const controllers = { Scores: { update: (req, res) => res.json({ metadata: req.body }) } };
+  installAdminScoreWrites({ controllers, models: Models });
+  server.get('/scores/:id/:number', adminAuth, controllers.Scores.updateScore);
+  server.put('/scores/:id', adminAuth, controllers.Scores.update);
   install({ server, models: Models, config }, adminAuth, access);
 
   const request = (route, options = {}) => new Promise((resolve, reject) => {
@@ -55,13 +68,16 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
     };
     const req = {
       body: options.body || {}, params: { tableId: '1', id: 'a', ...options.params },
+      query: options.query || {},
+      param: (name, fallback) => options.query?.[name] ?? fallback,
       headers: {cookie: options.cookie}, secure: true, admin: options.admin,
       get: (name) => name === 'X-OBR-Pontuador' && options.header !== false ? '1' : undefined,
       is: (type) => options.json !== false && type === 'application/json',
     };
     const handlers = routes.get(route);
     let i = 0;
-    const next = () => {
+    const next = (error) => {
+      if (error) return reject(error);
       try { handlers[i++](req, res, next); } catch (error) { reject(error); }
     };
     next();
@@ -71,7 +87,15 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
     const response = await request('post ' + base + '/login', { body: { password } });
     return { ...response, cookie: response.headers['Set-Cookie']?.split(';')[0] };
   };
-  return { request, configure, signIn, file, rows, access, config, advance: (ms) => { clock += ms; } };
+  function pauseNextUpdate() {
+    let release;
+    const resume = new Promise((resolve) => { release = resolve; });
+    const started = new Promise((resolve) => {
+      pauseUpdate = () => { resolve(); return resume; };
+    });
+    return { release, started };
+  }
+  return { request, configure, signIn, file, rows, access, config, pauseNextUpdate, advance: (ms) => { clock += ms; } };
 }
 
 test('only an admin can set a separate password; credential persists privately and routes are isolated', async (t) => {
@@ -153,4 +177,53 @@ test('shared scorer and server validation preserve legal UI values and derive th
   assert.throws(() => roundScore({squares:{'2':51}}));
   assert.throws(() => roundScore({gaps:{'55':true}}));
   assert.throws(() => roundScore({squares:{'invalid':1}}));
+});
+
+test('a simultaneous admin cell correction and a volunteer submission keep both rounds', async (t) => {
+  const f = await fixture(t);
+  await f.configure({ password: firstPassword });
+  const { cookie } = await f.signIn();
+  const pause = f.pauseNextUpdate();
+  const correction = f.request('get /scores/:id/:number', {
+    admin: true,
+    query: { value: '43', data: { corrected: true } },
+    params: { number: '2' },
+  });
+  await pause.started;
+  const submission = f.request('post ' + base + '/sumulas/:tableId/:id', {
+    cookie,
+    body: { round: 0, time: 80, data: { squares: { initial: 1 } } },
+  });
+  await new Promise(setImmediate);
+  pause.release();
+
+  assert.deepEqual((await Promise.all([correction, submission])).map(({ status }) => status), [200, 201]);
+  assert.equal(f.rows[0].scores[0].value, 5);
+  assert.equal(f.rows[0].scores[1].value, 80);
+  assert.equal(f.rows[0].scores[2].value, 43);
+  assert.equal(f.rows[0].scores[4].value, 25);
+});
+
+test('an old table snapshot cannot erase a volunteer submission', async (t) => {
+  const f = await fixture(t);
+  await f.configure({ password: firstPassword });
+  const { cookie } = await f.signIn();
+  const oldTable = structuredClone(f.rows[0]);
+  const submitted = await f.request('post ' + base + '/sumulas/:tableId/:id', {
+    cookie,
+    body: { round: 0, time: 80, data: { squares: { initial: 1 } } },
+  });
+  assert.equal(submitted.status, 201);
+
+  const edit = ({ scores, updatedAt }) => f.request('put /scores/:id', {
+    admin: true,
+    body: { scores: { ...scores, 4: { value: 14 } }, updatedAt: updatedAt.toISOString() },
+  });
+  assert.equal((await edit(oldTable)).status, 409);
+  assert.equal((await edit(f.rows[0])).status, 200);
+  assert.equal(f.rows[0].scores[0].value, 5);
+  assert.equal(f.rows[0].scores[1].value, 80);
+  assert.equal(f.rows[0].scores[4].value, 14);
+  const metadata = await f.request('put /scores/:id', { admin: true, body: { teamId: 't' } });
+  assert.deepEqual(metadata.data, { metadata: { teamId: 't' } });
 });

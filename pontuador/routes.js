@@ -1,5 +1,6 @@
 const path = require('path');
 const { createAccess, prefix } = require('./access');
+const { withScoreWrite } = require('./score-writes');
 const { eligibleTable, roundColumns, addFinalists, roundScore, filled } = require('./submission');
 
 const entry = prefix + '/acesso';
@@ -9,7 +10,6 @@ const adminConfig = '/obr-pontuador-config';
 
 function install(app, auth, access = createAccess(app.config)) {
   const { server, models: { Table, Scores, Team } } = app;
-  const pending = new Set();
   const noCache = (req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
@@ -95,9 +95,7 @@ function install(app, auth, access = createAccess(app.config)) {
       try { result = roundScore(data); }
       catch (error) { return res.status(400).json({ error: 'Súmula inválida.' }); }
       const conflict = () => res.status(409).json({ error: 'Rodada indisponível ou já registrada. Atualize a lista ou fale com a coordenação.' });
-      if (pending.has(id)) return conflict();
-      pending.add(id);
-      try {
+      return withScoreWrite(Scores, id, async () => {
         const table = await Table.findOne(tableId);
         if (!eligibleTable(table)) return conflict();
         const rows = await Scores.find({ tableId: table.id });
@@ -115,9 +113,7 @@ function install(app, auth, access = createAccess(app.config)) {
         const [saved] = await Scores.update({ id: row.id, tableId: table.id, updatedAt: row.updatedAt }, { scores });
         if (!saved) return conflict();
         return res.status(201).json({ ok: true });
-      } finally {
-        pending.delete(id);
-      }
+      });
     }));
 }
 

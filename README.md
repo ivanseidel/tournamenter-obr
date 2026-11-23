@@ -98,7 +98,9 @@ de equipes e rodadas disponíveis de tabelas de Resgate desbloqueadas, além de
 registrar a primeira súmula de cada rodada. A final continua restrita a
 finalistas. Voluntários não podem carregar súmulas anteriores, corrigir notas,
 acessar a administração nem alterar tabelas. A coordenação continua usando
-o acesso administrativo para correções. A senha é enviada no corpo da
+o acesso administrativo para correções. Se uma correção na tabela for
+recusada porque outra pessoa salvou a mesma linha, recarregue a tabela antes
+de repetir a edição. A senha é enviada no corpo da
 requisição, armazenada apenas como hash com sal, e pode ser trocada ou
 revogada pela coordenação; ambas as ações encerram as sessões de voluntários.
 
@@ -107,3 +109,7 @@ dados do Tournamenter, identificado pelo nome do banco. Use um diretório
 persistente fora das pastas públicas, mantenha uma instância por processo, e
 proteja rotas administrativas com a configuração normal do Tournamenter.
 Reiniciar o processo preserva a senha e encerra sessões em andamento.
+
+Se uma instância configurada em uma versão preliminar que usava scrypt for
+movida para o Tournamenter Desktop, defina novamente a senha de voluntários
+na configuração do plugin.

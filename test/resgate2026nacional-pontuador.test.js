@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function harness(table, data = {}, load = false, finalError) {
+function harness(table, data = {}, load = false, finalError, volunteer = false) {
   const controllers = {};
   const angularModule = {
     controller(name, handler) { controllers[name] = handler; return this; },
@@ -13,6 +13,7 @@ function harness(table, data = {}, load = false, finalError) {
   const writes = [];
   vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,
     '../public/tournamenter-obr/scripts/controllers.js'), 'utf8'), {
+    OBR_VOLUNTEER: volunteer,
     angular: { module: () => angularModule },
     _: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
     window: { alert: (message) => alerts.push(message) },
@@ -34,6 +35,11 @@ function harness(table, data = {}, load = false, finalError) {
     },
   };
   const Score = {
+    submitVolunteer(params, payload, done) {
+      assert.equal(params.id, finalist.id);
+      writes.push([payload.round, payload.time]);
+      done();
+    },
     saveScore(payload, done) {
       const { number, value } = payload;
       writes.push([number, value]);
@@ -108,4 +114,25 @@ test('R3 still saves points and time to columns 5 and 6, including for legacy ta
     scope.ok();
     assert.deepEqual(writes, [[4, 42], [5, 480]]);
   }
+});
+
+test('volunteers can correct a blank clock time before submitting an explicit zero', () => {
+  const row = { ...finalist, submittedRounds: [] };
+  const volunteerTable = { ...table, scores: [row] };
+  const { scope, writes, alerts } = harness(volunteerTable, {}, false, undefined, true);
+  scope.selectRound(0);
+  scope.selectScore(row);
+  scope.selected.completeMission = 1;
+
+  for (const time of ['', '  ', 'pendente', '-1', '481']) {
+    scope.selected.time = time;
+    scope.ok();
+  }
+  assert.deepEqual(writes, []);
+  assert.equal(alerts.length, 5);
+
+  scope.selected.time = '0';
+  scope.ok();
+  assert.deepEqual(writes, [[0, 0]]);
+  assert.equal(alerts.at(-1), 'OK! Salvo com sucesso.');
 });

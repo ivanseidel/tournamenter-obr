@@ -102,7 +102,17 @@
 
 				var selected = $scope.selected;
 				if (!selected.table || selected.round === null || !selected.score || !$scope.teamAvailable(selected.score)) return;
-				if (volunteer) return $modalInstance.close(selected, $scope.extra);
+				if (volunteer) {
+					if (savesTime(selected) && selected.completeMission) {
+						var input = selected.time;
+						var time = typeof input === 'string' && input.trim() ? Number(input) : input;
+						if (!Number.isFinite(time) || time < 0 || time > selected.maxTime) {
+							return window.alert('Informe um tempo entre 0 e ' + selected.maxTime + ' segundos.');
+						}
+						selected.time = time;
+					}
+					return $modalInstance.close(selected, $scope.extra);
+				}
 				var score = selected.score.scores;
 
 				var index1 = scoreColumn(selected);
@@ -236,7 +246,7 @@
 							Score.submitVolunteer({ tableId: selected.table.id, id: selected.score.id }, {
 								data: $scope.scoreData,
 								round: selected.round,
-								time: Number(selected.time),
+								time: selected.time,
 							}, function () {
 								window.alert('OK! Salvo com sucesso.');
 							}, function (response) {

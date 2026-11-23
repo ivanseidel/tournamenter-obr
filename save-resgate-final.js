@@ -1,4 +1,5 @@
 const { methodName, finalColumn } = require('./sorters/resgate2026nacional');
+const { withScoreWrite } = require('./pontuador/score-writes');
 
 module.exports = function saveResgateFinal(models) {
   const { Table, Scores } = models;
@@ -12,7 +13,7 @@ module.exports = function saveResgateFinal(models) {
     }
 
     const { tableId, id } = req.params;
-    try {
+    return withScoreWrite(Scores, id, async () => {
       const [table, scores] = await Promise.all([
         Table.findOne(tableId),
         Scores.find({ tableId }),
@@ -35,8 +36,6 @@ module.exports = function saveResgateFinal(models) {
         if (saved) return res.json(saved);
       }
       return res.status(409).json({ error: 'A pontuação da equipe mudou.' });
-    } catch (error) {
-      return next(error);
-    }
+    }).catch(next);
   };
 };
