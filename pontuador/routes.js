@@ -7,6 +7,16 @@ const entry = prefix + '/acesso';
 const scorerPage = prefix + '/voluntario';
 const api = prefix + '/voluntario-api';
 const adminConfig = '/obr-pontuador-config';
+const legacyScorerPaths = new Set([prefix, prefix + '/', prefix + '/index.html']);
+
+function legacyScorerPage(req) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return false;
+  try {
+    return legacyScorerPaths.has(path.posix.normalize(decodeURIComponent(req.path)).toLowerCase());
+  } catch (error) {
+    return false;
+  }
+}
 
 function install(app, auth, access = createAccess(app.config)) {
   const { server, models: { Table, Scores, Team } } = app;
@@ -37,6 +47,20 @@ function install(app, auth, access = createAccess(app.config)) {
     }
     return true;
   };
+
+  const redirectGuest = handle(async (req, res) => {
+    const { enabled } = await access.status();
+    return res.redirect(enabled ? entry : '/login');
+  });
+
+  server.use((req, res, next) => {
+    if (!legacyScorerPage(req)) return next();
+    res.set('Cache-Control', 'no-store');
+    const password = app.config.password;
+    if (!password || (req.session && req.session.authentication === password)) return next();
+    if (access.valid(req)) return res.redirect(scorerPage);
+    return redirectGuest(req, res);
+  });
 
   server.get(adminConfig, auth, noCache, handle(async (req, res) => res.json(await access.status())));
   server.post(adminConfig, auth, noCache, jsonOnly, handle(async (req, res) => {
