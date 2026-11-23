@@ -8,7 +8,7 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.4`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.5`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 ### Classificação de Resgate (N1 e N2)
@@ -92,6 +92,11 @@ deve ser organizada separadamente. A fórmula
 3. Compartilhe o endereço da instância seguido de `/tournamenter-obr/acesso`
    e a senha do pontuador com os voluntários. Nos tablets, use um navegador
    sem sessão administrativa. Use HTTPS em redes compartilhadas ou não confiáveis.
+
+Com o acesso de voluntários ativo, o endereço antigo `/tournamenter-obr/`
+pede a senha de voluntários se o navegador ainda não tiver uma sessão.
+Quem já entrou como voluntário segue para o pontuador restrito. Quem já
+entrou como coordenação continua abrindo o pontuador administrativo.
 
 A sessão de voluntários dura até 12 horas e permite apenas consultar nomes
 de equipes e rodadas disponíveis de tabelas de Resgate desbloqueadas, além de

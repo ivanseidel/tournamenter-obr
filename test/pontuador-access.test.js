@@ -20,7 +20,8 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
   let clock = Date.now();
   const access = createAccess(config, { file, now: () => clock });
   const routes = new Map();
-  const server = {};
+  const middleware = [];
+  const server = { use: (handler) => middleware.push(handler) };
   for (const method of ['get', 'post', 'put']) {
     server[method] = (url, ...handlers) => routes.set(method + ' ' + url, handlers);
   }
@@ -61,12 +62,16 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
 
   const request = (route, options = {}) => new Promise((resolve, reject) => {
     const result = { status: 200, headers: {} };
+    const [method, pathname] = route.split(' ');
     const res = {
       status(code) { result.status = code; return this; },
       set(key, value) { result.headers[key] = value; return this; },
       json(data) { resolve({ ...result, data }); return this; },
+      redirect(location) { resolve({ ...result, status: 302, location }); },
     };
     const req = {
+      method: method.toUpperCase(), path: pathname,
+      session: options.admin ? { authentication: config.password } : undefined,
       body: options.body || {}, params: { tableId: '1', id: 'a', ...options.params },
       query: options.query || {},
       param: (name, fallback) => options.query?.[name] ?? fallback,
@@ -74,7 +79,7 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
       get: (name) => name === 'X-OBR-Pontuador' && options.header !== false ? '1' : undefined,
       is: (type) => options.json !== false && type === 'application/json',
     };
-    const handlers = routes.get(route);
+    const handlers = [...middleware, ...(routes.get(route) || [(_req, response) => response.json('static file')])];
     let i = 0;
     const next = (error) => {
       if (error) return reject(error);
@@ -97,6 +102,34 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
   }
   return { request, configure, signIn, file, rows, access, config, pauseNextUpdate, advance: (ms) => { clock += ms; } };
 }
+
+test('the old scorer link asks guests to sign in and preserves the role of existing sessions', async (t) => {
+  const f = await fixture(t);
+  const oldLink = 'get /tournamenter-obr/';
+  assert.equal((await f.request(oldLink)).location, '/login');
+  await f.configure({ password: firstPassword });
+
+  for (const pathname of ['/tournamenter-obr', '/tournamenter-obr/', '/tournamenter-obr/index.html',
+    '/tournamenter-obr/%69ndex.html']) {
+    const response = await f.request('get ' + pathname);
+    assert.equal(response.status, 302);
+    assert.equal(response.location, '/tournamenter-obr/acesso');
+    assert.equal(response.headers['Cache-Control'], 'no-store');
+  }
+  assert.equal((await f.request('head /tournamenter-obr/')).location, '/tournamenter-obr/acesso');
+
+  const { cookie } = await f.signIn();
+  assert.equal((await f.request(oldLink, { cookie })).location, '/tournamenter-obr/voluntario');
+  assert.equal((await f.request(oldLink, { admin: true, cookie })).data, 'static file');
+  assert.equal((await f.request('get /tournamenter-obr/views/scorer.html')).data, 'static file');
+  await f.configure({ disable: true });
+  assert.equal((await f.request(oldLink, { cookie })).location, '/login');
+});
+
+test('the old scorer still works on instances without a configured password', async (t) => {
+  const f = await fixture(t, {});
+  assert.equal((await f.request('get /tournamenter-obr/')).data, 'static file');
+});
 
 test('only an admin can set a separate password; credential persists privately and routes are isolated', async (t) => {
   const f = await fixture(t);
