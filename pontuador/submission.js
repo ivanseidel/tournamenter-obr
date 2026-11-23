@@ -1,9 +1,8 @@
 const scorer = require('../public/tournamenter-obr/scripts/scorers')();
-const { methodName, finalColumn } = require('../sorters/resgate2026nacional');
+const { finalColumn } = require('../sorters/resgate2026nacional');
+const { isNationalRescue, roundPointsIndex } = require('../public/tournamenter-obr/scripts/resgate-columns');
 
-const rescueColumns = new Map([
-  [methodName, 6], ['obr2025', 6], ['obr2024', 6], ['obr2018nacional', 6], ['obr2017', 6],
-]);
+const legacyRescueMethods = new Set(['obr2025', 'obr2024', 'obr2018nacional', 'obr2017']);
 const features = { passage: 14, obstacles: 16, seesaw: 16, speedbump: 25,
   intersection: 30, gaps: 20, becos: 16, rampas: 30 };
 const filled = (row, index) => Boolean(row.scores && Object.prototype.hasOwnProperty.call(row.scores, index));
@@ -47,19 +46,22 @@ function roundScore(input) {
 }
 
 function eligibleTable(table) {
-  return table && table.locked !== 'yes' && rescueColumns.has(table.evaluateMethod) &&
-    Number(table.columns) >= rescueColumns.get(table.evaluateMethod);
+  return table && table.locked !== 'yes' && (isNationalRescue(table) || legacyRescueMethods.has(table.evaluateMethod)) &&
+    Number(table.columns) > roundPointsIndex(table, 2) + 1;
 }
 
 function roundColumns(table, round, row) {
-  if (round >= 0 && round <= 2 && Number.isInteger(round)) return { index: round * 2, time: round * 2 + 1 };
-  if (round === 3 && table.evaluateMethod === methodName && Number(table.columns) > finalColumn &&
+  if (round >= 0 && round <= 2 && Number.isInteger(round)) {
+    const index = roundPointsIndex(table, round);
+    return { index, time: index + 1 };
+  }
+  if (round === 3 && isNationalRescue(table) && Number(table.columns) > finalColumn &&
       row.resgateFinalista) return { index: finalColumn };
   return null;
 }
 
 function addFinalists(table, rows) {
-  if (table.evaluateMethod === methodName && Number(table.columns) > finalColumn) {
+  if (isNationalRescue(table) && Number(table.columns) > finalColumn) {
     table.scores = rows;
     table.calculate();
   }

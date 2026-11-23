@@ -8,19 +8,25 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.6`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.7`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 ### Classificação de Resgate (N1 e N2)
 
 Crie **uma tabela por nível**. As novas tabelas já vêm com a fórmula
-`resgate2026nacional` e as **10 colunas** abaixo. As tabelas existentes não
-são alteradas. Para outras modalidades, escolha a fórmula e as colunas
-correspondentes na configuração da tabela.
+`resgate2026nacional` e as **10 colunas** abaixo. A fórmula também aceita o nome
+`resgate2026obr`. Tabelas com o cabeçalho padrão anterior continuam usando a
+ordem original para calcular e lançar as notas. Para outras modalidades, escolha
+a fórmula e as colunas correspondentes na configuração da tabela.
 
 ```
-Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final
+Pôster, Relatório, Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pontos da Final
 ```
+
+Com essa ordem, mantenha as 10 colunas na administração e ajuste
+**Score Columns (View)** para **6** para exibir a parcial até R2. O placar
+público usa apenas Pôster, Relatório e os pontos e tempos de R1 e R2, inclusive
+nos desempates. A classificação administrativa continua usando as 10 colunas.
 
 O pontuador preenche os pontos e tempos das preliminares. Lance manualmente
 as notas brutas do Desafio Técnico, do Pôster (0 a 36) e do Relatório (0 a 96).

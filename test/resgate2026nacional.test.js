@@ -5,7 +5,7 @@ const { register } = require('../sorters/resgate2026nacional');
 const makeRow = (teamId, values) => ({
   teamId, scores: Object.fromEntries(values.map((value, i) => [i, { value }])),
 });
-const base = [110, 150, 80, 120, 50, 90, 10, 0, 0];
+const base = [0, 0, 110, 150, 80, 120, 50, 90, 10];
 class Table {
   constructor(scores, evaluateMethod = 'resgate2026nacional') {
     Object.assign(this, { scores, evaluateMethod, columns: 10 });
@@ -20,8 +20,8 @@ test('registration configures the new table defaults on the active collection', 
   assert.equal(attributes.evaluateMethod.defaultsTo, 'resgate2026nacional');
   assert.equal(attributes.columns.defaultsTo, 10);
   assert.deepEqual(attributes.headerScore.defaultsTo.split(', '), [
-    'Pontos R1', 'Tempo R1', 'Pontos R2', 'Tempo R2', 'Pontos R3', 'Tempo R3',
-    'Desafio Técnico', 'Pôster', 'Relatório', 'Pontos da Final',
+    'Pôster', 'Relatório', 'Pontos R1', 'Tempo R1', 'Pontos R2', 'Tempo R2',
+    'Pontos R3', 'Tempo R3', 'Desafio Técnico', 'Pontos da Final',
   ]);
 });
 
@@ -29,46 +29,62 @@ const rank = (...teams) => new Table(teams.map(([name, scores]) => makeRow(name,
 const byId = (rows, id) => rows.find((row) => row.teamId === id);
 
 test('arena includes the technical challenge; normalization uses the best arena in each table', () => {
-  const other = [160, 100, 130, 150, 40, 160, 10, 0, 0];
-  const evaluated = [...base.slice(0, 7), 18, 96];
+  const other = [0, 0, 160, 100, 130, 150, 40, 160, 10];
+  const evaluated = [18, 96, ...base.slice(2)];
   assert.equal(byId(rank(['A', evaluated], ['B', other]), 'A').final, 205);
   assert.equal(byId(rank(['A', evaluated]), 'A').final, 190);
   assert.equal(byId(rank(['A', evaluated], ['B', other]), 'B').final, 240);
 });
 
+test('both formula names use the new order and preserve scores under the previous default headers', () => {
+  for (const method of ['resgate2026nacional', 'resgate2026obr']) {
+    const table = new Table([makeRow('A', [18, 96, ...base.slice(2), 25])], method);
+    table.headerScore = attributes.headerScore.defaultsTo;
+    const [team] = table.calculate();
+    assert.equal(team.resgateFinalista, true);
+    assert.equal(team.final, 215);
+
+    table.headerScore = 'Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final';
+    table.scores = [makeRow('A', [110, 150, 80, 120, 50, 90, 10, 18, 96, 25])];
+    assert.equal(table.calculate()[0].final, 215);
+    table.columns = 7;
+    assert.equal(table.calculate()[0].final, 160);
+  }
+});
+
 test('desempate uses all three times including the discarded round', () => {
-  const rows = rank(['X', base], ['Y', [110, 150, 80, 120, 50, 80, 10, 0, 0]]);
+  const rows = rank(['X', base], ['Y', [0, 0, 110, 150, 80, 120, 50, 80, 10]]);
   assert.deepEqual(rows.map((row) => row.teamId), ['Y', 'X']);
 });
 
 test('zero time is accepted in the preliminary tie-break', () => {
-  const rows = rank(['X', base], ['Y', [110, 0, ...base.slice(2)]]);
+  const rows = rank(['X', base], ['Y', [0, 0, 110, 0, ...base.slice(4)]]);
   assert.deepEqual(rows.map((row) => row.teamId), ['Y', 'X']);
 });
 
 test('among equal top scores, the fastest round breaks the tie even if it is not the first', () => {
   const rows = rank(
-    ['X', [100, 100, 100, 50, 40, 100, 0, 0, 0]],
-    ['Y', [100, 70, 100, 80, 40, 100, 0, 0, 0]],
+    ['X', [0, 0, 100, 100, 100, 50, 40, 100, 0]],
+    ['Y', [0, 0, 100, 70, 100, 80, 40, 100, 0]],
   );
   assert.deepEqual(rows.map((row) => row.teamId), ['X', 'Y']);
 });
 
 test('equal totals and times use discarded points, then preliminary points in round order', () => {
   const rows = rank(
-    ['X', [100, 100, 70, 100, 20, 100, 0, 0, 0]],
-    ['Y', [100, 100, 70, 100, 30, 100, 0, 0, 0]],
-    ['Z', [70, 100, 100, 100, 30, 100, 0, 0, 0]],
+    ['X', [0, 0, 100, 100, 70, 100, 20, 100, 0]],
+    ['Y', [0, 0, 100, 100, 70, 100, 30, 100, 0]],
+    ['Z', [0, 0, 70, 100, 100, 100, 30, 100, 0]],
   );
   assert.deepEqual(rows.map((row) => row.teamId), ['Y', 'Z', 'X']);
   assert.deepEqual(rank(
-    ['X', [100, 100, 20, 100, 70, 100, 0, 0, 0]],
-    ['Y', [100, 100, 70, 100, 20, 100, 0, 0, 0]],
+    ['X', [0, 0, 100, 100, 20, 100, 70, 100, 0]],
+    ['Y', [0, 0, 100, 100, 70, 100, 20, 100, 0]],
   ).map((row) => row.teamId), ['Y', 'X']);
 });
 
 function standings(values) {
-  return values.map((n, i) => [String(i + 1), [n, 100, n, 110, 0, 120, 0, 0, 0]]);
+  return values.map((n, i) => [String(i + 1), [0, 0, n, 100, n, 110, 0, 120, 0]]);
 }
 
 test('only ten preliminary finalists receive final points, without changing arena normalization', () => {
@@ -83,7 +99,7 @@ test('only ten preliminary finalists receive final points, without changing aren
 });
 
 test('standings exclude final points when the effective column count hides the final', () => {
-  const table = new Table([makeRow('A', base), makeRow('B', [100, ...base.slice(1), 20])]);
+  const table = new Table([makeRow('A', base), makeRow('B', [0, 0, 100, ...base.slice(3), 20])]);
   table.columns = 9;
   const rows = table.calculate();
   assert.deepEqual(rows.map((row) => [row.teamId, row.rank, row.final]), [
@@ -97,11 +113,29 @@ test('standings exclude final points when the effective column count hides the f
 });
 
 test('standings exclude hidden preliminary columns from scores and qualification', () => {
-  const table = new Table([makeRow('A', [...base.slice(0, 7), 36, 96, 100])]);
+  const table = new Table([makeRow('A', [36, 96, ...base.slice(2), 100])]);
   table.columns = 7;
   const [team] = table.calculate();
-  assert.equal(team.final, 160);
+  assert.equal(team.final, 190);
   assert.equal(team.resgateFinalista, false);
+});
+
+test('a six-column view keeps teams tied even when hidden rounds decide the full standings', () => {
+  const visible = [36, 96, 110, 120, 80, 150];
+  const table = new Table([
+    makeRow('A', [...visible, 0, 480, 0, 0]),
+    makeRow('B', [...visible, 300, 1, 50, 100]),
+  ], 'resgate2026obr');
+  table.headerScore = attributes.headerScore.defaultsTo;
+  table.columns = 6;
+  assert.deepEqual(table.calculate().map(row => [row.final, row.rank, row.resgateFinalista]), [
+    [190, 1, false], [190, 1, false],
+  ]);
+
+  table.columns = 10;
+  assert.deepEqual(table.calculate().map(row => [row.teamId, row.final, row.rank]), [
+    ['B', 560, 1], ['A', 244, 2],
+  ]);
 });
 
 test('cutoff tie does not select one of the tied teams arbitrarily', () => {
@@ -112,15 +146,15 @@ test('cutoff tie does not select one of the tied teams arbitrarily', () => {
 });
 
 test('complete ties after adding the final stay tied, including a valid zero final', () => {
-  const a = [100, 100, 50, 100, 0, 100, 0, 0, 0, 0];
-  const b = [100, 120, 50, 120, 0, 120, 0, 0, 0, 0];
+  const a = [0, 0, 100, 100, 50, 100, 0, 100, 0, 0];
+  const b = [0, 0, 100, 120, 50, 120, 0, 120, 0, 0];
   assert.deepEqual(rank(['B', b], ['A', a]).map((row) => row.rank), [1, 1]);
   assert.deepEqual(rank(['B', b.slice(0, 9)], ['A', a.slice(0, 9)]).map((row) => row.rank), [1, 2]);
 });
 
 test('pending or invalid values do not qualify, while real zero is accepted', () => {
   const incomplete = [...base, 1000];
-  incomplete[8] = '';
+  incomplete[1] = '';
   const rows = rank(['A', incomplete], ['B', base]);
   assert.equal(rows.some((row) => row.resgateFinalista), false);
   assert.equal(byId(rows, 'A').final, 160);
@@ -137,7 +171,7 @@ test('non-resgate tables still use the original Tournamenter calculator', () => 
 test('launching the final does not collapse pre-existing non-finalist tie-break positions', () => {
   const teams = standings([100, 99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 90]);
   teams[0][1][9] = 1;
-  teams[11][1][5] = 100;
+  teams[11][1][7] = 100;
   const rows = rank(...teams);
   assert.equal(byId(rows, '12').rank, 11);
   assert.equal(byId(rows, '11').rank, 12);

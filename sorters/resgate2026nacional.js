@@ -1,9 +1,4 @@
-const methodName = 'resgate2026nacional';
-const scoreHeaders = [
-  'Pontos R1', 'Tempo R1', 'Pontos R2', 'Tempo R2', 'Pontos R3', 'Tempo R3',
-  'Desafio Técnico', 'Pôster', 'Relatório', 'Pontos da Final',
-];
-const preliminaryColumns = 9;
+const { methodName, scoreHeaders, isNationalRescue, layoutFor } = require('../public/tournamenter-obr/scripts/resgate-columns');
 const finalColumn = 9;
 const finalistCount = 10;
 const scoreScale = 2880;
@@ -17,19 +12,21 @@ function readNumber(row, columns, index, max = Infinity) {
   return Number.isFinite(number) && number >= 0 && number <= max ? number : null;
 }
 
-function readTeam(row, columns) {
-  const scores = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) =>
-    readNumber(row, columns, index, ({ 1: 480, 3: 480, 5: 480, 7: 36, 8: 96 })[index]));
-  const [r1, t1, r2, t2, r3, t3, challenge, poster, report] = scores;
-  const points = [r1 || 0, r2 || 0, r3 || 0];
-  const times = [t1, t2, t3].map((time) => time === null ? 480 : time);
+function readTeam(row, columns, layout) {
+  const poster = readNumber(row, columns, layout.poster, 36);
+  const report = readNumber(row, columns, layout.report, 96);
+  const challenge = readNumber(row, columns, layout.challenge);
+  const roundPoints = layout.roundPoints.map((index) => readNumber(row, columns, index));
+  const roundTimes = layout.roundPoints.map((index) => readNumber(row, columns, index + 1, 480));
+  const points = roundPoints.map((value) => value || 0);
+  const times = roundTimes.map((time) => time === null ? 480 : time);
   const discarded = Math.min(...points);
   const maxRound = Math.max(...points);
   const fastestTopRound = Math.min(...times.filter((_, index) => points[index] === maxRound));
 
   return {
     row,
-    complete: scores.slice(0, preliminaryColumns).every((value) => value !== null),
+    complete: [poster, report, challenge, ...roundPoints, ...roundTimes].every((value) => value !== null),
     arena: points.reduce((sum, value) => sum + value, 0) - discarded + (challenge || 0),
     poster: poster || 0,
     report: report || 0,
@@ -47,7 +44,8 @@ function compareKeys(left, right) {
 
 function calculate(table) {
   // Tournamenter sets columns to the view's limit when calculating public standings.
-  const teams = (table.scores || []).map((row) => readTeam(row, table.columns));
+  const layout = layoutFor(table);
+  const teams = (table.scores || []).map((row) => readTeam(row, table.columns, layout));
   const maxArena = teams.reduce((max, team) => Math.max(max, team.arena), 0);
 
   for (const team of teams) {
@@ -100,7 +98,7 @@ function register(tableCollection) {
   const prototype = tableCollection._model.prototype;
   const legacyCalculate = prototype.calculate;
   prototype.calculate = function (table) {
-    if ((table || this).evaluateMethod !== methodName) return legacyCalculate.apply(this, arguments);
+    if (!isNationalRescue(table || this)) return legacyCalculate.apply(this, arguments);
     this.scores = calculate(table || this);
     return this.scores;
   };

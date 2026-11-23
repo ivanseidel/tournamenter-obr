@@ -11,8 +11,7 @@ function harness(table, data = {}, load = false, finalError, volunteer = false) 
   };
   const alerts = [];
   const writes = [];
-  vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,
-    '../public/tournamenter-obr/scripts/controllers.js'), 'utf8'), {
+  const context = vm.createContext({
     OBR_VOLUNTEER: volunteer,
     angular: { module: () => angularModule },
     _: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
@@ -20,6 +19,10 @@ function harness(table, data = {}, load = false, finalError, volunteer = false) 
     console: { log() {} },
     setTimeout: (f) => f(),
   });
+  for (const script of ['resgate-columns.js', 'controllers.js']) {
+    vm.runInContext(fs.readFileSync(path.resolve(__dirname,
+      '../public/tournamenter-obr/scripts', script), 'utf8'), context);
+  }
   const scorerScope = { $watch() {}, $apply() {} };
   const Scorer = { model: {}, totalTime: 480, score: () => ({ total: 42 }) };
   const timer = { reset() {}, data: { value: 1000 } };
@@ -106,13 +109,20 @@ test('national final loads the stored score sheet from column 10', () => {
   assert.deepEqual(writes, []);
 });
 
-test('R3 still saves points and time to columns 5 and 6, including for legacy tables', () => {
-  for (const mode of [table, { ...table, evaluateMethod: 'obr2025' }]) {
-    const { scope, writes } = harness(mode);
-    scope.selectRound(2);
-    scope.selectScore(finalist);
-    scope.ok();
-    assert.deepEqual(writes, [[4, 42], [5, 480]]);
+test('the scorer saves round points and times in the slots for each table layout', () => {
+  const oldHeaders = 'Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final';
+  for (const [mode, first] of [
+    [table, 2], [{ ...table, evaluateMethod: 'resgate2026obr' }, 2],
+    [{ ...table, headerScore: oldHeaders }, 0], [{ ...table, evaluateMethod: 'obr2025' }, 0],
+  ]) {
+    for (const round of [0, 1, 2]) {
+      const { scope, writes } = harness(mode);
+      scope.selectRound(round);
+      scope.selectScore(finalist);
+      scope.ok();
+      const index = first + round * 2;
+      assert.deepEqual(writes, [[index, 42], [index + 1, 480]]);
+    }
   }
 });
 
