@@ -8,7 +8,7 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.5`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.6`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 ### Classificação de Resgate (N1 e N2)
@@ -91,6 +91,14 @@ Entrevista, Apresentação 1, Apresentação 2 e Stand. Registre a nota inteira
 de consenso dos juízes em cada campo. A célula guarda o total em `value` e
 os valores de cada critério, suas justificativas e a justificativa geral em
 `data`. As justificativas são opcionais.
+
+Para enviar a avaliação à equipe, acesse o pontuador como coordenação e
+selecione a coluna, a tabela e a equipe. **Baixar PDF da ficha** exporta a
+coluna escolhida. **Baixar PDF da equipe** reúne as fichas já registradas
+nessa tabela. O relatório inclui cada critério com sua nota e justificativa,
+além da justificativa geral. Os PDFs usam a última avaliação salva e também
+estão disponíveis em tabelas bloqueadas. Para notas lançadas diretamente
+na tabela, o relatório identifica o total e a ausência de detalhamento.
 
 Na entrevista, a ficha grava a nota técnica e o bônus de sustentabilidade de
 até 10 pontos em suas respectivas colunas. Nas apresentações, registre as

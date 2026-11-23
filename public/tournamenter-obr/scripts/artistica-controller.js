@@ -86,14 +86,25 @@
     $scope.teamLabel = function (row) {
       return (row.team.name || 'Equipe sem nome') + ($scope.alreadySubmitted(row) ? ' · já avaliada' : '');
     };
+    function updateSubmissionStatus(hasScore) {
+      var columns = $scope.selection.team.submittedColumns;
+      var index = columns.indexOf($scope.column.id);
+      if (hasScore && index === -1) columns.push($scope.column.id);
+      if (!hasScore && index !== -1) columns.splice(index, 1);
+    }
 
+    function teamPath() {
+      return encodeURIComponent($scope.selection.table.id) + '/' + encodeURIComponent($scope.selection.team.id);
+    }
+    $scope.reportUrl = function (columnId) {
+      return api + '/relatorios/' + teamPath() + '/' + columnId;
+    };
     function sheetUrl() {
-      return api + '/sumulas/' + encodeURIComponent($scope.selection.table.id) + '/' +
-        encodeURIComponent($scope.selection.team.id) + '/' + $scope.column.id;
+      return api + '/sumulas/' + teamPath() + '/' + $scope.column.id;
     }
 
     $scope.openSheet = function () {
-      if ($scope.busy || !$scope.selection.team || (volunteer && $scope.alreadySubmitted())) return;
+      if ($scope.busy || !$scope.selection.team || $scope.selection.table.locked || (volunteer && $scope.alreadySubmitted())) return;
       clearSheet();
       $scope.busy = true;
       var column = $scope.column;
@@ -102,6 +113,7 @@
         if (!body || !Array.isArray(body.cells) || !body.revision) return failed(response);
         revision = body.revision;
         occupied = body.cells.length > 0;
+        updateSubmissionStatus(occupied);
         var main = body.cells.filter(function (cell) { return cell.index === column.index; })[0];
         var bonus = body.cells.filter(function (cell) { return cell.index === column.bonusIndex; })[0];
         var restored = forms.restore(column.id, (main || bonus || {}).data);
@@ -142,6 +154,7 @@
       return $http.put(sheetUrl(), { revision: revision, data: $scope.draft },
         { headers: { 'X-OBR-Pontuador': '1' } }).then(function (response) {
         if (!response.data || !Array.isArray(response.data.cells) || !response.data.revision) return failed(response);
+        updateSubmissionStatus(true);
         clearSheet();
         $scope.saved = result;
         $window.scrollTo(0, 0);

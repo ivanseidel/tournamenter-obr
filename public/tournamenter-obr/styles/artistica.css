@@ -26,6 +26,7 @@ h3 { font-size: 20px; }
 .art-selectors { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
 .art-selectors > div { flex: 1 1 210px; min-width: 0; }
 .art-selectors + p { margin: 12px 0 0; }
+.art-downloads { display: flex; flex-wrap: wrap; gap: 8px; }
 .art-sheet-heading { padding-bottom: 16px; }
 .art-criterion { padding: 18px 0; border-top: 1px solid #dce2e4; }
 .art-number { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #475760; }
