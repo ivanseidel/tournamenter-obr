@@ -8,7 +8,7 @@
 	<ol class="breadcrumb">
 		<li>Salvar/Carregar</li>
 		<li ng-show="selected.table"><span ng-click="page='selectTable'">{{selected.table.name}}</span></li>
-		<li ng-show="selected.round !== null"><span ng-click="page='selectRound'">{{selected.table.headers.scores[selected.round]}}</span></li>
+		<li ng-show="selected.round !== null"><span ng-click="page='selectRound'">{{rounds(selected.table)[selected.round]}}</span></li>
 		<li ng-show="selected.score"><span ng-click="page='selectTeam'">{{selected.score.team.name}}</span></li>
 	</ol>
 
@@ -36,7 +36,7 @@
 		<h2>Selecione o Round</h2>
 		<div class="list-group">
 			<div class="list-group-item"
-				ng-repeat="n in ['Round 1', 'Round 2', 'Round 3 ou Final']"
+				ng-repeat="n in rounds(selected.table)"
 				ngold-repeat="n in selected.table.headers.scores"
 				ng-class="{active: selected.round == $index}"
 				ng-click="selectRound($index);">
@@ -62,12 +62,12 @@
 		<h2>Selecione a Equipe</h2>
 		<div class="list-group">
 			<div class="list-group-item"
-				ng-repeat="score in selected.table.scores | orderBy: 'team.name'"
+				ng-repeat="score in selected.table.scores | filter: teamAvailable | orderBy: 'team.name'"
 				ng-class="{active: selected.score.id == score.id}"
 				ng-click="selectScore(score);">
 				{{score.team.name || 'Sem nome'}}
-					<span class="label label-danger" ng-if="score.scores[selected.round * 2]">
-						{{score.scores[selected.round * 2].value}} Pontos
+					<span class="label label-danger" ng-if="score.scores[scoreColumn(selected)]">
+						{{score.scores[scoreColumn(selected)].value}} Pontos
 					</span>
 			</div>
 		</div>
@@ -96,24 +96,24 @@
 		<h2>Confirmar dados</h2>
 
 		<h3>Tabela: <span class="label label-info">{{selected.table.name}}</span></h3>
-		<!-- <h3>Round: <span class="label label-info">{{selected.table.headers.scores[selected.round]}}</span></h3> -->
-		<h3>Round: <span class="label label-info">{{selected.round + 1}}</span></h3>
+		<!-- <h3>Round: <span class="label label-info">{{rounds(selected.table)[selected.round]}}</span></h3> -->
+		<h3>Round: <span class="label label-info">{{rounds(selected.table)[selected.round]}}</span></h3>
 		<h3>Equipe: <span class="label label-info">{{selected.score.team.name}}</span></h3>
 		<h3>
 			Pontuação:
 			<span class="label label-success">{{selected.total}}</span>
-			<span class="label label-danger" ng-if="selected.score.scores[selected.round * 2]">
-				 <- {{selected.score.scores[selected.round * 2].value}} Pontos
+			<span class="label label-danger" ng-if="selected.score.scores[scoreColumn(selected)]">
+				 <- {{selected.score.scores[scoreColumn(selected)].value}} Pontos
 			</span>
 		</h3>
 
-		<div class="input-group input-group-lg">
+		<div class="input-group input-group-lg" ng-if="savesTime(selected)">
 			<span class="input-group-addon">Tempo total:</span>
 			<input ng-if="selected.completeMission" type="text" class="form-control" placeholder="Tempo" ng-model="selected.time">
 			<span class="form-control" ng-if="!selected.completeMission">{{selected.maxTime}}</span>
 		</div>
 
-		<div class="btn-group btn-group-justified" style="margin-top: 24px; margin-bottom: 24px;">
+		<div class="btn-group btn-group-justified" ng-if="savesTime(selected)" style="margin-top: 24px; margin-bottom: 24px;">
 			<label class="btn btn-default" ng-model="selected.completeMission"
 			  btn-radio="0">{{selected.maxTime}} Seg</label>
 			<label class="btn btn-default" ng-model="selected.completeMission"

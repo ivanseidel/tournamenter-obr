@@ -6,6 +6,23 @@
 	*/
 	var GlobalScorerName = 'RescueScorer2026Nacional';
 	var SCORE_WITH_TIME = true;
+	var PRELIMINARY_ROUNDS = ['Round 1', 'Round 2', 'Round 3'];
+
+	function isNationalRescue(table) {
+		return table && table.evaluateMethod === 'resgate2026nacional';
+	}
+
+	function isNationalFinal(selected) {
+		return isNationalRescue(selected.table) && selected.round === 3;
+	}
+
+	function scoreColumn(selected) {
+		return isNationalFinal(selected) ? 9 : (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
+	}
+
+	function savesTime(selected) {
+		return SCORE_WITH_TIME && !isNationalFinal(selected);
+	}
 
 	angular.module('app.controllers', [])
 
@@ -50,12 +67,26 @@
 
 			$scope.selectTable = function (table){
 				$scope.selected.table = table;
+				$scope.selected.round = null;
 				$scope.selected.score = null;
 			}
 
 			$scope.selectRound = function (round){
 				$scope.selected.round = round;
+				$scope.selected.score = null;
 			}
+
+			$scope.scoreColumn = scoreColumn;
+			$scope.savesTime = savesTime;
+			$scope.rounds = function (table) {
+				if (!isNationalRescue(table)) return ['Round 1', 'Round 2', 'Round 3 ou Final'];
+				return table.columns >= 10 && table.scores && table.scores.some(function (row) {
+					return row.resgateFinalista;
+				}) ? PRELIMINARY_ROUNDS.concat('Final') : PRELIMINARY_ROUNDS;
+			};
+			$scope.teamAvailable = function (row) {
+				return !isNationalFinal($scope.selected) || row.resgateFinalista;
+			};
 
 			$scope.selectScore = function (score){
 				$scope.selected.score = score;
@@ -64,11 +95,11 @@
 			$scope.ok = function () {
 
 				var selected = $scope.selected;
+				if (!selected.table || selected.round === null || !selected.score || !$scope.teamAvailable(selected.score)) return;
 				var score = selected.score.scores;
 
-				var index1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
-				var index2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
-				var isScoredAlready = score[index1] || (SCORE_WITH_TIME && score[index2])
+				var index1 = scoreColumn(selected);
+				var isScoredAlready = score[index1] || (savesTime(selected) && score[index1 + 1])
 				var isLoading = extra.doNotSave
 
 				if(!isLoading && isScoredAlready){
@@ -159,18 +190,19 @@
 					if(doNotSave && selected && selected.score.id){
 						console.log(selected)
 						var score = selected.score;
-						var index = SCORE_WITH_TIME ? selected.round * 2 : selected.round
+						var index = scoreColumn(selected)
 						var scoreData = score.scores[index];
 						var scoreTime = 0;
 
 						// Load time if SCORE_WITH_TIME is true
-						if (SCORE_WITH_TIME) {
+						if (savesTime(selected)) {
 							scoreTime = score.scores[index + 1] && score.scores[index + 1].value || 0
 						}
 						console.log(scoreData, selected.round, scoreTime)
 						// var scoreTime = score.scores[(selected.round - 1) * 2 + 1];
 
-						var parsedData = JSON.parse(scoreData.data);
+						if (!scoreData || !scoreData.data) return window.alert('Não há uma súmula salva para esta rodada.');
+						var parsedData = typeof scoreData.data === 'string' ? JSON.parse(scoreData.data) : scoreData.data;
 						console.log(parsedData);
 
 						setTimeout(function (){
@@ -186,13 +218,30 @@
 					// Saves if doNotSave flag is false
 					if(!doNotSave && selected && selected.score.id){
 
-						if(SCORE_WITH_TIME){
+						if(savesTime(selected)){
 							if(!selected.completeMission)
 								selected.time = Scorer.totalTime;
 						}
 
-						var number1 = (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
-						var number2 = (SCORE_WITH_TIME ? selected.round * 2 + 1 : selected.round);
+						var number1 = scoreColumn(selected);
+						var number2 = number1 + 1;
+
+						if (isNationalFinal(selected)) {
+							Score.saveFinal({
+								tableId: selected.table.id,
+								id: selected.score.id,
+							}, {
+								data: $scope.scoreData,
+								value: selected.total,
+								updatedAt: selected.score.updatedAt,
+							}, checkScore, function (response) {
+								if (response.status === 409 && response.data && response.data.error) {
+									return window.alert(response.data.error + ' Abra o pontuador novamente para atualizar a seleção.');
+								}
+								window.alert('FALHA AO SALVAR #1. REFAÇA A OPERAÇÃO.');
+							});
+							return;
+						}
 
 						// Save Data
 						Score.saveScore({
@@ -202,7 +251,7 @@
 							value: selected.total,
 						}, function (){
 
-							if(SCORE_WITH_TIME){
+							if(savesTime(selected)){
 								// Save Time
 								Score.saveScore({
 									number: number2,
@@ -226,10 +275,9 @@
 							}, function (score){
 								console.log(score);
 								console.log(selected.total, score.scores[number1]);
-								console.log(score.scores[number2].value, Math.round(selected.time));
-								if(score.scores[number1].value != selected.total){
+								if(!score.scores[number1] || score.scores[number1].value != selected.total){
 									window.alert('FALHA AO SALVAR #3. REFAÇA A OPERAÇÃO.');
-								}else if(SCORE_WITH_TIME && score.scores[number2].value != Math.floor(selected.time)){
+								}else if(savesTime(selected) && (!score.scores[number2] || score.scores[number2].value != Math.floor(selected.time))){
 									window.alert('FALHA AO SALVAR #4. REFAÇA A OPERAÇÃO.');
 								}else{
 									window.alert('OK! Salvo com sucesso.');
