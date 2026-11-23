@@ -17,13 +17,15 @@
   if (login) {
     var secret = document.getElementById('obr-volunteer-password');
     var feedback = document.getElementById('obr-volunteer-feedback');
+    var modality = document.getElementById('obr-volunteer-modality');
+    if (new URLSearchParams(location.search).get('modalidade') === 'artistica') modality.value = 'artistica';
     login.addEventListener('submit', function (event) {
       event.preventDefault();
       var button = login.querySelector('button');
       button.disabled = true;
       feedback.textContent = '';
       send('/tournamenter-obr/voluntario-api/login', { password: secret.value }).then(function () {
-        location.replace('/tournamenter-obr/voluntario');
+        location.replace(modality.value === 'artistica' ? '/tournamenter-obr/voluntario-artistica' : '/tournamenter-obr/voluntario');
       }).catch(function (error) {
         feedback.textContent = error.message;
         secret.select();
@@ -67,11 +69,13 @@
   }
 
   var logout = document.getElementById('obr-volunteer-logout');
-  if (logout && location.pathname.replace(/\/$/, '') === '/tournamenter-obr/voluntario') {
+  var scorerPath = location.pathname.replace(/\/$/, '');
+  var artistic = scorerPath === '/tournamenter-obr/voluntario-artistica';
+  if (logout && (artistic || scorerPath === '/tournamenter-obr/voluntario')) {
     logout.hidden = false;
     logout.addEventListener('click', function () {
       send('/tournamenter-obr/voluntario-api/logout', {}).then(function () {
-        location.replace('/tournamenter-obr/acesso');
+        location.replace('/tournamenter-obr/acesso' + (artistic ? '?modalidade=artistica' : ''));
       }).catch(function (error) { window.alert(error.message); });
     });
   }

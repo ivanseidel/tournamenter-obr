@@ -43,6 +43,10 @@ module.exports = {
           name: 'Pontuador',
         },
         {
+          path: '/obr-artistica',
+          name: 'Pontuador Artística',
+        },
+        {
           path: '/obr-config',
           name: 'Configurar (Importar/Exportar)',
         },

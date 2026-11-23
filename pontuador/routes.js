@@ -2,6 +2,7 @@ const path = require('path');
 const { createAccess, prefix } = require('./access');
 const { withScoreWrite } = require('./score-writes');
 const { eligibleTable, roundColumns, addFinalists, roundScore, filled } = require('./submission');
+const artistic = require('./artistica');
 
 const entry = prefix + '/acesso';
 const scorerPage = prefix + '/voluntario';
@@ -47,6 +48,7 @@ function install(app, auth, access = createAccess(app.config)) {
     }
     return true;
   };
+  artistic.install(app, { auth, noCache, handle, jsonOnly, requireVolunteer, checkState, access });
 
   const redirectGuest = handle(async (req, res) => {
     const { enabled } = await access.status();
@@ -72,8 +74,9 @@ function install(app, auth, access = createAccess(app.config)) {
     return res.json(await access.status());
   }));
   server.get(entry, noCache, (req, res) => {
-    if (req.path !== entry) return res.redirect(entry);
-    if (access.valid(req)) return res.redirect(scorerPage);
+    const isArtistic = req.query.modalidade === 'artistica';
+    if (req.path !== entry) return res.redirect(isArtistic ? artistic.login : entry);
+    if (access.valid(req)) return res.redirect(isArtistic ? artistic.volunteerPage : scorerPage);
     return res.sendFile(path.join(__dirname, '../public/tournamenter-obr/acesso.html'));
   });
   server.get(scorerPage, noCache, (req, res) => {
