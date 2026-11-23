@@ -1,6 +1,4 @@
-var app = angular.module('app.scorers', [])
-
-.factory('RescueScorer2026Nacional', function (){
+function rescueScorer2026Nacional() {
   var model = {
     gaps: {
 
@@ -197,8 +195,15 @@ var app = angular.module('app.scorers', [])
       return scored;
     }
   }
-})
+}
 
+if (typeof module === 'object' && module.exports) {
+  module.exports = rescueScorer2026Nacional;
+}
+
+if (typeof angular !== 'undefined') {
+angular.module('app.scorers', [])
+.factory('RescueScorer2026Nacional', rescueScorer2026Nacional)
 .factory('RescueScorer2025Nacional', function (){
   var model = {
     gaps: {
@@ -2842,3 +2847,5 @@ var app = angular.module('app.scorers', [])
     }
   }
 })
+
+}

@@ -66,7 +66,7 @@
 				ng-class="{active: selected.score.id == score.id}"
 				ng-click="selectScore(score);">
 				{{score.team.name || 'Sem nome'}}
-					<span class="label label-danger" ng-if="score.scores[scoreColumn(selected)]">
+					<span class="label label-danger" ng-if="!volunteer && score.scores[scoreColumn(selected)]">
 						{{score.scores[scoreColumn(selected)].value}} Pontos
 					</span>
 			</div>
@@ -102,7 +102,7 @@
 		<h3>
 			Pontuação:
 			<span class="label label-success">{{selected.total}}</span>
-			<span class="label label-danger" ng-if="selected.score.scores[scoreColumn(selected)]">
+			<span class="label label-danger" ng-if="!volunteer && selected.score.scores[scoreColumn(selected)]">
 				 <- {{selected.score.scores[scoreColumn(selected)].value}} Pontos
 			</span>
 		</h3>

@@ -6,6 +6,7 @@
 	*/
 	var GlobalScorerName = 'RescueScorer2026Nacional';
 	var SCORE_WITH_TIME = true;
+	var volunteer = typeof OBR_VOLUNTEER !== 'undefined' && OBR_VOLUNTEER;
 	var PRELIMINARY_ROUNDS = ['Round 1', 'Round 2', 'Round 3'];
 
 	function isNationalRescue(table) {
@@ -46,6 +47,7 @@
 			// $scope.scoreId = scoreId;
 
 			$scope.page = 'selectTable';
+			$scope.volunteer = volunteer;
 			$scope.selected = {
 				table: null,
 				round: null,
@@ -60,8 +62,11 @@
 
 			$scope.tables = Table.all(
 				function (){},
-				function (){
+				function (response){
 					$modalInstance.dismiss('cancel');
+					if (volunteer && response && response.status === 401) {
+						return window.location.assign('/tournamenter-obr/acesso');
+					}
 					window.alert('FALHA AO BAIXAR EQUIPES E TABELAS. REFAÇA A OPERAÇÃO.');
 				});
 
@@ -85,7 +90,8 @@
 				}) ? PRELIMINARY_ROUNDS.concat('Final') : PRELIMINARY_ROUNDS;
 			};
 			$scope.teamAvailable = function (row) {
-				return !isNationalFinal($scope.selected) || row.resgateFinalista;
+				if (isNationalFinal($scope.selected) && !row.resgateFinalista) return false;
+				return !volunteer || row.submittedRounds.indexOf($scope.selected.round) === -1;
 			};
 
 			$scope.selectScore = function (score){
@@ -96,6 +102,17 @@
 
 				var selected = $scope.selected;
 				if (!selected.table || selected.round === null || !selected.score || !$scope.teamAvailable(selected.score)) return;
+				if (volunteer) {
+					if (savesTime(selected) && selected.completeMission) {
+						var input = selected.time;
+						var time = typeof input === 'string' && input.trim() ? Number(input) : input;
+						if (!Number.isFinite(time) || time < 0 || time > selected.maxTime) {
+							return window.alert('Informe um tempo entre 0 e ' + selected.maxTime + ' segundos.');
+						}
+						selected.time = time;
+					}
+					return $modalInstance.close(selected, $scope.extra);
+				}
 				var score = selected.score.scores;
 
 				var index1 = scoreColumn(selected);
@@ -123,6 +140,7 @@
 		function ($scope, Scorer, stopwatch, $modal, Score){
 			var scp = $scope;
 
+			$scope.volunteer = volunteer;
 			$scope.scorer = Scorer;
 			$scope.timer = stopwatch;
 			$scope.team = null;
@@ -159,6 +177,7 @@
 			};
 
 			$scope.selectScoredTeam = function (doNotSave){
+				if (volunteer && doNotSave) return;
 
 				var finalTime = 0;
 
@@ -221,6 +240,24 @@
 						if(savesTime(selected)){
 							if(!selected.completeMission)
 								selected.time = Scorer.totalTime;
+						}
+
+						if (volunteer) {
+							Score.submitVolunteer({ tableId: selected.table.id, id: selected.score.id }, {
+								data: $scope.scoreData,
+								round: selected.round,
+								time: selected.time,
+							}, function () {
+								window.alert('OK! Salvo com sucesso.');
+							}, function (response) {
+								if (response.status === 401) {
+									window.alert('Sua sessão expirou. Entre novamente no pontuador.');
+									return window.location.assign('/tournamenter-obr/acesso');
+								}
+								window.alert(response.data && response.data.error ||
+									'Não foi possível salvar. Atualize a lista ou fale com a coordenação.');
+							});
+							return;
 						}
 
 						var number1 = scoreColumn(selected);

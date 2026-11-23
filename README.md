@@ -8,7 +8,7 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 
 ## Nacional 2026.2
 
-A versão do pacote é `2026.2.3`. O pontuador de resgate nacional 2026 usa como
+A versão do pacote é `2026.2.4`. O pontuador de resgate nacional 2026 usa como
 base as regras e a interface da nacional 2025.2, incluindo o tempo de 480 segundos.
 
 ### Classificação de Resgate (N1 e N2)
@@ -82,3 +82,34 @@ empatadas na tabela; uma rodada extra, prevista no
 [manual nacional 2026 (p. 48)](https://obr.robocup.org.br/wp-content/uploads/2026/10/OBR2026_-Manual-de-Regras-e-Instrucoes-_Etapa-Nacional_-Robotica-Artistica.pptx-1.pdf#page=48),
 deve ser organizada separadamente. A fórmula
 `artistica2026` continua disponível para as tabelas da etapa regional.
+
+## Acesso ao pontuador para voluntários
+
+1. Configure a senha administrativa do Tournamenter (`PASSWORD`) e mantenha-a
+   apenas com a coordenação. O acesso separado fica desativado sem essa senha.
+2. Na sessão da coordenação, abra **Plugin OBR → Configurar → Acesso ao
+   pontuador**. Defina uma senha diferente, de pelo menos 12 caracteres.
+3. Compartilhe o endereço da instância seguido de `/tournamenter-obr/acesso`
+   e a senha do pontuador com os voluntários. Nos tablets, use um navegador
+   sem sessão administrativa. Use HTTPS em redes compartilhadas ou não confiáveis.
+
+A sessão de voluntários dura até 12 horas e permite apenas consultar nomes
+de equipes e rodadas disponíveis de tabelas de Resgate desbloqueadas, além de
+registrar a primeira súmula de cada rodada. A final continua restrita a
+finalistas. Voluntários não podem carregar súmulas anteriores, corrigir notas,
+acessar a administração nem alterar tabelas. A coordenação continua usando
+o acesso administrativo para correções. Se uma correção na tabela for
+recusada porque outra pessoa salvou a mesma linha, recarregue a tabela antes
+de repetir a edição. A senha é enviada no corpo da
+requisição, armazenada apenas como hash com sal, e pode ser trocada ou
+revogada pela coordenação; ambas as ações encerram as sessões de voluntários.
+
+Cada instância guarda o arquivo privado de credencial em seu diretório de
+dados do Tournamenter, identificado pelo nome do banco. Use um diretório
+persistente fora das pastas públicas, mantenha uma instância por processo, e
+proteja rotas administrativas com a configuração normal do Tournamenter.
+Reiniciar o processo preserva a senha e encerra sessões em andamento.
+
+Se uma instância configurada em uma versão preliminar que usava scrypt for
+movida para o Tournamenter Desktop, defina novamente a senha de voluntários
+na configuração do plugin.
