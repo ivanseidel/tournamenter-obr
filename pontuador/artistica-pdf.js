@@ -71,14 +71,15 @@ function writeSheet(doc, table, team, sheet) {
     const entry = draft.criteria[criterion.id];
     spaceFor(doc, 48);
     text(doc, criterion.label + '  ·  ' + criterionScore(criterion, entry.points), 10.5, true);
-    const note = entry.justification.trim() ? entry.justification : 'Não informada.';
-    text(doc, 'Justificativa: ' + note, 10, false, muted);
+    const note = entry.justification.trim() ? 'Justificativa: ' + entry.justification : ' ';
+    text(doc, note, 10, false, muted);
     doc.moveDown(0.54);
   });
 
   spaceFor(doc, 37);
-  text(doc, 'Justificativa geral', 10.5, true);
-  text(doc, draft.justification.trim() ? draft.justification : 'Não informada.', 10, false, muted);
+  const hasGeneralNote = Boolean(draft.justification.trim());
+  text(doc, hasGeneralNote ? 'Justificativa geral' : ' ', 10.5, true);
+  text(doc, hasGeneralNote ? draft.justification : ' ', 10, false, muted);
 }
 
 function renderReport({table, team, sheets}) {
