@@ -1,4 +1,5 @@
-const { methodName, finalColumn } = require('./sorters/resgate2026nacional');
+const { isNationalRescue } = require('./public/tournamenter-obr/scripts/resgate-columns');
+const { finalColumn } = require('./sorters/resgate2026nacional');
 const { withScoreWrite } = require('./pontuador/score-writes');
 
 module.exports = function saveResgateFinal(models) {
@@ -19,7 +20,7 @@ module.exports = function saveResgateFinal(models) {
         Scores.find({ tableId }),
       ]);
       if (!table) return res.status(404).json({ error: 'Tabela não encontrada.' });
-      if (table.evaluateMethod !== methodName || table.columns <= finalColumn) {
+      if (!isNationalRescue(table) || table.columns <= finalColumn) {
         return res.status(409).json({ error: 'A tabela não tem uma final disponível.' });
       }
 

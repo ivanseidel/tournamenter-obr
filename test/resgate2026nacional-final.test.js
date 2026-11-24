@@ -18,7 +18,7 @@ function makeScores() {
   return Array.from({ length: 11 }, (_, i) => ({
     id: i + 1,
     updatedAt: new Date(0),
-    scores: Object.fromEntries([110 - i, 150, 80, 120, 50, 90, 10, 0, 0]
+    scores: Object.fromEntries([0, 0, 110 - i, 150, 80, 120, 50, 90, 10]
       .map((value, column) => [column, { value }])),
   }));
 }
@@ -74,7 +74,7 @@ test('final write rejects a finalist displaced by a preliminary correction befor
   const earlierTable = new Table();
   earlierTable.scores = rows;
   assert.equal(earlierTable.calculate().find((row) => row.id === 10).resgateFinalista, true);
-  rows[10].scores[0].value = 120;
+  rows[10].scores[2].value = 120;
 
   const response = await submit(10);
 

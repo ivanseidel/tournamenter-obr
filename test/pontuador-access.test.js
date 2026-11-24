@@ -204,6 +204,27 @@ test('protected submission writes the first result and time together; never repl
   assert.equal((await write()).status, 409);
 });
 
+test('national volunteer submissions preserve poster and report and track rounds in the new positions', async (t) => {
+  const f = await fixture(t);
+  const table = f.tables[0];
+  table.evaluateMethod = 'resgate2026obr';
+  table.columns = 8;
+  const row = f.rows[0];
+  row.scores = { 0: { value: 34 }, 1: { value: 84 }, 5: { value: 90 } };
+  await f.configure({ password: firstPassword });
+  const { cookie } = await f.signIn();
+  const list = () => f.request('get ' + base + '/tabelas', { cookie });
+  assert.deepEqual((await list()).data[0].scores[0].submittedRounds, [1]);
+  const result = await f.request('post ' + base + '/sumulas/:tableId/:id', {
+    cookie, body: { round: 0, time: 75, data: { squares: { initial: 1 } } },
+  });
+  assert.equal(result.status, 201);
+  assert.deepEqual([0, 1, 2, 3].map((index) => row.scores[index].value), [34, 84, 5, 75]);
+  assert.deepEqual((await list()).data[0].scores[0].submittedRounds, [0, 1]);
+  table.columns = 7;
+  assert.deepEqual((await list()).data, []);
+});
+
 test('shared scorer and server validation preserve legal UI values and derive the total', () => {
   const calculated = roundScore({
     squares:{initial:1,'1':'2'}, tentativa:{'1':'1'}, obstacles:{'11':true},

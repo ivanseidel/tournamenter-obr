@@ -9,16 +9,13 @@
 	var volunteer = typeof OBR_VOLUNTEER !== 'undefined' && OBR_VOLUNTEER;
 	var PRELIMINARY_ROUNDS = ['Round 1', 'Round 2', 'Round 3'];
 
-	function isNationalRescue(table) {
-		return table && table.evaluateMethod === 'resgate2026nacional';
-	}
-
 	function isNationalFinal(selected) {
-		return isNationalRescue(selected.table) && selected.round === 3;
+		return window.ResgateColumns.isNationalRescue(selected.table) && selected.round === 3;
 	}
 
 	function scoreColumn(selected) {
-		return isNationalFinal(selected) ? 9 : (SCORE_WITH_TIME ? selected.round * 2 : selected.round);
+		if (isNationalFinal(selected)) return 9;
+		return SCORE_WITH_TIME ? window.ResgateColumns.roundPointsIndex(selected.table, selected.round) : selected.round;
 	}
 
 	function savesTime(selected) {
@@ -85,7 +82,7 @@
 			$scope.scoreColumn = scoreColumn;
 			$scope.savesTime = savesTime;
 			$scope.rounds = function (table) {
-				if (!isNationalRescue(table)) return ['Round 1', 'Round 2', 'Round 3 ou Final'];
+				if (!window.ResgateColumns.isNationalRescue(table)) return ['Round 1', 'Round 2', 'Round 3 ou Final'];
 				return table.columns >= 10 && table.scores && table.scores.some(function (row) {
 					return row.resgateFinalista;
 				}) ? PRELIMINARY_ROUNDS.concat('Final') : PRELIMINARY_ROUNDS;
