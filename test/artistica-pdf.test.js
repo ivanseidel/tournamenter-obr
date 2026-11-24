@@ -37,7 +37,7 @@ test('artistic PDF includes official values, each saved criterion, penalties, du
   for (const needle of [
     table, team, 'Nota registrada na tabela: 90 / 100', 'Nota calculada pelos critérios da ficha: 0 / 100',
     '2 × 3 = 6 pontos de dedução', 'Deduções: 6', 'Inferior a 1 min 30 s',
-    draft.justification, draft.criteria.reinicios.justification
+    'Justificativa geral', draft.justification, 'Justificativa: ' + draft.criteria.reinicios.justification
   ].concat(stage.criteria.map(c => c.label))) {
     assert.ok(drawn.includes(needle), needle);
   }
@@ -52,6 +52,18 @@ test('artistic PDF preserves zero and separately identifies missing official int
   assert.match(content(), /Nota calculada pelos critérios da ficha: 100 \/ 100/);
   assert.match(content(), /Sustentabilidade registrada: 5 \/ 10/);
   assert.match(content(), /Sustentabilidade calculada pela ficha: 0 \/ 10/);
+});
+
+test('artistic PDF leaves blank space for empty or whitespace-only justifications', async t => {
+  const content = inspectText(t);
+  const draft = complete(interview);
+  draft.criteria.hardware.justification = ' \n\t ';
+  draft.justification = ' \n ';
+
+  await renderReport({table, team, sheets: [{column: interview, draft, value: 100, bonus: 10}]});
+  const drawn = content();
+  assert.doesNotMatch(drawn, /Justificativa:|Justificativa geral|Não informada/);
+  assert.equal(drawn.split('\n').filter(line => line === ' ').length, interview.criteria.length + 2);
 });
 
 test('a score without saved criteria prints only its official values', async t => {
