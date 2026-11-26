@@ -6,6 +6,18 @@ Extensão para o Tournamenter que permite pontuar pelo tablet em competições d
 * Instale este módulo no gerenciador de extensões do Tournamenter, incluindo a seguinte URL: `https://github.com/ivanseidel/tournamenter-obr`
 * Para cada instância de servidor que desejar utilizar, habilite o módulo
 
+## Desenvolvimento e distribuição offline
+
+Use Node.js 22.11 ou superior. Na raiz do plugin, execute `npm ci`,
+`npm test` e `npm pack`. O pacote inclui o JavaScript compilado de React,
+as folhas de estilo, fontes, imagens e o manual. A instalação do pacote
+compilado dispensa ferramentas de frontend. No checkout de desenvolvimento,
+`npm run build` recompila as telas após uma alteração em `client/`.
+
+O servidor Tournamenter serve as páginas do plugin na rede local. A importação
+com token e a sincronização com o Olimpo são os fluxos que utilizam a internet.
+A sincronização automática segue a configuração salva da instância.
+
 ## Nacional 2026.2
 
 A versão do pacote é `2026.2.8`. O pontuador de resgate nacional 2026 usa como

@@ -1,39 +1,19 @@
-/*
-  Default view module
-*/
-var _ = require('lodash');
-var path = require('path');
-var request = require('request')
-
-var auth = app.helpers.isAuthenticated
-var package = require('./package.json')
-var SyncModule = require('./SyncModule')
-var saveResgateFinal = require('./save-resgate-final')
-var pontuadorAccess = require('./pontuador/routes')
-var installAdminScoreWrites = require('./pontuador/score-writes').installAdminScoreWrites
-
-var hasUpdate = null
+const path = require('node:path');
+const pkg = require('./package.json');
+const { createSync } = require('./SyncModule');
+const saveResgateFinal = require('./save-resgate-final');
+const pontuadorAccess = require('./pontuador/routes');
+const { installAdminScoreWrites } = require('./pontuador/score-writes');
+const publicDir = path.join(__dirname, 'public');
+const statusMenu = { path: '/obr-config', name: '', badge: 'Sync: Inicializando...' };
 
 module.exports = {
   type: ['menu'],
-
-  getAssets: function (host = app){
+  getAssets(host = global.app) {
     installAdminScoreWrites(host);
-    // Register the legacy scorer guard before the host serves extension assets.
-    pontuadorAccess.install(host, auth);
-    return {
-      css: [],
-
-      js: [],
-
-      jst: [],
-
-      serve: [
-        `${__dirname}/public`,
-      ]
-    }
+    pontuadorAccess.install(host, host.helpers.isAuthenticated);
+    return { css: [], js: [], jst: [], serve: [publicDir] };
   },
-
   menus: [
     {
       name: 'Plugin OBR',
@@ -66,99 +46,42 @@ module.exports = {
       order: 6
     },
     // Realtime badge for Sincronization with Sistema Olimpo
-    SyncModule.statusMenu
+    statusMenu
     // {name: 'Pontuador', path: '/tournamenter-obr', order: 6},
     // {name: 'Importador Sistema Olimpo', path: '/tournamenter-obr/importar.html', order: 7},
   ],
 
-  initialize: function(app){
-    // Get 'Table' model from App
-    var tournamenterRoot = app.config.root;
-    var tableModelPath = path.join(tournamenterRoot, './models/Table');
-    var TableModel = require(tableModelPath)
-    
-    // Inject OBR Scoring systems
-    TableModel.evaluateMethods.obr2017 = require('./sorters/obr2017');
-    TableModel.evaluateMethods.obr2018nacional = require('./sorters/obr2018nacional');
-    TableModel.evaluateMethods.obr2024 = require('./sorters/obr2024');
-    TableModel.evaluateMethods.obr2025 = require('./sorters/obr2025');
-    TableModel.evaluateMethods.artistica2025 = require('./sorters/artistica2025');
-    TableModel.evaluateMethods.artistica2026 = require('./sorters/artistica2026');
-    TableModel.evaluateMethods.artistica2026nacional = require('./sorters/artistica2026nacional');
-    require('./sorters/resgate2026nacional').register(app.models.Table);
-
-    // Use Portuguese for new tables. Existing tables retain their settings.
-    app.models.Table.attributes.headerTeam.defaultsTo = 'Equipe';
-
-    // Update Default Tournamenter Logo
-    app.config.appLogo = path.join(__dirname, '/public/tournamenter-obr/obr.png')
-
-    // Add views path to view engine
-    var viewsFolder = path.join(__dirname, '/public/tournamenter-obr')
-    var views = app.server.get('views').push(viewsFolder)
-
-    // Add route to change configs/get
-    app.server.all('/obr-sync',       auth, SyncModule.updateConfig)
-    app.server.all('/obr-last-sync',  auth, SyncModule.getLastSync)
-    app.server.post('/obr-resgate-final/:tableId/:id', auth, saveResgateFinal(app.models))
-
-    // Render Configuration screen
-    app.server.get('/obr-config',     auth, function (req, res) {
-      return res.render('obr-config', { path: req.route.path });
-    })
-
-    // Render desafio screen
-    app.server.get('/obr-desafio',    auth, function (req, res) {
-      return res.render('obr-desafio', { path: req.route.path });
-    })
-
-    // Render Gerador de rounds screen
-    app.server.get('/obr-rounds',    auth, function (req, res) {
-      return res.render('obr-rounds', { path: req.route.path });
-    })
-
-    // Set home screen to show a big huge button to guide judges
-    app.server.get('/',     auth, function (req, res) {
-      return res.render('obr-home', { path: req.route.path, newestVersion: hasUpdate});
-    })
-
-    // Init SyncModule
-    SyncModule.init(app)
-
-    // Check uptades on this package
-    request({
-      url: 'http://registry.npmjs.org/' + package.name,
-      json: true,
-    }, function (err, response, body){
-      if (err){
-        // Just check for updates if internet...
-        return;
-      }
-      if (response.statusCode != 200 || !body) {
-        // No problem. Just ignore
-        return;
-      }
-
-      var currentVersion = package.version
-      var newestVersion = body && body['dist-tags'] && body['dist-tags'].latest
-
-      if (newestVersion != currentVersion) {
-        hasUpdate = newestVersion
-        console.log()
-        console.log('>>>>>>>>>> NOVO UPDATE PARA O tournamenter-obr')
-        console.log('>>>>>>>>>> Versão: '+newestVersion)
-        console.log()
-      }
-    })
+  async initialize(host) {
+    const { config, models, server, helpers } = host;
+    const TableModel = require(path.join(config.root, 'models', 'Table'));
+    for (const method of ['obr2017', 'obr2018nacional', 'obr2024', 'obr2025', 'artistica2025', 'artistica2026', 'artistica2026nacional']) {
+      TableModel.evaluateMethods[method] = require('./sorters/' + method);
+    }
+    require('./sorters/resgate2026nacional').register(models.Table);
+    models.Table.attributes.headerTeam.defaultsTo = 'Equipe';
+    if (!config.appLogo || path.resolve(config.appLogo) === path.join(config.root, 'public/img/branding.png')) {
+      config.appLogo = path.join(publicDir, 'tournamenter-obr', 'obr.png');
+    }
+    const auth = helpers.isAuthenticated;
+    const sync = createSync(host, statusMenu);
+    server.all('/obr-sync', auth, sync.updateConfig);
+    server.all('/obr-last-sync', auth, sync.getLastSync);
+    server.post('/obr-resgate-final/:tableId/:id', auth, saveResgateFinal(models));
+    for (const route of ['/', '/obr-config', '/obr-desafio', '/obr-rounds']) {
+      server.get(route, auth, (req, res) => res.sendFile('admin.html', { root: path.join(__dirname, 'pontuador') }));
+    }
+    let newestVersion = null;
+    // Keep the update notice optional on isolated competition networks.
+    fetch('https://registry.npmjs.org/' + pkg.name + '/latest', { signal: AbortSignal.timeout(3000) })
+      .then(response => response.ok ? response.json() : null)
+      .then(info => {
+        if (info?.version && info.version.localeCompare(pkg.version, 'en', { numeric: true }) > 0) newestVersion = info.version;
+      }).catch(() => {});
+    server.get('/obr-versao', auth, (req, res) => res.json({ newestVersion }));
+    await sync.initialize();
+    if (host.close) {
+      const close = host.close.bind(host);
+      host.close = async () => { sync.close(); await close(); };
+    }
   },
-
-  render: function(req, res, next, locals){
-    var viewPath = __dirname+'/index';
-
-    var relViewPath = path.relative(path.resolve(__dirname+'/../../views'), viewPath);
-
-    res.render(relViewPath, _.extend(locals, {
-      layout: path.join(__dirname, 'layout.ejs'),
-    }));
-  },
-}
+};

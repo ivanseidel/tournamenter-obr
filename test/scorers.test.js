@@ -2,34 +2,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
 
 const artistica2026 = require('../sorters/artistica2026');
 
+const { scorers, current } = require('../public/tournamenter-obr/scripts/scorers');
 function loadScorers() {
-  const factories = {};
-  const moduleApi = {
-    factory(name, factoryFn) {
-      factories[name] = factoryFn();
-      return moduleApi;
-    },
-  };
-
-  const context = {
-    angular: {
-      module() {
-        return moduleApi;
-      },
-    },
-    Math,
-    console,
-  };
-
-  const scorersPath = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'scripts', 'scorers.js');
-  const source = fs.readFileSync(scorersPath, 'utf8');
-  vm.runInNewContext(source, context, { filename: scorersPath });
-
-  return factories;
+  return Object.fromEntries(Object.entries(scorers).map(([name, create]) => [name, create()]));
 }
 
 function cloneModel(model) {
@@ -42,7 +20,7 @@ test('national 2026 scorer preserves national 2025 score components except total
   const current = scorers.RescueScorer2026Nacional;
 
   assert.ok(current);
-  assert.match(current.view, /^views\/rescue_scorer_2026_nacional\.html\?r=/);
+  assert.equal(current.view, 'rescue_scorer_2026_nacional');
   assert.equal(current.totalTime, 480);
   assert.deepEqual(cloneModel(current.model), cloneModel(previous.model));
 
@@ -85,24 +63,15 @@ test('national 2026 rounds up fractional scores without increasing exact integer
   assert.equal(scorer.score(integral).total, 169); // 100 × 1.3² = 169
 });
 
-test('the scoring controller activates the national 2026 rescue scorer', () => {
-  const controllers = {};
-  const moduleApi = {
-    controller(name, controller) {
-      controllers[name] = controller;
-      return moduleApi;
-    },
-  };
-  const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'tournamenter-obr', 'scripts', 'controllers.js'), 'utf8');
-  vm.runInNewContext(source, { angular: { module: () => moduleApi } });
-
-  assert.equal(controllers.RescueScorer[1], 'RescueScorer2026Nacional');
+test('the live scorer activates national 2026', () => {
+  assert.equal(current, scorers.RescueScorer2026Nacional);
+  assert.equal(require('../client/rescue-round').scorer.view, current().view);
 });
 
 test('national 2026 rescue view preserves the national 2025 interface', () => {
-  const views = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views');
-  const previous = fs.readFileSync(path.join(views, 'rescue_scorer_2025_nacional.html'), 'utf8');
-  const current = fs.readFileSync(path.join(views, 'rescue_scorer_2026_nacional.html'), 'utf8');
+  const views = path.join(__dirname, '..', 'client', 'sheets');
+  const previous = fs.readFileSync(path.join(views, 'rescue_scorer_2025_nacional.jsx'), 'utf8');
+  const current = fs.readFileSync(path.join(views, 'rescue_scorer_2026_nacional.jsx'), 'utf8');
 
   assert.equal(current, previous.replace('Nacional 2025.2', 'Nacional 2026.2.2'));
 });
@@ -112,15 +81,13 @@ test('registers the regional 2026 scorer with the expected base config', () => {
   const scorer = scorers.RescueScorer2026Regional;
 
   assert.ok(scorer);
-  assert.match(scorer.view, /^views\/rescue_scorer_2026_regional\.html\?r=/);
+  assert.equal(scorer.view, 'rescue_scorer_2026_regional');
   assert.equal(scorer.totalTime, 300);
 });
 
 test('save score modal displays the scorer max time instead of a hardcoded value', () => {
-  const modalPath = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views', 'modal_select_team.html');
-  const source = fs.readFileSync(modalPath, 'utf8');
-
-  assert.match(source, /\{\{selected\.maxTime\}\}/);
+  const source = fs.readFileSync(path.join(__dirname, '..', 'client', 'Rescue.jsx'), 'utf8');
+  assert.match(source, /scorer\.totalTime/);
   assert.doesNotMatch(source, /480 Seg/);
 });
 
@@ -173,10 +140,10 @@ test('regional 2026 route markers allow extra attempts without tile points', () 
 });
 
 test('regional 2026 scorer view allows up to nine route marker attempts', () => {
-  const viewPath = path.join(__dirname, '..', 'public', 'tournamenter-obr', 'views', 'rescue_scorer_2026_regional.html');
+  const viewPath = path.join(__dirname, '..', 'client', 'sheets', 'rescue_scorer_2026_regional.jsx');
   const source = fs.readFileSync(viewPath, 'utf8');
 
-  assert.match(source, /\[0,1,2,3,4,5,6,7,8,9\]/);
+  assert.match(source.replace(/\s/g, ''), /\[0,1,2,3,4,5,6,7,8,9\]/);
 });
 
 test('sorts artistica 2026 scores with weighted score and tiebreakers', () => {

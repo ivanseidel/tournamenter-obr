@@ -1,215 +1,81 @@
-var TAG = _TAG('SyncModule')
+const _ = require('lodash');
+const endpoint = 'https://olimpo.robocup.org.br/api/events/steps/score';
+const defaults = { url: null, sync: false, method: 'POST', interval: 600 };
 
-var request = require('request')
+function createSync(host, statusMenu) {
+  const { Config } = host.models;
+  let timer;
+  let pending;
+  let current = defaults;
+  let failed = false;
 
-const OLIMPO_API_URL = "https://olimpo.robocup.org.br/api/events/steps/score"
-
-exports.default = {
-  url: null, 
-  sync: false,
-  method: 'POST',
-  interval: 600,
-}
-
-/*
- * Initializes deamon based on database configuration
- */
-exports.init = function (app) {
-  // Generate 'obr-sync' config in database
-  // app.models.Config.destroy({id: 'obr-sync'}, console.log)
-  app.models.Config.findOrCreate({id: 'obr-sync'}, _.defaults({
-    id:'obr-sync',
-  }, exports.default), function (err, config){
-    if (err) {
-      return console.log('Falha ao criar configuração da `obr-sync`!');
+  function updateBadge() {
+    statusMenu.badge = 'Sincronização OBR: ' + (!current.sync ? '😴️ Desligado' : failed ? '👎 Falhou' : '👌 Ligado');
+  }
+  async function transmit() {
+    const tables = await new Promise((resolve, reject) => {
+      const query = host.controllers.Table._findAssociated(null, resolve, { isView: true });
+      query?.catch?.(reject);
+    });
+    const steps = tables.map(ConvertTableToMatrix).filter(Boolean);
+    const response = await fetch(endpoint, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ steps }), signal: AbortSignal.timeout(20000),
+    });
+    if (!response.ok) throw new Error('Falha na sincronização. Retorno: ' + response.status);
+    await Config.update('obr-last-sync', { value: Date.now() });
+  }
+  function sync() {
+    if (!pending) {
+      pending = transmit().then(() => { failed = false; }, error => { failed = true; throw error; })
+        .finally(() => { pending = null; updateBadge(); });
     }
-
-    console.log(TAG, 'init:', config.sync ? 'Ligado' : 'Desligado')
-    exports.updateDeamon(config)
-  })
-
-  app.models.Config.findOrCreate(_.defaults({
-    id:'obr-last-sync',
-  }, {}), function (err, config){
-    if (err) {
-      return console.log('Falha ao criar configuração da `obr-last-sync`!');
-    }
-  })
-}
-
-/*
- * Handles the route /obr-sync
- * Saves configs in the database, and update deamon to reflect new config
- */
-exports.updateConfig = function (req, res) {
-
-  // Save to database
-  app.models.Config.findOne('obr-sync', function (err, model) {
-    var config = _.defaults(req.query, model, exports.default)
-    config = _.pick(config, _.keys(exports.default))
-    
-    // Fix for boolean flags like 'sync'
-    var falses = ['false', '0', 'off', false]
-    config.sync = falses.includes(config.sync) ? false : true
-
-    // Convert time to number
-    config.interval = parseInt(config.interval)
-    
-    // Update deamon
-    exports.updateDeamon(config)
-
-    // Persist do db if 'now' is not set
-    if ('now' in req.query) {
-      exports.sync(config, function (err, data) {
-        if (err) {
-          return res.status(500).send(err)
-        }
-
-        return res.send('now')
-      })
-    } else {
-      app.models.Config.update('obr-sync', config, function (err, model){
-        return res.send(_.pick(model[0], _.keys(exports.default)))
-      })
-    }
-  })
-}
-
-/*
- * Controls the menu badge with the Sync status
- */
-exports.statusMenu = {
-  path: '/obr-config',
-  name: '',
-  badge: 'Sync: Inicializando...'
-}
-
-exports.updateBadge = function () {
-  var badge = 'Sincronização OBR: '
-
-  if (!exports.config.sync) {
-    badge += '<span style="color: #DDD"> 😴️ Desligado</span>'
-  } else if (exports.error) {
-    badge += '<span style="color: #ff687d"> 👎 Falhou </span>'
-  } else {
-    badge += '<span style="color: #33EE30"> 👌 Ligado</span>'
+    return pending;
+  }
+  function schedule(config) {
+    clearInterval(timer);
+    current = _.pick(config, Object.keys(defaults));
+    updateBadge();
+    if (!current.sync) return;
+    const run = () => sync().catch(error => console.warn('[OBR]', error.message));
+    timer = setInterval(run, Math.min(1800, Math.max(60, Number(current.interval) || 600)) * 1000);
+    timer.unref?.();
+    run();
   }
 
-  exports.statusMenu.badge = badge
-}
-
-/*
- * Returns the last successfull sync
- */
-exports.getLastSync = function getLastSync(req, res) {
-  app.models.Config.findOne('obr-last-sync', function (err, config) {
-    if (err) {
-      return res.status(500).send(err)
-    }
-
-    var lastSync = config && config.value
-    res.send({timestamp: lastSync || null,  })
-  })
-}
-
-/*
- * Updates the timestamp of the last success on sync (config: obr-last-sync)
- */
-exports.didSync = function didSync() {
-  app.models.Config.update('obr-last-sync', {
-    value: Date.now()
-  }, function (err, model) {
-    console.log(TAG, 'didSync', err ? err : 'OK')
-  })
-}
-
-exports.error = null
-exports.config = null
-exports.interval = null
-
-/*
- * Updates the deamon responsible for triggering sync
- */
-exports.updateDeamon = function (config) {
-  exports.config = config
-  clearInterval(exports.interval)
-  exports.interval = null
-
-  exports.updateBadge()
-
-  if (!config.sync) {
-    return
+  async function initialize() {
+    await Config.findOrCreate({ id: 'obr-last-sync' }, { id: 'obr-last-sync' });
+    const config = await Config.findOrCreate({ id: 'obr-sync' }, { id: 'obr-sync', ...defaults });
+    schedule(config);
   }
-  // Limit interval period
-  var period = exports.config.interval * 1000 || 0
-  period = Math.max(period,  1 * 60 * 1000) // 1 minute minimum
-  period = Math.min(period, 30 * 60 * 1000) // 30 minutes maximum
-  
-  // Update interval
-  exports.interval = setInterval(exports.sync, period)
-  
-  // Call on change
-  exports.sync()
-
-  console.log(TAG, 'Deamon updated. ')
+  async function updateConfig(req, res, next) {
+    try {
+      const params = { ...req.query, ...req.body };
+      if ('now' in params) {
+        await sync();
+        return res.json({ ok: true });
+      }
+      if (!Object.keys(params).some(key => Object.hasOwn(defaults, key))) return res.json(current);
+      const config = { ...current, ..._.pick(params, Object.keys(defaults)) };
+      config.sync = [true, 'true', 'on', '1'].includes(config.sync);
+      config.interval = Number(config.interval);
+      if (!Number.isInteger(config.interval) || config.interval < 60 || config.interval > 1800) {
+        return res.status(400).json({ error: 'Informe um intervalo entre 60 e 1800 segundos.' });
+      }
+      const [stored] = await Config.update('obr-sync', config);
+      schedule(stored);
+      res.json(current);
+    } catch (error) { next(error); }
+  }
+  async function getLastSync(req, res, next) {
+    try { res.json({ timestamp: (await Config.findOne('obr-last-sync'))?.value || null }); }
+    catch (error) { next(error); }
+  }
+  return { initialize, updateConfig, getLastSync, close: () => clearInterval(timer) };
 }
 
-/*
- * Fetches table data and sends as a post to the defined URL
- */
-exports.sync = function (config, next) {
-  config = config || exports.config
+module.exports = { createSync };
 
-  // Check tournamenter is compatible...
-  if (! ('ConvertTableToMatrix' in app.helpers) )
-    return next('A versão do TournamenterApp precisa estar acima de 1.7.0')
-
-  // Sync
-  console.log(TAG, 'Sync data...')
-
-  // Get tables
-  app.controllers.Table._findAssociated(null, function (tables) {
-
-    var steps = tables.map(ConvertTableToMatrix).filter(step => step !== null)
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-    var data = {
-      steps
-    }
-    request({
-      url: OLIMPO_API_URL, 
-      json: data,
-      method: 'POST'
-    }, function (err, httpResponse, body) {
-      if (err) {
-        console.log(TAG, 'Failed to sync: ' + err)
-        exports.error = true; exports.updateBadge();
-        return next && next((err || '').toString() || body)
-      }
-
-      let statusCode = httpResponse.statusCode
-      if (statusCode >= 400) {
-        console.log(TAG, 'Failed to sync', statusCode)
-        exports.error = true; exports.updateBadge();
-        return next && next('Falha na sincronização. Retorno: ' + statusCode + ': ' + body)
-      }
-
-      // Update badge
-      exports.error = false; exports.updateBadge();
-
-      // Update timestamp
-      exports.didSync()
-
-      // Push to url as post
-      next && next(null, body)
-    })
-  }, {
-    isView: true,
-  })
-}
-
-/*
- * Convert table to matrix
- */
 function ConvertTableToMatrix(table) {
   if (!table || !table.scores || !table.scores[0] || !table.scores[0].team)
     return null;

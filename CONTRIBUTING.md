@@ -14,12 +14,12 @@ Portanto é necessário atualizar o plugin para cada nova edição da modalidade
 
 ### Passos para atualização
 1. [Faça um fork](https://github.com/ivanseidel/tournamenter-obr/fork) do repositório e em seguida clone em seu computador. *dica: Você pode abrir uma issue no repositório avisando ao mantenedor e outros desenvolvedores que pretende atualizar o plugin para uma respectiva versão* 
-2. Copie a view da respectiva etapa do ano anterior, por exemplo, se você deseja atualizar o plugin para a etapa estadual em 2023, faça uma cópia do arquivo `public/tournamenter-obr/views/rescue_scorer_2022_regional.html` renomeando-o para `public/tournamenter-obr/views/rescue_scorer_2023_regional.html`
-3. Vá em `public/tournamenter-obr/scripts/scorers.js` e copie a `.factory` do ano anterior, por exemplo, `RescueScorer2022Regional`, então renomeei a sua cópia para `RescueScorer2023Regional`
-4. Atualize a versão do plugin, que segue o esquema de `[yyyy-[0, 1]-x]` onde `"yyyy"` é o ano da respectiva versão, por exemplo, 2023, `"[0, 1]"` deve ser 1 para estadual ou 2 para nacional, `"x"` atualizado a cada modificação pós lançamento. Atualize a versão dentro `package.json` e do html da view copiada no passo 2
-5. Atualize a variável global `GlobalScorerName` dentro do arquivo `public/tournamenter-obr/scripts/controllers.js` com o nome da factory criada no passo 3.
-6. Atualize a tabela de pontuação das missões que tiveram suas pontuações atualizadas de acordo com o manual da obr. Esta tabela se encontra dentro da factory criada no passo 3 na variável `scorings`. Para atualizar, por exemplo, a pontuação do obstáculo de 10 para 15 pontos, basta modificar de `obstacles: [0,10]` para `obstacles: [0,15]`
-7. Adicione as novas missões se existirem, dentro da view criada e do scorer, seguindo como modelo as outras missões
+2. Copie o componente da última edição em `client/sheets/`. O componente recebe o modelo, os totais calculados, o cronômetro e a função `update` para editar a ficha.
+3. Copie a função da edição anterior em `public/tournamenter-obr/scripts/scorers.js` e registre a nova no objeto `scorers`. O navegador e o servidor compartilham o mesmo cálculo da edição ativa.
+4. Atualize a versão do pacote e a identificação da edição no componente de ficha.
+5. Selecione a função de pontuação no export `current` e importe a ficha correspondente em `client/Rescue.jsx`.
+6. Atualize a matriz de pontos `scorings`, os campos aceitos em `pontuador/submission.js` e os testes de cálculo conforme o manual.
+7. Execute `npm ci`, `npm test` e `npm run build`. Rode o servidor Tournamenter com o plugin habilitado para testar no navegador.
 8. Faça um push dos seus commits para seu fork e [abra um pull request](https://github.com/ivanseidel/tournamenter-obr/compare)
 
 ### Considerações

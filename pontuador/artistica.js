@@ -73,7 +73,7 @@ function updateDeductions(scores) {
 
 function install(app, { auth, noCache, handle, jsonOnly, requireVolunteer, checkState, access }) {
   const { server, models: { Scores, Table, Team } } = app;
-  const render = (req, res) => res.sendFile(path.join(__dirname, 'artistica.html'));
+  const render = (req, res) => res.sendFile('artistica.html', { root: __dirname });
   server.get(adminPage, auth, noCache, render);
   server.get(volunteerPage, noCache, (req, res) => {
     if (!access.valid(req)) return res.redirect(login);

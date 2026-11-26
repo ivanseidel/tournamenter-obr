@@ -77,12 +77,12 @@ function install(app, auth, access = createAccess(app.config)) {
     const isArtistic = req.query.modalidade === 'artistica';
     if (req.path !== entry) return res.redirect(isArtistic ? artistic.login : entry);
     if (access.valid(req)) return res.redirect(isArtistic ? artistic.volunteerPage : scorerPage);
-    return res.sendFile(path.join(__dirname, '../public/tournamenter-obr/acesso.html'));
+    return res.sendFile('acesso.html', { root: path.join(__dirname, '../public/tournamenter-obr') });
   });
   server.get(scorerPage, noCache, (req, res) => {
     if (req.path !== scorerPage) return res.redirect(scorerPage);
     if (!access.valid(req)) return res.redirect(entry);
-    return res.sendFile(path.join(__dirname, '../public/tournamenter-obr/index.html'));
+    return res.sendFile('index.html', { root: path.join(__dirname, '../public/tournamenter-obr') });
   });
   server.post(api + '/login', noCache, jsonOnly, handle(access.signIn));
   server.post(api + '/logout', noCache, jsonOnly, handle(access.signOut));
