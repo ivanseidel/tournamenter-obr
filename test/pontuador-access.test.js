@@ -71,7 +71,7 @@ async function fixture(t, config = { password: 'senha administrativa de teste' }
       attachment(name) { result.filename = name; return this; },
       send(data) { resolve({ ...result, data }); return this; },
       redirect(location) { resolve({ ...result, status: 302, location }); },
-      sendFile(file) { resolve({ ...result, file }); },
+      sendFile(file, options) { resolve({ ...result, file: path.resolve(options.root, file) }); },
     };
     const req = {
       method: method.toUpperCase(), path: pathname,

@@ -1,0 +1,15 @@
+.ended { background-color: rgba(255,20,20,.7); background-image: none; }
+.obr-dialog { padding: 0; border: 1px solid #999; border-radius: 6px; width: min(900px, 96%); max-height: 94vh; box-shadow: 0 5px 15px rgba(0,0,0,.5); }
+.obr-dialog::backdrop { background: rgba(0,0,0,.5); }
+.obr-dialog .list-group-item { width: 100%; text-align: left; }
+.no-decoration:hover { text-decoration: none; }
+.btn-group-justified > button.btn { display: table-cell; float: none; width: auto; }
+.btn-group-justified:has(> button.btn) { display: flex; }
+.btn-group-justified:has(> button.btn) > * { flex: 1 1 0; width: auto; }
+#obr-root:has(#wrap) { height: 100%; }
+@media print {
+  #wrap > .container { padding-top: 0; }
+  #footer { display: none; }
+  .container, .print-full-width { width: 100%; }
+  .print-avoid-break { break-inside: avoid; }
+}

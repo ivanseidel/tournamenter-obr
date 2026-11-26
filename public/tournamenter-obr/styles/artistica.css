@@ -1,4 +1,4 @@
-[ng-cloak], .art-nav [hidden] { display: none !important; }
+.art-nav [hidden] { display: none !important; }
 body { background: #f4f6f7; color: #24343d; font-size: 16px; }
 .art-width { max-width: 920px; margin: auto; padding: 0 20px; }
 .art-nav { background: #20333c; color: #fff; }

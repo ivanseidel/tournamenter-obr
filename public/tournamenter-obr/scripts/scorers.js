@@ -132,7 +132,7 @@ function rescueScorer2026Nacional() {
   }
 
   return {
-    view: 'views/rescue_scorer_2026_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2026_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -197,14 +197,9 @@ function rescueScorer2026Nacional() {
   }
 }
 
-if (typeof module === 'object' && module.exports) {
-  module.exports = rescueScorer2026Nacional;
-}
-
-if (typeof angular !== 'undefined') {
-angular.module('app.scorers', [])
-.factory('RescueScorer2026Nacional', rescueScorer2026Nacional)
-.factory('RescueScorer2025Nacional', function (){
+const scorers = {
+  RescueScorer2026Nacional: rescueScorer2026Nacional,
+  RescueScorer2025Nacional() {
   var model = {
     gaps: {
 
@@ -338,7 +333,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2025_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2025_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -400,9 +395,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})  
-  
-.factory('RescueScorer2025Regional', function (){
+  },
+  RescueScorer2025Regional() {
   var model = {
     gaps: {
 
@@ -539,7 +533,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2025_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2025_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -591,10 +585,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-  
-.factory('RescueScorer2026Regional', function (){
+  },
+  RescueScorer2026Regional() {
   var model = {
     gaps: {
 
@@ -732,7 +724,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2026_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2026_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -784,10 +776,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-  
-.factory('RescueScorer2024Nacional', function (){
+  },
+  RescueScorer2024Nacional() {
   var model = {
     gaps: {
 
@@ -921,7 +911,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2024_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2024_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -983,9 +973,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})  
-
-.factory('RescueScorer2024Regional', function (){
+  },
+  RescueScorer2024Regional() {
   var model = {
     gaps: {
 
@@ -1124,7 +1113,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2024_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2024_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -1176,9 +1165,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2023Nacional', function (){
+  },
+  RescueScorer2023Nacional() {
   var model = {
     gaps: {
 
@@ -1311,7 +1299,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2023_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2023_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -1373,9 +1361,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-  
-.factory('RescueScorer2023Regional', function (){
+  },
+  RescueScorer2023Regional() {
   var model = {
     gaps: {
 
@@ -1499,7 +1486,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2023_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2023_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -1562,9 +1549,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2022Nacional', function (){
+  },
+  RescueScorer2022Nacional() {
 
   var model = {
     gaps: {
@@ -1702,7 +1688,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2022_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2022_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -1761,9 +1747,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2022Regional', function (){
+  },
+  RescueScorer2022Regional() {
 
   var model = {
     rooms: {
@@ -1837,7 +1822,7 @@ angular.module('app.scorers', [])
   var rescueKitMultipliers = [1, 1.1, 1.2]
 
   return {
-    view: 'views/rescue_scorer_2022_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2022_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -1875,9 +1860,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2019Regional', function (){
+  },
+  RescueScorer2019Regional() {
 
   var model = {
     rooms: {
@@ -1941,7 +1925,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2019_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2019_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -1975,9 +1959,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2018Nacional', function (){
+  },
+  RescueScorer2018Nacional() {
 
   var model = {
     rooms: {
@@ -2125,7 +2108,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2018_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2018_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -2161,9 +2144,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2018Regional', function (){
+  },
+  RescueScorer2018Regional() {
 
   var model = {
     rooms: {
@@ -2227,7 +2209,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2018_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2018_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -2261,9 +2243,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('RescueScorer2017Nacional', function (){
+  },
+  RescueScorer2017Nacional() {
 
   var model = {
     rooms: {
@@ -2365,7 +2346,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2017_nacional.html?r='+Math.random(),
+    view: 'rescue_scorer_2017_nacional',
     model: model,
     scorings: scorings,
     totalTime: 480,
@@ -2399,10 +2380,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-
-.factory('RescueScorer2017Regional', function (){
+  },
+  RescueScorer2017Regional() {
 
   var model = {
     rooms: {
@@ -2450,7 +2429,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2017_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2017_regional',
     model: model,
     scorings: scorings,
     totalTime: 300,
@@ -2484,13 +2463,12 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
+  },
 // =========================================
 // =========== Versões antigas =============
 // =========================================
 
-.factory('RescueAScorer', function (){
+  RescueAScorer() {
 
   var model = {
     rooms: {
@@ -2533,7 +2511,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2014.html?r='+Math.random(),
+    view: 'rescue_scorer_2014_nacional',
     model: model,
     scorings: scorings,
     score: function (model){
@@ -2561,9 +2539,8 @@ angular.module('app.scorers', [])
     }
   }
 
-})
-
-.factory('RescueScorer2015Regional', function (){
+  },
+  RescueScorer2015Regional() {
 
   var model = {
     rooms: {
@@ -2610,7 +2587,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2016_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2016_regional',
     model: model,
     scorings: scorings,
     score: function (model){
@@ -2637,10 +2614,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-
-.factory('RescueScorer2016Regional', function (){
+  },
+  RescueScorer2016Regional() {
 
   var model = {
     rooms: {
@@ -2709,7 +2684,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/rescue_scorer_2016_regional.html?r='+Math.random(),
+    view: 'rescue_scorer_2016_regional',
     model: model,
     scorings: scorings,
     score: function (model){
@@ -2742,9 +2717,8 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
-
-.factory('FLLWorldClassScorer', function (){
+  },
+  FLLWorldClassScorer() {
 
   var model = {
     door:0,
@@ -2793,7 +2767,7 @@ angular.module('app.scorers', [])
   }
 
   return {
-    view: 'views/fll_scorer_world_class.html',
+    view: 'fll_scorer_world_class',
     model: model,
     scorings: scorings,
     score: function (model){
@@ -2846,6 +2820,7 @@ angular.module('app.scorers', [])
       return scored;
     }
   }
-})
+  },
+};
 
-}
+module.exports = { scorers, current: scorers.RescueScorer2026Nacional };

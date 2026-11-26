@@ -12,20 +12,30 @@
     "url": "https://github.com/ivanseidel/tournamenter-obr/issues"
   },
   "scripts": {
-    "start": "./node_modules/.bin/http-server public/tournamenter-obr",
-    "assets": "bower install && bower-installer",
+    "build": "esbuild client/main.jsx --bundle --minify --legal-comments=linked --jsx=automatic --outfile=public/tournamenter-obr/dist/main.js",
+    "prepare": "npm run build",
     "test": "node --test"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "http-server": "^0.7.1",
-    "lodash": "^4.14.0",
-    "pdfkit": "0.13.0",
-    "request": "^2.81.0"
+    "lodash": "4.18.1",
+    "pdfkit": "0.17.2"
   },
   "devDependencies": {
-    "bower": "^1.7.9",
-    "bower-installer": "latest"
-  }
+    "esbuild": "0.28.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "underscore": "1.13.8"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "files": [
+    "*.js",
+    "client",
+    "pontuador",
+    "sorters",
+    "public"
+  ]
 }

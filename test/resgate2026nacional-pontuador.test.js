@@ -1,148 +1,109 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-
-function harness(table, data = {}, load = false, finalError, volunteer = false) {
-  const controllers = {};
-  const angularModule = {
-    controller(name, handler) { controllers[name] = handler; return this; },
-  };
-  const alerts = [];
-  const writes = [];
-  const context = vm.createContext({
-    OBR_VOLUNTEER: volunteer,
-    angular: { module: () => angularModule },
-    _: { deepClone: (value) => JSON.parse(JSON.stringify(value)) },
-    window: { alert: (message) => alerts.push(message) },
-    console: { log() {} },
-    setTimeout: (f) => f(),
-  });
-  for (const script of ['resgate-columns.js', 'controllers.js']) {
-    vm.runInContext(fs.readFileSync(path.resolve(__dirname,
-      '../public/tournamenter-obr/scripts', script), 'utf8'), context);
-  }
-  const scorerScope = { $watch() {}, $apply() {} };
-  const Scorer = { model: {}, totalTime: 480, score: () => ({ total: 42 }) };
-  const timer = { reset() {}, data: { value: 1000 } };
-  let modal;
-  const $modal = {
-    open({ resolve }) {
-      const scope = {};
-      const extra = resolve.extra();
-      controllers.SaveScoreController(scope, { close: (selected) => modal.onClose(selected) },
-        extra, { all: () => [table] });
-      modal = { scope };
-      return { result: { then: (callback) => { modal.onClose = callback; } } };
-    },
-  };
-  const Score = {
-    submitVolunteer(params, payload, done) {
-      assert.equal(params.id, finalist.id);
-      writes.push([payload.round, payload.time]);
-      done();
-    },
-    saveScore(payload, done) {
-      const { number, value } = payload;
-      writes.push([number, value]);
-      data[number] = { value };
-      done();
-    },
-    saveFinal(params, payload, done, fail) {
-      assert.equal(params.tableId, table.id);
-      assert.equal(params.id, finalist.id);
-      assert.equal(payload.updatedAt, finalist.updatedAt);
-      if (finalError) return fail(finalError);
-      writes.push([9, payload.value]);
-      data[9] = { value: payload.value, data: payload.data };
-      done();
-    },
-    get({ id }, done) { done({ id, scores: data }); },
-  };
-  controllers.RescueScorer.at(-1)(scorerScope, Scorer, timer, $modal, Score);
-  scorerScope.selectScoredTeam(load);
-  modal.scope.selectTable(table);
-  return { ...modal, writes, alerts, scorerScope };
-}
+const { rounds, available, loadRound, submitRound } = require('../client/rescue-round');
 
 const finalist = { id: 'a', updatedAt: '2026-01-01T00:00:00.000Z', resgateFinalista: true, scores: {} };
 const other = { id: 'b', resgateFinalista: false, scores: {} };
-const table = { id: 'table', columns: 10, evaluateMethod: 'resgate2026nacional', scores: [finalist, other] };
+const table = {
+  id: 'table',
+  columns: 10,
+  evaluateMethod: 'resgate2026nacional',
+  scores: [finalist, other],
+};
+const base = { table, round: 3, row: finalist, data: {}, total: 42, time: 480, volunteer: false };
 
-test('national final is separate from R3, saves only column 10, and verifies its readback', () => {
-  const { scope, writes, alerts } = harness(table);
-  assert.deepEqual(Array.from(scope.rounds(table)), ['Round 1', 'Round 2', 'Round 3', 'Final']);
-  scope.selectRound(3);
-  assert.equal(scope.teamAvailable(other), false);
-  scope.selectScore(other);
-  scope.ok();
-  assert.deepEqual(writes, []);
-  scope.selectScore(finalist);
-  scope.ok();
-  assert.deepEqual(writes, [[9, 42]]);
-  assert.deepEqual(alerts, ['OK! Salvo com sucesso.']);
-});
-
-test('national final shows a conflict instead of success when a team loses its spot', () => {
-  const { scope, writes, alerts } = harness(table, {}, false, {
-    status: 409,
-    data: { error: 'A equipe não está classificada para a final.' },
-  });
-  scope.selectRound(3);
-  scope.selectScore(finalist);
-  scope.ok();
-
-  assert.deepEqual(writes, []);
-  assert.deepEqual(alerts, [
-    'A equipe não está classificada para a final. Abra o pontuador novamente para atualizar a seleção.',
+test('national final only saves column 10 for a finalist, and verifies the saved result', async () => {
+  assert.deepEqual(rounds(table), ['Round 1', 'Round 2', 'Round 3', 'Final']);
+  assert.equal(available(table, 3, other, false), false);
+  await assert.rejects(submitRound(assert.fail, { ...base, row: other }), /disponível/);
+  const calls = [];
+  const request = async (url, options) => {
+    calls.push([url, options]);
+    return { scores: { 9: { value: 42 } } };
+  };
+  await submitRound(request, base);
+  assert.deepEqual(calls, [
+    [
+      '/obr-resgate-final/table/a',
+      { method: 'POST', body: { data: {}, value: 42, updatedAt: finalist.updatedAt } },
+    ],
+    ['/scores/a', undefined],
   ]);
+  await assert.rejects(
+    submitRound(async () => ({ scores: {} }), base),
+    /difere da súmula/,
+  );
 });
 
-test('national final loads the stored score sheet from column 10', () => {
-  const scored = { ...finalist, scores: { 9: { data: '{"completed":42}' } } };
-  const { scope, writes, scorerScope } = harness(table, {}, true);
-  scope.selectRound(3);
-  scope.selectScore(scored);
-  scope.ok();
-  assert.equal(scorerScope.scoreData.completed, 42);
-  assert.deepEqual(writes, []);
+test('national final surfaces a conflict when a team loses its place', async () => {
+  const conflict = Object.assign(new Error('A equipe não está classificada para a final.'), {
+    status: 409,
+  });
+  await assert.rejects(
+    submitRound(async () => {
+      throw conflict;
+    }, base),
+    (error) => error === conflict,
+  );
 });
 
-test('the scorer saves round points and times in the slots for each table layout', () => {
-  const oldHeaders = 'Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final';
+test('loads old string and object score sheets from the national final', () => {
+  for (const stored of ['{"completed":42}', { completed: 42 }]) {
+    const row = { ...finalist, scores: { 9: { data: stored } } };
+    assert.deepEqual(loadRound(table, 3, row), { data: { completed: 42 }, seconds: 0 });
+  }
+});
+
+test('preliminary points and time are saved atomically in the slots for both layouts', async () => {
+  const oldHeaders =
+    'Pontos R1, Tempo R1, Pontos R2, Tempo R2, Pontos R3, Tempo R3, Desafio Técnico, Pôster, Relatório, Pontos da Final';
   for (const [mode, first] of [
-    [table, 2], [{ ...table, evaluateMethod: 'resgate2026obr' }, 2],
-    [{ ...table, headerScore: oldHeaders }, 0], [{ ...table, evaluateMethod: 'obr2025' }, 0],
+    [table, 2],
+    [{ ...table, evaluateMethod: 'resgate2026obr' }, 2],
+    [{ ...table, headerScore: oldHeaders }, 0],
+    [{ ...table, evaluateMethod: 'obr2025' }, 0],
   ]) {
     for (const round of [0, 1, 2]) {
-      const { scope, writes } = harness(mode);
-      scope.selectRound(round);
-      scope.selectScore(finalist);
-      scope.ok();
       const index = first + round * 2;
-      assert.deepEqual(writes, [[index, 42], [index + 1, 480]]);
+      const row = { ...finalist, scores: { 8: { value: 11 } } };
+      let writes = 0,
+        scores;
+      await submitRound(
+        async (url, options) => {
+          if (options) {
+            writes++;
+            assert.equal(options.method, 'PUT');
+            assert.equal(options.body.updatedAt, row.updatedAt);
+            scores = options.body.scores;
+          }
+          return { scores };
+        },
+        { ...base, table: mode, row, round },
+      );
+      assert.equal(writes, 1);
+      assert.deepEqual(scores, {
+        8: { value: 11 },
+        [index]: { value: 42, data: {} },
+        [index + 1]: { value: 480, data: {} },
+      });
     }
   }
 });
 
-test('volunteers can correct a blank clock time before submitting an explicit zero', () => {
-  const row = { ...finalist, submittedRounds: [] };
-  const volunteerTable = { ...table, scores: [row] };
-  const { scope, writes, alerts } = harness(volunteerTable, {}, false, undefined, true);
-  scope.selectRound(0);
-  scope.selectScore(row);
-  scope.selected.completeMission = 1;
-
+test('volunteers can submit explicit zero after correcting blank or invalid time', async () => {
+  const args = { ...base, round: 0, volunteer: true, row: { ...finalist, submittedRounds: [] } };
   for (const time of ['', '  ', 'pendente', '-1', '481']) {
-    scope.selected.time = time;
-    scope.ok();
+    await assert.rejects(submitRound(assert.fail, { ...args, time }), /Informe um tempo/);
   }
-  assert.deepEqual(writes, []);
-  assert.equal(alerts.length, 5);
-
-  scope.selected.time = '0';
-  scope.ok();
-  assert.deepEqual(writes, [[0, 0]]);
-  assert.equal(alerts.at(-1), 'OK! Salvo com sucesso.');
+  let sent;
+  await submitRound(
+    async (url, options) => {
+      sent = [url, options.body];
+    },
+    { ...args, time: '0' },
+  );
+  assert.deepEqual(sent, [
+    '/tournamenter-obr/voluntario-api/sumulas/table/a',
+    { data: {}, round: 0, time: 0 },
+  ]);
 });

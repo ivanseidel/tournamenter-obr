@@ -1,4 +1,4 @@
-const scorer = require('../public/tournamenter-obr/scripts/scorers')();
+const scorer = require('../public/tournamenter-obr/scripts/scorers').current();
 const { finalColumn } = require('../sorters/resgate2026nacional');
 const { isNationalRescue, roundPointsIndex } = require('../public/tournamenter-obr/scripts/resgate-columns');
 
